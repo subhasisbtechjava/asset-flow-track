@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 204 100% 99%;
+    --background: 210 40% 98%;
     --foreground: 200 20% 20%;
 
     --card: 0 0% 100%;
@@ -23,8 +23,8 @@
     --muted: 215 16% 92%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 200 65% 92%;
-    --accent-foreground: 200 30% 20%;
+    --accent: 29 100% 50%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
@@ -46,13 +46,13 @@
   }
 
   .dark {
-    --background: 212 35% 12%;
+    --background: 212 35% 9%;
     --foreground: 210 40% 98%;
 
-    --card: 213 35% 15%;
+    --card: 213 35% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 213 35% 15%;
+    --popover: 213 35% 12%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 199 89% 48%;
@@ -64,7 +64,7 @@
     --muted: 213 25% 25%;
     --muted-foreground: 215 20% 70%;
 
-    --accent: 213 50% 25%;
+    --accent: 29 100% 50%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62% 40%;
@@ -82,13 +82,17 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-soft-gray text-foreground font-sans transition-colors duration-300;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
   }
 }
 
 @layer components {
   .status-badge {
-    @apply px-2 py-1 text-xs font-medium rounded-full text-white;
+    @apply px-2 py-1 text-xs font-medium rounded-full text-white shadow-sm transition-all;
   }
 
   .status-badge-pending {
@@ -109,5 +113,28 @@
 
   .status-badge-not-started {
     @apply bg-status-notStarted;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-card-hover;
+  }
+  
+  .gradient-heading {
+    @apply bg-gradient-to-r from-primary to-accent1 bg-clip-text text-transparent;
+  }
+  
+  .animated-progress-bar {
+    @apply relative overflow-hidden h-2 bg-muted rounded-full;
+  }
+  
+  .animated-progress-bar::before {
+    content: '';
+    @apply absolute inset-0 animate-progress-fill;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }

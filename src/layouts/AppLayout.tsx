@@ -1,18 +1,17 @@
 
 import { Outlet } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import Sidebar from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { Toaster } from "@/components/ui/toaster";
 
 const AppLayout = () => {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          <Outlet />
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen flex flex-col w-full bg-background transition-colors duration-300">
+      <Header />
+      <main className="flex-1 p-4 md:p-6 overflow-auto container mx-auto max-w-7xl animate-fade-in">
+        <Outlet />
+      </main>
+      <Toaster />
+    </div>
   );
 };
 

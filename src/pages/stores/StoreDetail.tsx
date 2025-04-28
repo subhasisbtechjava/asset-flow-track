@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,17 +12,17 @@ import { StoreSummaryCards } from "@/components/store/StoreSummaryCards";
 import { StoreProgressCards } from "@/components/store/StoreProgressCards";
 import { DocumentEntryDialog } from "@/components/store/DocumentEntryDialog";
 import { StoreAssetsTable } from "@/components/store/StoreAssetsTable";
-import { useNavigate } from "react-router-dom";
+import { StoreAsset } from "@/types";
 
 const StoreDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [storeAssetsList, setStoreAssetsList] = useState(() => 
+  const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>(() => 
     id ? getStoreAssetsByStoreId(id) : []
   );
-  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<'po' | 'invoice' | 'grn' | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ const StoreDetail = () => {
             The store you're looking for doesn't exist or has been removed.
           </p>
           <Button asChild>
-            <Link to="/stores">Back to Stores</Link>
+            <Link to="/">Back to Dashboard</Link>
           </Button>
         </div>
       </div>
@@ -162,8 +162,8 @@ const StoreDetail = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Link to="/stores" className="text-muted-foreground hover:text-foreground">
-              Stores
+            <Link to="/" className="text-muted-foreground hover:text-foreground">
+              Dashboard
             </Link>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <span>{store.name}</span>
