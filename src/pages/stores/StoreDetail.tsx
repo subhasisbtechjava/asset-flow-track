@@ -7,6 +7,10 @@ import {
   Trash2, 
   ChevronRight,
   AlertTriangle,
+  Upload,
+  Check,
+  X,
+  FileCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
@@ -32,6 +36,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { getStoreById, getStoreAssetsByStoreId } from "@/data/mockData";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -40,12 +66,16 @@ const StoreDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [storeAssetsList, setStoreAssetsList] = useState(() => 
+    id ? getStoreAssetsByStoreId(id) : []
+  );
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [documentType, setDocumentType] = useState<'po' | 'invoice' | 'grn' | null>(null);
+  const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   
   // Fetch store details
   const store = id ? getStoreById(id) : null;
-  
-  // Fetch store assets
-  const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
   
   if (!store) {
     return (
@@ -86,13 +116,129 @@ const StoreDetail = () => {
   };
 
   // Calculate some summary statistics
-  const totalAssets = storeAssets.length;
-  const assetsInProgress = storeAssets.filter(
+  const totalAssets = storeAssetsList.length;
+  const assetsInProgress = storeAssetsList.filter(
     sa => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
   ).length;
-  const assetsCompleted = storeAssets.filter(
+  const assetsCompleted = storeAssetsList.filter(
     sa => sa.isGrnDone && sa.isFinanceBooked
   ).length;
+
+  // Open document dialog
+  const openDocumentDialog = (assetId: string, type: 'po' | 'invoice' | 'grn') => {
+    setSelectedAsset(assetId);
+    setDocumentType(type);
+    
+    // Pre-fill with existing value
+    const asset = storeAssetsList.find(a => a.id === assetId);
+    if (asset) {
+      if (type === 'po') setInputValue(asset.poNumber || '');
+      if (type === 'invoice') setInputValue(asset.invoiceNumber || '');
+      if (type === 'grn') setInputValue(asset.grnNumber || '');
+    }
+  };
+
+  // Close document dialog
+  const closeDocumentDialog = () => {
+    setSelectedAsset(null);
+    setDocumentType(null);
+    setInputValue('');
+  };
+
+  // Save document number
+  const saveDocumentNumber = () => {
+    if (!selectedAsset || !documentType || !inputValue) return;
+    
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setStoreAssetsList(prev => 
+        prev.map(asset => {
+          if (asset.id === selectedAsset) {
+            const updatedAsset = { ...asset };
+            
+            if (documentType === 'po') {
+              updatedAsset.poNumber = inputValue;
+            } else if (documentType === 'invoice') {
+              updatedAsset.invoiceNumber = inputValue;
+            } else if (documentType === 'grn') {
+              updatedAsset.grnNumber = inputValue;
+            }
+            
+            return updatedAsset;
+          }
+          return asset;
+        })
+      );
+      
+      toast({
+        title: "Update successful",
+        description: `${documentType.toUpperCase()} number updated successfully.`,
+      });
+      
+      setIsLoading(false);
+      closeDocumentDialog();
+    }, 800);
+  };
+
+  // Toggle status
+  const toggleStatus = (assetId: string, field: string) => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setStoreAssetsList(prev => 
+        prev.map(asset => {
+          if (asset.id === assetId) {
+            const updatedAsset = { ...asset };
+            
+            if (field === 'isGrnDone') {
+              updatedAsset.isGrnDone = !asset.isGrnDone;
+            } else if (field === 'isTaggingDone') {
+              updatedAsset.isTaggingDone = !asset.isTaggingDone;
+            } else if (field === 'isProjectHeadApproved') {
+              // For approval, convert null to true and toggle between true/false
+              if (asset.isProjectHeadApproved === null) {
+                updatedAsset.isProjectHeadApproved = true;
+              } else {
+                updatedAsset.isProjectHeadApproved = !asset.isProjectHeadApproved;
+              }
+            } else if (field === 'isAuditDone') {
+              updatedAsset.isAuditDone = !asset.isAuditDone;
+            } else if (field === 'isFinanceBooked') {
+              updatedAsset.isFinanceBooked = !asset.isFinanceBooked;
+            }
+            
+            return updatedAsset;
+          }
+          return asset;
+        })
+      );
+      
+      toast({
+        title: "Status updated",
+        description: `Asset status has been updated successfully.`,
+      });
+      
+      setIsLoading(false);
+    }, 500);
+  };
+
+  // Status display components
+  const StatusDisplay = ({ isDone }: { isDone: boolean | null }) => {
+    if (isDone === null) return <Badge variant="outline">Pending</Badge>;
+    return isDone ? 
+      <Badge className="bg-green-500 hover:bg-green-600">Done</Badge> : 
+      <Badge variant="destructive">Not Done</Badge>;
+  };
+  
+  const ApprovalDisplay = ({ isApproved }: { isApproved: boolean | null }) => {
+    if (isApproved === null) return <Badge variant="outline">Pending</Badge>;
+    return isApproved ? 
+      <Badge className="bg-green-500 hover:bg-green-600">Approved</Badge> : 
+      <Badge variant="destructive">Not Approved</Badge>;
+  };
 
   return (
     <div className="space-y-6">
@@ -205,126 +351,416 @@ const StoreDetail = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <CardTitle>Store Assets</CardTitle>
-              <CardDescription>
-                Manage and track assets for this store
-              </CardDescription>
-            </div>
-            <Button asChild>
-              <Link to={`/stores/${store.id}/assets`}>
-                <Package className="mr-2 h-4 w-4" />
-                Manage Assets
-              </Link>
-            </Button>
-          </div>
+          <CardTitle>Store Assets</CardTitle>
+          <CardDescription>
+            Manage store assets and track purchasing progress
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all">
-            <TabsList>
-              <TabsTrigger value="all">All Assets ({storeAssets.length})</TabsTrigger>
-              <TabsTrigger value="in-progress">In Progress ({assetsInProgress})</TabsTrigger>
-              <TabsTrigger value="completed">Completed ({assetsCompleted})</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all" className="mt-4">
-              <AssetList assets={storeAssets} storeId={store.id} />
-            </TabsContent>
-            <TabsContent value="in-progress" className="mt-4">
-              <AssetList 
-                assets={storeAssets.filter(sa => 
-                  sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
-                )} 
-                storeId={store.id} 
-              />
-            </TabsContent>
-            <TabsContent value="completed" className="mt-4">
-              <AssetList 
-                assets={storeAssets.filter(sa => 
-                  sa.isGrnDone && sa.isFinanceBooked
-                )} 
-                storeId={store.id} 
-              />
-            </TabsContent>
-          </Tabs>
+          <div className="rounded-md border">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Asset</TableHead>
+                    <TableHead className="w-[100px]">Quantity</TableHead>
+                    <TableHead className="w-[120px]">PO</TableHead>
+                    <TableHead className="w-[120px]">Invoice</TableHead>
+                    <TableHead className="w-[120px]">GRN</TableHead>
+                    <TableHead className="w-[100px]">Tagging</TableHead>
+                    <TableHead className="w-[100px]">Approval</TableHead>
+                    <TableHead className="w-[100px]">Audit</TableHead>
+                    <TableHead className="w-[100px]">Booking</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {storeAssetsList.length > 0 ? (
+                    storeAssetsList.map((storeAsset) => (
+                      <TableRow key={storeAsset.id}>
+                        <TableCell>
+                          <div className="font-medium">
+                            {storeAsset.asset?.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {storeAsset.asset?.code}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {storeAsset.quantity} {storeAsset.asset?.unitOfMeasurement}
+                        </TableCell>
+                        
+                        {/* PO Number */}
+                        <TableCell>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button 
+                                variant={storeAsset.poNumber ? "secondary" : "outline"} 
+                                size="sm" 
+                                className="w-full"
+                              >
+                                {storeAsset.poNumber || "Not Done"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="grid gap-4">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium leading-none">PO Number</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Enter the purchase order number for {storeAsset.asset?.name}
+                                  </p>
+                                </div>
+                                <div className="grid gap-2">
+                                  <Input 
+                                    placeholder="Enter PO number"
+                                    defaultValue={storeAsset.poNumber || ""}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                  />
+                                  <div className="flex gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="w-full"
+                                      onClick={() => {
+                                        toast({
+                                          title: "Upload feature",
+                                          description: "File upload will be implemented soon"
+                                        });
+                                      }}
+                                    >
+                                      <Upload className="mr-2 h-4 w-4" /> 
+                                      Upload File
+                                    </Button>
+                                  </div>
+                                  <Button 
+                                    onClick={() => {
+                                      if (inputValue) {
+                                        openDocumentDialog(storeAsset.id, 'po');
+                                        saveDocumentNumber();
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description: "Please enter a PO number",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        
+                        {/* Invoice Number */}
+                        <TableCell>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button 
+                                variant={storeAsset.invoiceNumber ? "secondary" : "outline"} 
+                                size="sm" 
+                                className="w-full"
+                              >
+                                {storeAsset.invoiceNumber || "Not Done"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="grid gap-4">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium leading-none">Invoice Number</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Enter the invoice number for {storeAsset.asset?.name}
+                                  </p>
+                                </div>
+                                <div className="grid gap-2">
+                                  <Input 
+                                    placeholder="Enter invoice number"
+                                    defaultValue={storeAsset.invoiceNumber || ""}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                  />
+                                  <div className="flex gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="w-full"
+                                      onClick={() => {
+                                        toast({
+                                          title: "Upload feature",
+                                          description: "File upload will be implemented soon"
+                                        });
+                                      }}
+                                    >
+                                      <Upload className="mr-2 h-4 w-4" /> 
+                                      Upload File
+                                    </Button>
+                                  </div>
+                                  <Button 
+                                    onClick={() => {
+                                      if (inputValue) {
+                                        openDocumentDialog(storeAsset.id, 'invoice');
+                                        saveDocumentNumber();
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description: "Please enter an invoice number",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        
+                        {/* GRN Number */}
+                        <TableCell>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button 
+                                variant={storeAsset.grnNumber ? "secondary" : "outline"} 
+                                size="sm" 
+                                className="w-full"
+                              >
+                                {storeAsset.grnNumber || "Not Done"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
+                              <div className="grid gap-4">
+                                <div className="space-y-2">
+                                  <h4 className="font-medium leading-none">GRN Number</h4>
+                                  <p className="text-sm text-muted-foreground">
+                                    Enter the GRN number for {storeAsset.asset?.name}
+                                  </p>
+                                </div>
+                                <div className="grid gap-2">
+                                  <Input 
+                                    placeholder="Enter GRN number"
+                                    defaultValue={storeAsset.grnNumber || ""}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                  />
+                                  <Button 
+                                    onClick={() => {
+                                      if (inputValue) {
+                                        openDocumentDialog(storeAsset.id, 'grn');
+                                        saveDocumentNumber();
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description: "Please enter a GRN number",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        
+                        {/* Tagging Status */}
+                        <TableCell>
+                          <Button
+                            size="sm" 
+                            variant={storeAsset.isTaggingDone ? "default" : "outline"}
+                            className="w-full"
+                            onClick={() => toggleStatus(storeAsset.id, 'isTaggingDone')}
+                            disabled={isLoading}
+                          >
+                            {storeAsset.isTaggingDone ? (
+                              <>
+                                <Check className="mr-1 h-4 w-4" /> Done
+                              </>
+                            ) : "Not Done"}
+                          </Button>
+                        </TableCell>
+                        
+                        {/* Approval Status */}
+                        <TableCell>
+                          <Button
+                            size="sm" 
+                            variant={
+                              storeAsset.isProjectHeadApproved === null
+                                ? "outline"
+                                : storeAsset.isProjectHeadApproved
+                                  ? "default"
+                                  : "destructive"
+                            }
+                            className="w-full"
+                            onClick={() => toggleStatus(storeAsset.id, 'isProjectHeadApproved')}
+                            disabled={isLoading}
+                          >
+                            {storeAsset.isProjectHeadApproved === null ? (
+                              "Pending"
+                            ) : storeAsset.isProjectHeadApproved ? (
+                              <>
+                                <Check className="mr-1 h-4 w-4" /> Approved
+                              </>
+                            ) : (
+                              <>
+                                <X className="mr-1 h-4 w-4" /> Not Approved
+                              </>
+                            )}
+                          </Button>
+                        </TableCell>
+                        
+                        {/* Audit Status */}
+                        <TableCell>
+                          <Button
+                            size="sm" 
+                            variant={storeAsset.isAuditDone ? "default" : "outline"}
+                            className="w-full"
+                            onClick={() => toggleStatus(storeAsset.id, 'isAuditDone')}
+                            disabled={isLoading}
+                          >
+                            {storeAsset.isAuditDone ? (
+                              <>
+                                <Check className="mr-1 h-4 w-4" /> Done
+                              </>
+                            ) : "Not Done"}
+                          </Button>
+                        </TableCell>
+                        
+                        {/* Finance Booking Status */}
+                        <TableCell>
+                          <Button
+                            size="sm" 
+                            variant={storeAsset.isFinanceBooked ? "default" : "outline"}
+                            className="w-full"
+                            onClick={() => toggleStatus(storeAsset.id, 'isFinanceBooked')}
+                            disabled={isLoading}
+                          >
+                            {storeAsset.isFinanceBooked ? (
+                              <>
+                                <Check className="mr-1 h-4 w-4" /> Done
+                              </>
+                            ) : "Not Done"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={9} className="h-24 text-center">
+                        <div className="flex flex-col items-center justify-center text-muted-foreground">
+                          <AlertTriangle className="h-8 w-8 mb-2" />
+                          <p>No assets found for this store</p>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-4"
+                            onClick={() => navigate(`/stores/${store.id}/assets`)}
+                          >
+                            <Package className="mr-2 h-4 w-4" />
+                            Add Assets
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate(`/stores/${store.id}/assets`)}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            Manage Assets
+          </Button>
+          <Button
+            onClick={() => {
+              toast({
+                title: "Changes saved",
+                description: "All updates have been saved successfully"
+              });
+            }}
+          >
+            <FileCheck className="mr-2 h-4 w-4" />
+            Save All Changes
+          </Button>
+        </CardFooter>
       </Card>
-    </div>
-  );
-};
 
-interface AssetListProps {
-  assets: any[];
-  storeId: string;
-}
-
-const AssetList = ({ assets, storeId }: AssetListProps) => {
-  const navigate = useNavigate();
-
-  const getAssetStatus = (asset: any): 'not-started' | 'pending' | 'in-progress' | 'approved' | 'completed' => {
-    if (!asset.poNumber) return 'not-started';
-    if (asset.isFinanceBooked) return 'completed';
-    if (asset.isProjectHeadApproved) return 'approved';
-    if (asset.poNumber) return 'in-progress';
-    return 'pending';
-  };
-
-  if (assets.length === 0) {
-    return (
-      <div className="text-center py-8 border rounded-lg">
-        <AlertTriangle className="mx-auto h-10 w-10 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-medium">No assets found</h3>
-        <p className="mt-1 text-muted-foreground">
-          You haven't added any assets to this store yet.
-        </p>
-        <Button 
-          variant="outline" 
-          className="mt-4"
-          onClick={() => navigate(`/stores/${storeId}/assets`)}
-        >
-          Add Assets
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-muted/50">
-              <th className="py-3 px-4 text-left text-sm font-medium">Asset</th>
-              <th className="py-3 px-4 text-left text-sm font-medium">Category</th>
-              <th className="py-3 px-4 text-left text-sm font-medium">Quantity</th>
-              <th className="py-3 px-4 text-left text-sm font-medium">Status</th>
-              <th className="py-3 px-4 text-left text-sm font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {assets.map((asset) => (
-              <tr key={asset.id} className="border-t hover:bg-muted/20">
-                <td className="py-3 px-4">
-                  <div className="font-medium">{asset.asset?.name}</div>
-                  <div className="text-xs text-muted-foreground">{asset.asset?.code}</div>
-                </td>
-                <td className="py-3 px-4">{asset.asset?.category}</td>
-                <td className="py-3 px-4">
-                  {asset.quantity} {asset.asset?.unitOfMeasurement}
-                </td>
-                <td className="py-3 px-4">
-                  <StatusBadge status={getAssetStatus(asset)} />
-                </td>
-                <td className="py-3 px-4">
-                  <Button variant="ghost" size="sm">
-                    View Details
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Document Entry Dialog */}
+      <Dialog open={!!selectedAsset && !!documentType} onOpenChange={() => selectedAsset && closeDocumentDialog()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {documentType === 'po' && 'Enter PO Number'}
+              {documentType === 'invoice' && 'Enter Invoice Number'}
+              {documentType === 'grn' && 'Enter GRN Number'}
+            </DialogTitle>
+            <DialogDescription>
+              {documentType === 'po' && 'Enter the purchase order number for this asset'}
+              {documentType === 'invoice' && 'Enter the invoice number for this asset'}
+              {documentType === 'grn' && 'Enter the goods receipt note number for this asset'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Input
+                placeholder={
+                  documentType === 'po'
+                    ? 'e.g. PO-2023-001'
+                    : documentType === 'invoice'
+                    ? 'e.g. INV-2023-001'
+                    : 'e.g. GRN-2023-001'
+                }
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </div>
+            {(documentType === 'po' || documentType === 'invoice') && (
+              <div>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    toast({
+                      title: "Upload feature",
+                      description: "File upload will be implemented soon"
+                    });
+                  }}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload File (PDF/JPG)
+                </Button>
+                <div className="text-xs text-muted-foreground mt-2">
+                  Max file size: 5MB. Only PDF or JPG formats allowed.
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={closeDocumentDialog}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              onClick={saveDocumentNumber}
+              disabled={!inputValue || isLoading}
+            >
+              {isLoading ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
