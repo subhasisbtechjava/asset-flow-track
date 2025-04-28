@@ -7,23 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface StoreAsset {
-  id: string;
-  asset?: {
-    name: string;
-    code: string;
-    unitOfMeasurement: string;
-  };
-  quantity: number;
-  poNumber: string | null;
-  invoiceNumber: string | null;
-  grnNumber: string | null;
-  isTaggingDone: boolean;
-  isProjectHeadApproved: boolean | null;
-  isAuditDone: boolean;
-  isFinanceBooked: boolean;
-}
+import { StoreAsset } from "@/types";
 
 interface StoreAssetsTableProps {
   storeId: string;
