@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import AppLayout from "./layouts/AppLayout";
@@ -25,23 +25,21 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="stores" element={<StoreList />} />
-              <Route path="stores/new" element={<StoreForm />} />
-              <Route path="stores/edit/:id" element={<StoreForm />} />
-              <Route path="stores/:id" element={<StoreDetail />} />
-              <Route path="stores/:id/assets" element={<StoreAssets />} />
-              <Route path="assets" element={<AssetList />} />
-              <Route path="assets/new" element={<AssetForm />} />
-              <Route path="assets/edit/:id" element={<AssetForm />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<AppLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="stores" element={<StoreList />} />
+            <Route path="stores/new" element={<StoreForm />} />
+            <Route path="stores/edit/:id" element={<StoreForm />} />
+            <Route path="stores/:id" element={<StoreDetail />} />
+            <Route path="stores/:id/assets" element={<StoreAssets />} />
+            <Route path="assets" element={<AssetList />} />
+            <Route path="assets/new" element={<AssetForm />} />
+            <Route path="assets/edit/:id" element={<AssetForm />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
