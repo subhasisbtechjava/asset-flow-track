@@ -125,12 +125,12 @@ const Dashboard = () => {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4 md:w-1/2">
-                <Select onValueChange={(value) => setBrandFilter(value || null)}>
+                <Select onValueChange={(value) => setBrandFilter(value === "all" ? null : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Brand" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Brands</SelectItem>
+                    <SelectItem value="all">All Brands</SelectItem>
                     {brands.map((brand) => (
                       <SelectItem key={brand} value={brand}>
                         {brand}
@@ -138,12 +138,12 @@ const Dashboard = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select onValueChange={(value) => setCityFilter(value || null)}>
+                <Select onValueChange={(value) => setCityFilter(value === "all" ? null : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="City" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Cities</SelectItem>
+                    <SelectItem value="all">All Cities</SelectItem>
                     {cities.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}
