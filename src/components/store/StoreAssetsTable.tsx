@@ -1,4 +1,3 @@
-
 import { AlertTriangle, Check, FileCheck, Package, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -34,10 +33,19 @@ export const StoreAssetsTable = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Store Assets</CardTitle>
-        <CardDescription>
-          Manage store assets and track purchasing progress
-        </CardDescription>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle>Store Assets</CardTitle>
+            <CardDescription>Manage store assets and track purchasing progress</CardDescription>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate(`/assets/new?storeId=${storeId}`)}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            Add Assets
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
@@ -311,24 +319,13 @@ export const StoreAssetsTable = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter>
         <Button 
           variant="outline" 
-          onClick={() => navigate(`/stores/${storeId}/assets`)}
+          onClick={() => navigate(`/assets?storeId=${storeId}`)}
         >
           <Package className="mr-2 h-4 w-4" />
           Manage Assets
-        </Button>
-        <Button
-          onClick={() => {
-            toast({
-              title: "Changes saved",
-              description: "All updates have been saved successfully"
-            });
-          }}
-        >
-          <FileCheck className="mr-2 h-4 w-4" />
-          Save All Changes
         </Button>
       </CardFooter>
     </Card>

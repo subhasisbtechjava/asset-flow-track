@@ -9,9 +9,7 @@ import {
   LogOut, 
   Settings, 
   Sun, 
-  Moon,
-  CircleCheck,
-  CircleX
+  Moon
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
@@ -43,7 +41,7 @@ export function Header() {
           <Link to="/" className="flex items-center">
             <div className="flex flex-col mr-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-accent1 bg-clip-text text-transparent">
-                Asset Flow
+                StoreTracker
               </h1>
               <p className="text-xs text-muted-foreground">QSR Asset Tracking</p>
             </div>
@@ -87,17 +85,6 @@ export function Header() {
                     <Users className="mr-2 h-4 w-4" />
                     <span>Manage Users</span>
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="flex items-center cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>My Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

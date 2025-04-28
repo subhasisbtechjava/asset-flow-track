@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,8 @@ import AssetForm from "./pages/assets/AssetForm";
 import StoreForm from "./pages/stores/StoreForm";
 import Login from "./pages/auth/Login";
 import NotFound from "./pages/NotFound";
+import UserList from "./pages/users/UserList";
+import ProfileSettings from "./pages/profile/ProfileSettings";
 
 const queryClient = new QueryClient();
 
@@ -29,14 +30,12 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="stores/new" element={<StoreForm />} />
-              <Route path="stores/edit/:id" element={<StoreForm />} />
               <Route path="stores/:id" element={<StoreDetail />} />
               <Route path="assets" element={<AssetList />} />
               <Route path="assets/new" element={<AssetForm />} />
               <Route path="assets/edit/:id" element={<AssetForm />} />
-              {/* Redirect old stores route to dashboard */}
-              <Route path="stores" element={<Navigate to="/" replace />} />
+              <Route path="users" element={<UserList />} />
+              <Route path="profile" element={<ProfileSettings />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

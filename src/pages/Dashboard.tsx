@@ -1,7 +1,6 @@
-
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Store, ArrowRight, Download } from "lucide-react";
+import { Store, ArrowRight, Download, Plus } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -28,7 +27,6 @@ const Dashboard = () => {
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
   const [cityFilter, setCityFilter] = useState<string | null>(null);
 
-  // Get unique brands and cities for filters
   const brands = useMemo(() => 
     Array.from(new Set(mockStores.map(store => store.brand))),
     []
@@ -39,7 +37,6 @@ const Dashboard = () => {
     []
   );
 
-  // Filter stores based on search term and filters
   const filteredStores = mockStores.filter(store => {
     const matchesSearch = 
       searchTerm === "" || 
@@ -52,7 +49,6 @@ const Dashboard = () => {
     return matchesSearch && matchesBrand && matchesCity;
   });
 
-  // Calculate summary stats
   const totalStores = filteredStores.length;
   const highProgressStores = filteredStores.filter(store => 
     store.grnCompletionPercentage > 75 && store.financeBookingPercentage > 75
@@ -61,7 +57,6 @@ const Dashboard = () => {
     store.grnCompletionPercentage < 25 || store.financeBookingPercentage < 25
   ).length;
   
-  // Mock export function
   const exportToCSV = () => {
     console.log("Exporting data to CSV...");
     alert("Export to CSV functionality will be implemented in the next phase.");
@@ -108,9 +103,9 @@ const Dashboard = () => {
               <CardTitle>Store Progress</CardTitle>
               <CardDescription>Track progress of all your QSR store setups</CardDescription>
             </div>
-            <Button variant="outline" onClick={exportToCSV}>
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Store
             </Button>
           </div>
         </CardHeader>
@@ -217,16 +212,10 @@ const Dashboard = () => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter>
           <p className="text-sm text-muted-foreground">
             Showing {filteredStores.length} of {mockStores.length} stores
           </p>
-          <Button asChild>
-            <Link to="/stores">
-              <Store className="mr-2 h-4 w-4" />
-              Manage Stores
-            </Link>
-          </Button>
         </CardFooter>
       </Card>
     </div>
