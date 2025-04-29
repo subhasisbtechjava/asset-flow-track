@@ -52,6 +52,7 @@ const StoreAddAssets = () => {
     );
   }
 
+  // Fix: Use correct property names (name and code instead of potentially non-existent properties)
   const filteredAssets = assetsToAdd.filter(asset => 
     asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.code.toLowerCase().includes(searchTerm.toLowerCase()) ||

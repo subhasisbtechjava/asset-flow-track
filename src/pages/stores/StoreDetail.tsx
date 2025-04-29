@@ -61,10 +61,10 @@ const StoreDetail = () => {
     }, 1000);
   };
 
-  // Filter assets based on search term
+  // Filter assets based on search term - FIX: Use asset?.name and asset?.code instead of assetName and assetCode
   const filteredAssets = storeAssetsList.filter(asset => 
-    asset.assetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.assetCode.toLowerCase().includes(searchTerm.toLowerCase())
+    asset.asset?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate summary statistics
