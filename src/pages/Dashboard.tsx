@@ -1,7 +1,7 @@
 
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Store, ArrowRight, Plus } from "lucide-react";
+import { Store, ArrowRight, Plus, MoreHorizontal } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -21,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { mockStores } from "@/data/mockData";
 
 const Dashboard = () => {
@@ -104,13 +110,11 @@ const Dashboard = () => {
               <CardTitle>Store Progress</CardTitle>
               <CardDescription>Track progress of all your QSR store setups</CardDescription>
             </div>
-            <Button >
-              {/* <Link to="/stores/new"> */}
-              <>
+            <Button asChild>
+              <Link to="/stores/new">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Store
-              </>
-              {/* </Link> */}
+              </Link>
             </Button>
           </div>
         </CardHeader>
@@ -195,16 +199,24 @@ const Dashboard = () => {
                             />
                           </td>
                           <td className="py-3 px-4">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              asChild
-                            >
-                              <Link to={`/stores/${store.id}`}>
-                                Details
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                              </Link>
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/stores/${store.id}`}>View Details</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/stores/edit/${store.id}`}>Edit</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Mark as Complete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </td>
                         </tr>
                       ))

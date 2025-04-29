@@ -1,9 +1,10 @@
 
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { FileEdit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,7 @@ const StoreDetail = () => {
   const [documentType, setDocumentType] = useState<'po' | 'invoice' | 'grn' | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   
   // Fetch store details
   const store = id ? getStoreById(id) : null;
@@ -58,6 +60,12 @@ const StoreDetail = () => {
       navigate("/stores");
     }, 1000);
   };
+
+  // Filter assets based on search term
+  const filteredAssets = storeAssetsList.filter(asset => 
+    asset.assetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asset.assetCode.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Calculate summary statistics
   const totalAssets = storeAssetsList.length;
@@ -229,9 +237,21 @@ const StoreDetail = () => {
         financeBookingPercentage={store.financeBookingPercentage}
       />
 
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search assets by name or code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       <StoreAssetsTable
         storeId={store.id}
-        storeAssets={storeAssetsList}
+        storeAssets={filteredAssets}
         isLoading={isLoading}
         onToggleStatus={toggleStatus}
         onDocumentDialogOpen={openDocumentDialog}
