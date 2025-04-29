@@ -18,25 +18,25 @@ const MOCK_USERS: User[] = [
   {
     id: "1",
     name: "Admin User",
-    email: "admin@example.com",
+    email: "admin@gmail.com",
     role: "admin" as UserRole
   },
   {
     id: "2",
     name: "Procurement User",
-    email: "procurement@example.com",
+    email: "procurement@gmail.com",
     role: "procurement" as UserRole
   },
   {
     id: "3",
     name: "Project Head",
-    email: "projecthead@example.com",
+    email: "projecthead@gmail.com",
     role: "projectHead" as UserRole
   },
   {
     id: "4",
     name: "Finance User",
-    email: "finance@example.com",
+    email: "finance@gmail.com",
     role: "finance" as UserRole
   }
 ];

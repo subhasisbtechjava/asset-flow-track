@@ -57,12 +57,12 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center mb-2">
-            <div className="h-14 w-14  flex items-center justify-center">
+            <div className="h-[84px] w-[84px]  flex items-center justify-center">
               {/* <Package className="h-6 w-6 text-primary-foreground" /> */}
               <img src="/images/Wow_MomoLogo.png" alt="" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome to Asset Flow</CardTitle>
+          <CardTitle className="text-2xl">Welcome to Store Tracker</CardTitle>
           <CardDescription>
             Store Tracking System
           </CardDescription>
