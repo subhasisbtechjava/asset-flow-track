@@ -165,7 +165,7 @@ const AssetForm = () => {
                   name="pricePerUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price per Unit ($)</FormLabel>
+                      <FormLabel>Price per Unit (<span>&#8377;</span>)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 

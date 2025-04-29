@@ -67,7 +67,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">QSR Asset Purchase Tracking Overview</p>
+        <p className="text-muted-foreground">Store Tracking Overview</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -104,11 +104,13 @@ const Dashboard = () => {
               <CardTitle>Store Progress</CardTitle>
               <CardDescription>Track progress of all your QSR store setups</CardDescription>
             </div>
-            <Button asChild>
-              <Link to="/stores/new">
+            <Button >
+              {/* <Link to="/stores/new"> */}
+              <>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Store
-              </Link>
+              </>
+              {/* </Link> */}
             </Button>
           </div>
         </CardHeader>
@@ -162,7 +164,7 @@ const Dashboard = () => {
                       <th className="py-3 px-4 text-left text-sm font-medium">Brand</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">City</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">GRN Progress</th>
-                      <th className="py-3 px-4 text-left text-sm font-medium">Finance Progress</th>
+                      <th className="py-3 px-4 text-left text-sm font-medium">ERP Progress</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">Actions</th>
                     </tr>
                   </thead>

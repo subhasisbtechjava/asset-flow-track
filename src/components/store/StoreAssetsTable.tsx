@@ -40,7 +40,7 @@ export const StoreAssetsTable = ({
           </div>
           <Button 
             variant="outline" 
-            // onClick={() => navigate(`/assets/new?storeId=${storeId}`)}
+            onClick={() => navigate(`/assets/new?storeId=${storeId}`)}
           >
             <Package className="mr-2 h-4 w-4" />
             Add Assets

@@ -130,7 +130,7 @@ const AssetList = () => {
                               <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{asset.name}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">{asset.unitOfMeasurement}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                ${asset.pricePerUnit.toFixed(2)}
+                                <span>&#8377;</span>{asset.pricePerUnit.toFixed(2)}
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
                                 <div className="flex justify-end space-x-2">

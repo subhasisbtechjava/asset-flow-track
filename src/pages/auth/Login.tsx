@@ -57,13 +57,14 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center mb-2">
-            <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-              <Package className="h-6 w-6 text-primary-foreground" />
+            <div className="h-14 w-14  flex items-center justify-center">
+              {/* <Package className="h-6 w-6 text-primary-foreground" /> */}
+              <img src="/images/Wow_MomoLogo.png" alt="" />
             </div>
           </div>
           <CardTitle className="text-2xl">Welcome to Asset Flow</CardTitle>
           <CardDescription>
-            QSR Asset Purchase Tracking System
+            Store Tracking System
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -110,7 +111,7 @@ const Login = () => {
                 />
               </div>
 
-              <div className="text-sm text-muted-foreground">
+              {/* <div className="text-sm text-muted-foreground">
                 <p>Demo accounts:</p>
                 <ul className="list-disc pl-5 mt-1 space-y-1">
                   <li>Admin: admin@example.com</li>
@@ -119,7 +120,7 @@ const Login = () => {
                   <li>Finance: finance@example.com</li>
                   <li>Password: password (for all accounts)</li>
                 </ul>
-              </div>
+              </div> */}
             </CardContent>
             
             <CardFooter>
