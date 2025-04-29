@@ -19,10 +19,10 @@ import NotFound from "./pages/NotFound";
 import UserList from "./pages/users/UserList";
 import ProfileSettings from "./pages/profile/ProfileSettings";
 
-// Create a new QueryClient instance
-const queryClient = new QueryClient();
-
 const App = () => {
+  // Move QueryClient initialization inside the component
+  const queryClient = new QueryClient();
+  
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light">
