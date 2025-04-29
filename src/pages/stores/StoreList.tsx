@@ -81,7 +81,7 @@ const StoreList = () => {
                         />
                         <ProgressBadge 
                           percentage={store.financeBookingPercentage} 
-                          label="Finance Booking" 
+                          label="ERP Booking" 
                           size="sm"
                         />
                       </div>

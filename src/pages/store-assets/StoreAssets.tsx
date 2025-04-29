@@ -634,7 +634,7 @@ const StoreAssets = () => {
                   </AccordionItem>
                   
                   <AccordionItem value="finance">
-                    <AccordionTrigger>Finance Booking</AccordionTrigger>
+                    <AccordionTrigger>ERP Booking</AccordionTrigger>
                     <AccordionContent>
                       <FormField
                         control={workflowStepForm.control}
@@ -649,7 +649,7 @@ const StoreAssets = () => {
                             </FormControl>
                             <div className="space-y-1 leading-none">
                               <FormLabel>
-                                Mark Finance Booking as Done
+                                Mark ERP Booking as Done
                               </FormLabel>
                             </div>
                           </FormItem>

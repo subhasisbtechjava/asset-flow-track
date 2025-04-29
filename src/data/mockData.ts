@@ -9,46 +9,46 @@ const randomPercentage = (min: number, max: number) =>
 export const mockStores: Store[] = [
   {
     id: '1',
-    name: 'Downtown Location',
-    code: 'QSR-001',
-    brand: 'BurgerBite',
-    city: 'New York',
+    name: 'Acropolis',
+    code: 'KOL246',
+    brand: 'Wow! Kulfi',
+    city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(50, 100),
     financeBookingPercentage: randomPercentage(30, 90)
   },
   {
     id: '2',
-    name: 'Westside Mall',
-    code: 'QSR-002',
-    brand: 'BurgerBite',
-    city: 'Los Angeles',
+    name: 'Avishikta',
+    code: 'KOL214',
+    brand: 'Wow! Momo',
+    city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(50, 100),
     financeBookingPercentage: randomPercentage(30, 90)
   },
   {
     id: '3',
-    name: 'Central Plaza',
-    code: 'QSR-003',
-    brand: 'ChickenSpot',
-    city: 'Chicago',
+    name: 'Kasba',
+    code: 'KOL036',
+    brand: 'Wow! Kulfi',
+    city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(50, 100),
     financeBookingPercentage: randomPercentage(30, 90)
   },
   {
     id: '4',
-    name: 'Harborview Center',
-    code: 'QSR-004',
-    brand: 'ChickenSpot',
-    city: 'Miami',
+    name: 'Ballygunge',
+    code: 'KOL039',
+    brand: 'Wow! Chicken',
+    city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(0, 40),
     financeBookingPercentage: randomPercentage(0, 30)
   },
   {
     id: '5',
-    name: 'Uptown Square',
-    code: 'QSR-005',
-    brand: 'PizzaPlace',
-    city: 'Seattle',
+    name: 'Baghajatin Park',
+    code: 'KOL199',
+    brand: 'Wow! China',
+    city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(0, 40),
     financeBookingPercentage: randomPercentage(0, 30)
   }

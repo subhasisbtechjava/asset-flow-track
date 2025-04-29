@@ -40,10 +40,11 @@ export function Header() {
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <div className="flex flex-col mr-2">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-accent1 bg-clip-text text-transparent">
+              {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-accent1 bg-clip-text text-transparent">
                 StoreTracker
               </h1>
-              <p className="text-xs text-muted-foreground">QSR Asset Tracking</p>
+              <p className="text-xs text-muted-foreground">QSR Asset Tracking</p> */}
+              <img src="/images/Wow_MomoLogo.png" alt="" className="h-11" />
             </div>
           </Link>
         </div>
