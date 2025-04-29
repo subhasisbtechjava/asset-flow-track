@@ -54,7 +54,7 @@ const StoreForm = () => {
 
     // Mock API call - would be replaced with real data persistence
     setTimeout(() => {
-      if (isEditing) {
+      if (isEditing && storeData) {
         // Mock update existing store
         console.log("Updating store:", { id, ...values });
         toast({
