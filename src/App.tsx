@@ -19,35 +19,39 @@ import NotFound from "./pages/NotFound";
 import UserList from "./pages/users/UserList";
 import ProfileSettings from "./pages/profile/ProfileSettings";
 
+// Create a new QueryClient instance
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<AppLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="stores/:id" element={<StoreDetail />} />
-              <Route path="stores/new" element={<StoreForm />} />
-              <Route path="stores/edit/:id" element={<StoreForm />} />
-              <Route path="stores/:id/add-assets" element={<StoreAddAssets />} />
-              <Route path="assets" element={<AssetList />} />
-              <Route path="assets/new" element={<AssetForm />} />
-              <Route path="assets/edit/:id" element={<AssetForm />} />
-              <Route path="users" element={<UserList />} />
-              <Route path="profile" element={<ProfileSettings />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </AuthProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AuthProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<AppLayout />}>
+                <Route index element={<Navigate to="/stores" replace />} />
+                <Route path="stores" element={<Dashboard />} />
+                <Route path="stores/:id" element={<StoreDetail />} />
+                <Route path="stores/new" element={<StoreForm />} />
+                <Route path="stores/edit/:id" element={<StoreForm />} />
+                <Route path="stores/:id/add-assets" element={<StoreAddAssets />} />
+                <Route path="assets" element={<AssetList />} />
+                <Route path="assets/new" element={<AssetForm />} />
+                <Route path="assets/edit/:id" element={<AssetForm />} />
+                <Route path="users" element={<UserList />} />
+                <Route path="profile" element={<ProfileSettings />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
