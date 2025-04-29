@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import AppLayout from "./layouts/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import StoreDetail from "./pages/stores/StoreDetail";
+import StoreAddAssets from "./pages/stores/StoreAddAssets";
 import AssetList from "./pages/assets/AssetList";
 import AssetForm from "./pages/assets/AssetForm";
 import StoreForm from "./pages/stores/StoreForm";
@@ -31,6 +33,9 @@ const App = () => (
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="stores/:id" element={<StoreDetail />} />
+              <Route path="stores/new" element={<StoreForm />} />
+              <Route path="stores/edit/:id" element={<StoreForm />} />
+              <Route path="stores/:id/add-assets" element={<StoreAddAssets />} />
               <Route path="assets" element={<AssetList />} />
               <Route path="assets/new" element={<AssetForm />} />
               <Route path="assets/edit/:id" element={<AssetForm />} />

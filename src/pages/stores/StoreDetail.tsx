@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -180,6 +179,12 @@ const StoreDetail = () => {
             <Link to={`/stores/edit/${store.id}`}>
               <FileEdit className="mr-2 h-4 w-4" />
               Edit
+            </Link>
+          </Button>
+          <Button variant="default" asChild>
+            <Link to={`/stores/${store.id}/add-assets`}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Assets
             </Link>
           </Button>
           <AlertDialog>

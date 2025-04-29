@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Store, ArrowRight, Download, Plus } from "lucide-react";
+import { Store, ArrowRight, Plus } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -103,9 +103,11 @@ const Dashboard = () => {
               <CardTitle>Store Progress</CardTitle>
               <CardDescription>Track progress of all your QSR store setups</CardDescription>
             </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Store
+            <Button asChild>
+              <Link to="/stores/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Store
+              </Link>
             </Button>
           </div>
         </CardHeader>
@@ -168,7 +170,11 @@ const Dashboard = () => {
                       filteredStores.map((store) => (
                         <tr key={store.id} className="border-t">
                           <td className="py-3 px-4 text-sm">{store.code}</td>
-                          <td className="py-3 px-4 text-sm font-medium">{store.name}</td>
+                          <td className="py-3 px-4 text-sm font-medium">
+                            <Link to={`/stores/${store.id}`} className="hover:underline">
+                              {store.name}
+                            </Link>
+                          </td>
                           <td className="py-3 px-4">
                             <Badge variant="outline">{store.brand}</Badge>
                           </td>
