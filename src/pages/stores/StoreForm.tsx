@@ -4,6 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { storeAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
+import { Store} from '@/types';
+
 import { 
   Form, 
   FormControl, 
@@ -37,17 +40,24 @@ const StoreForm = () => {
   const isEditing = !!id;
 
   // If editing, find the store data
-  const storeData = isEditing ? getStoreById(id) : null;
 
+  //const editStoreDetails = storeAPI.getStoreById(id);  
+
+  const storeData = isEditing ? getStoreById(id) : null;
+  //const storeData = isEditing ? editStoreDetails : null;
+console.log(storeData);
   const form = useForm<StoreFormValues>({
     resolver: zodResolver(storeFormSchema),
     defaultValues: {
       name: storeData?.name || "",
       brand: storeData?.brand || "",
       city: storeData?.city || "",
-      code: storeData?.code || `QSR-${String(mockStores.length + 1).padStart(3, '0')}`,
+      //code: storeData?.code || `KOL${String(mockStores.length + 1).padStart(3, '0')}`,
+      code: storeData?.code || "",
     },
   });
+  
+  type newStore = Store;
 
   const onSubmit = async (values: StoreFormValues) => {
     setIsLoading(true);
@@ -56,20 +66,42 @@ const StoreForm = () => {
     setTimeout(() => {
       if (isEditing && storeData) {
         // Mock update existing store
+        const updateStoreValues= {                   
+          name: values.name || '', // Fallback to empty string
+          code: values.code || '',
+          brand: values.brand || '',
+          city: values.city || '',
+          grnCompletionPercentage: 0,
+          financeBookingPercentage: 0
+        };
+
+        const updatedStore = storeAPI.updateStore(id,updateStoreValues);
         console.log("Updating store:", { id, ...values });
         toast({
           title: "Store updated",
-          description: `${values.name} has been updated successfully.`,
+          description: `Store has been updated successfully.`,
         });
       } else {
         // Mock creating new store
-        const newStore = {
+        const newStore:Store = {
+          // id: generateId(),
+          // ...values,
+          // grnCompletionPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+          // financeBookingPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+
+
           id: generateId(),
-          ...values,
+          name: values.name || '', // Fallback to empty string
+          code: values.code || '',
+          brand: values.brand || '',
+          city: values.city || '',
           grnCompletionPercentage: 0,
-          financeBookingPercentage: 0,
+          financeBookingPercentage: 0
         };
-        console.log("Creating store:", newStore);
+
+        const newlycreatedStore = storeAPI.createStore(newStore);
+      
+        console.log("Creating store:", newlycreatedStore);
         toast({
           title: "Store created",
           description: `${values.name} has been created successfully.`,
@@ -78,7 +110,7 @@ const StoreForm = () => {
       
       setIsLoading(false);
       navigate("/stores");
-    }, 1000);
+    }, 1000);    
   };
 
   return (
@@ -104,7 +136,7 @@ const StoreForm = () => {
                   <FormItem>
                     <FormLabel>Store Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Downtown Location" {...field} />
+                      <Input placeholder="Store Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,7 +151,7 @@ const StoreForm = () => {
                     <FormItem>
                       <FormLabel>Brand</FormLabel>
                       <FormControl>
-                        <Input placeholder="BurgerBite" {...field} />
+                        <Input placeholder="Brand" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -133,7 +165,7 @@ const StoreForm = () => {
                     <FormItem>
                       <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input placeholder="New York" {...field} />
+                        <Input placeholder="City" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -149,9 +181,7 @@ const StoreForm = () => {
                     <FormLabel>Store Code</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="QSR-001" 
-                        {...field} 
-                      />
+                        placeholder="KOL001" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

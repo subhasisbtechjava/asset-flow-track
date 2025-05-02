@@ -2,6 +2,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { User, UserRole } from "@/types";
+import { authAPI } from '../api/authAPI';  // ADDED ON 30-04-2025//////
+
+///// BELOW ADDED  ON 30-04-2025//////
+interface User {
+  id: string;
+  email: string;
+  name: string; 
+}
+
+
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +24,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Mock user data - would be replaced with real authentication
+/*
 const MOCK_USERS: User[] = [
   {
     id: "1",
@@ -40,6 +51,7 @@ const MOCK_USERS: User[] = [
     role: "finance" as UserRole
   }
 ];
+*/
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -63,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, isLoading, location.pathname, navigate]);
 
+  /*
   const login = async (email: string, password: string) => {
     // Mock authentication - would be replaced with real authentication service
     setIsLoading(true);
@@ -81,6 +94,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     setIsLoading(false);
+  };
+  */
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      // Call the actual API instead of mock
+      const user = await authAPI.login(email, password);
+      console.log(user)
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error; // Re-throw to let the login form handle it
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = () => {

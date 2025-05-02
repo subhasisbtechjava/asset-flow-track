@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { authAPI } from '../../api/authAPI';  // ADDED ON 30-04-2025//////
 
 interface User {
   id: string;
@@ -12,10 +13,14 @@ interface User {
   role: string;
 }
 
-const mockUsers: User[] = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'Manager' },
-];
+const allUsers = await authAPI.getAllUsers();
+
+// const mockUsers: User[] = [
+//   { id: '1', name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+//   { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'Manager' },
+// ];
+
+const mockUsers: User[] =allUsers;
 
 const UserList = () => {
   const [searchTerm, setSearchTerm] = useState("");

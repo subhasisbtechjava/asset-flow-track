@@ -1,7 +1,9 @@
 
-import { useState, useMemo } from "react";
+import { useState, useMemo,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Store, ArrowRight, Plus, MoreHorizontal } from "lucide-react";
+import { authAPI } from '../api/authAPI';  // ADDED ON 30-04-2025//////
+import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
 import { 
   Card, 
   CardContent, 
@@ -27,24 +29,55 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { mockStores } from "@/data/mockData";
+//import { mockStores } from "@/data/mockData";
+
+
+
+
 
 const Dashboard = () => {
+  const [stores, setStores] = useState<Store[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
   const [cityFilter, setCityFilter] = useState<string | null>(null);
+  const randomPercentage = (min: number, max: number) => 
+    Math.floor(Math.random() * (max - min + 1) + min);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const allStores = await storeAPI.getAllStores();
+        const storedata = allStores.map((store) => ({
+          ...store,
+          grnCompletionPercentage: randomPercentage(50, 100),
+          financeBookingPercentage: randomPercentage(50, 90),
+        }));
+  
+        setStores(storedata);
+      } catch (error) {
+        console.error("Failed to fetch stores", error);
+      }
+    };
+  
+    fetchStores();
+  }, []);
+
 
   const brands = useMemo(() => 
-    Array.from(new Set(mockStores.map(store => store.brand))),
-    []
+    Array.from(new Set(stores.map(store => store.brand))),
+  [stores]
   );
   
+  // const brands = stores.map(store => {
+  //   return store.brand
+  // });
+  //console.log(brands);
   const cities = useMemo(() => 
-    Array.from(new Set(mockStores.map(store => store.city))),
-    []
+    Array.from(new Set(stores.map(store => store.city))),
+  [stores]
   );
 
-  const filteredStores = mockStores.filter(store => {
+  const filteredStores = stores.filter(store => {
     const matchesSearch = 
       searchTerm === "" || 
       store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,6 +103,7 @@ const Dashboard = () => {
   };
 
   return (
+    // <div className="space-y-6">
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -235,7 +269,7 @@ const Dashboard = () => {
         </CardContent>
         <CardFooter>
           <p className="text-sm text-muted-foreground">
-            Showing {filteredStores.length} of {mockStores.length} stores
+            Showing {stores.length} of {stores.length} stores
           </p>
         </CardFooter>
       </Card>

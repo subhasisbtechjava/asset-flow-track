@@ -1,11 +1,36 @@
 
 import { Store, Asset, StoreAsset } from '@/types';
+import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
 
 // Generate random percentage between min and max
 const randomPercentage = (min: number, max: number) => 
   Math.floor(Math.random() * (max - min + 1) + min);
 
+
+ const allstores = await storeAPI.getAllStores();
+
+ let data=[];
+
+for (let i = 0; i < allstores.length; i++) { 
+  data.push({
+    id:allstores[i].id,
+    code:allstores[i].code,
+    name:allstores[i].name,
+    brand:allstores[i].brand,
+    city: allstores[i].city,
+    grnCompletionPercentage:  randomPercentage(50, 100), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+    financeBookingPercentage: randomPercentage(50, 90), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+  });
+}
+
+export const mockStores: Store[] = data;
+
+// console.log('===========');
+// console.log(allstores);
+ //console.log(data);
+
 // Mock Stores Data
+/*
 export const mockStores: Store[] = [
   {
     id: '1',
@@ -24,35 +49,10 @@ export const mockStores: Store[] = [
     city: 'Kolkata',
     grnCompletionPercentage: randomPercentage(50, 100),
     financeBookingPercentage: randomPercentage(30, 90)
-  },
-  {
-    id: '3',
-    name: 'Kasba',
-    code: 'KOL036',
-    brand: 'Wow! Kulfi',
-    city: 'Kolkata',
-    grnCompletionPercentage: randomPercentage(50, 100),
-    financeBookingPercentage: randomPercentage(30, 90)
-  },
-  {
-    id: '4',
-    name: 'Ballygunge',
-    code: 'KOL039',
-    brand: 'Wow! Chicken',
-    city: 'Kolkata',
-    grnCompletionPercentage: randomPercentage(0, 40),
-    financeBookingPercentage: randomPercentage(0, 30)
-  },
-  {
-    id: '5',
-    name: 'Baghajatin Park',
-    code: 'KOL199',
-    brand: 'Wow! China',
-    city: 'Kolkata',
-    grnCompletionPercentage: randomPercentage(0, 40),
-    financeBookingPercentage: randomPercentage(0, 30)
-  }
+  }  
 ];
+*/
+
 
 // Mock Assets Data
 export const mockAssets: Asset[] = [
