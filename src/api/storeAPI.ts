@@ -92,7 +92,11 @@ export const assetAPI = {
   // Get all assets
   getAllAssets: async () => {
     try {
-      const response = await axios.get(`${API_URL}/assets`);
+      const response = await axios.get(`${API_URL}/assets`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching assets:', error);
