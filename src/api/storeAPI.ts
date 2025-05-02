@@ -137,12 +137,12 @@ export const storeAssetAPI = {
   },
 
   // Add assets to store
-  addAssetsToStore: async (storeId: string, assets: {assetId: string, quantity: number}[]) => {
+  assignAssetsToStore: async (storeId: string, assets: {assetId: string, quantity: number, price?: number}[]) => {
     try {
       const response = await axios.post(`${API_URL}/stores/${storeId}/assets`, { assets });
       return response.data;
     } catch (error) {
-      console.error(`Error adding assets to store ${storeId}:`, error);
+      console.error(`Error assigning assets to store ${storeId}:`, error);
       throw error;
     }
   },
@@ -166,16 +166,73 @@ export const storeAssetAPI = {
     storeId: string, 
     storeAssetId: string, 
     documentType: 'po' | 'invoice' | 'grn', 
-    documentNumber: string
+    documentNumber: string,
+    additionalDetails?: {
+      date?: Date,
+      amount?: number,
+      files?: File[]
+    }
   ) => {
     try {
-      const response = await axios.put(
-        `${API_URL}/stores/${storeId}/assets/${storeAssetId}/documents`,
-        { documentType, documentNumber }
+      // For file uploads, we need to use FormData
+      if (additionalDetails?.files && additionalDetails.files.length > 0) {
+        const formData = new FormData();
+        formData.append('documentType', documentType);
+        formData.append('documentNumber', documentNumber);
+        
+        if (additionalDetails.date) {
+          formData.append('date', additionalDetails.date.toISOString());
+        }
+        
+        if (additionalDetails.amount !== undefined) {
+          formData.append('amount', additionalDetails.amount.toString());
+        }
+        
+        additionalDetails.files.forEach((file, index) => {
+          formData.append(`files`, file);
+        });
+        
+        const response = await axios.put(
+          `${API_URL}/stores/${storeId}/assets/${storeAssetId}/documents/upload`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        return response.data;
+      } else {
+        // Regular JSON request for text fields only
+        const response = await axios.put(
+          `${API_URL}/stores/${storeId}/assets/${storeAssetId}/documents`,
+          { 
+            documentType, 
+            documentNumber,
+            ...additionalDetails
+          }
+        );
+        return response.data;
+      }
+    } catch (error) {
+      console.error(`Error updating document for store asset ${storeAssetId}:`, error);
+      throw error;
+    }
+  },
+  
+  // Get document files for a store asset
+  getDocumentFiles: async (
+    storeId: string,
+    storeAssetId: string,
+    documentType: 'po' | 'invoice' | 'grn'
+  ) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/stores/${storeId}/assets/${storeAssetId}/documents/${documentType}/files`
       );
       return response.data;
     } catch (error) {
-      console.error(`Error updating document for store asset ${storeAssetId}:`, error);
+      console.error(`Error fetching document files for store asset ${storeAssetId}:`, error);
       throw error;
     }
   },

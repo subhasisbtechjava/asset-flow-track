@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Plus, Search } from "lucide-react";
@@ -32,6 +31,9 @@ const StoreDetail = () => {
   // Fetch store details
   const store = id ? getStoreById(id) : null;
   
+  // Fetch store assets
+  const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
+  
   if (!store) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -61,7 +63,7 @@ const StoreDetail = () => {
     }, 1000);
   };
 
-  // Filter assets based on search term - FIX: Use asset?.name and asset?.code instead of assetName and assetCode
+  // Filter assets based on search term
   const filteredAssets = storeAssetsList.filter(asset => 
     asset.asset?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -193,7 +195,7 @@ const StoreDetail = () => {
           <Button variant="default" asChild>
             <Link to={`/stores/${store.id}/add-assets`}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Assets
+              Assign Assets
             </Link>
           </Button>
           <AlertDialog>
