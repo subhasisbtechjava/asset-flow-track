@@ -5,13 +5,17 @@
 import axios from 'axios';
 import { User } from '@/types';
 
-const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+//const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+
+
+const API_URL = import.meta.env.VITE_API_URL // ADDED ON 30-04-2025//////
 
 export const authAPI = {
   // Login user
   login: async (email: string, password: string) => {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      //console.log(response.data.token);
       // Store token in localStorage
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -61,5 +65,23 @@ export const authAPI = {
       console.error('Error registering user:', error);
       throw error;
     }
-  }
+  },
+
+  getAllUsers: async () => {
+      try {
+        //const response = await axios.get(`${API_URL}/stores`);
+        const response = await axios.get(`${API_URL}/users`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+          }
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+        throw error;
+      }
+    },
+
+
+
 };

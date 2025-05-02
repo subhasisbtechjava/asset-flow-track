@@ -1,10 +1,11 @@
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, FileEdit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { assetAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
 import {
   Card,
   CardContent,
@@ -27,20 +28,29 @@ import {
 import { toast } from "@/components/ui/use-toast";
 
 const AssetList = () => {
+  const [filteredAssets, setAssets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const filteredAssets = mockAssets.filter((asset) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      asset.name.toLowerCase().includes(searchLower) ||
-      asset.code.toLowerCase().includes(searchLower) ||
-      asset.category.toLowerCase().includes(searchLower)
-    );
-  });
+
+  useEffect(() => {
+      const fetchAssets = async () => {
+        try {
+          const allAssets = await assetAPI.getAllAssets();    
+          console.log(allAssets);         
+          setAssets(allAssets);
+        } catch (error) {
+          console.error("Failed to fetch stores", error);
+        }
+      };
+    
+      fetchAssets();
+    }, []);
+
+
 
   // Categories for grouping
-  const categories = Array.from(new Set(mockAssets.map((asset) => asset.category)));
+  const categories = Array.from(new Set(filteredAssets.map((asset) => asset.category)));
 
   // Group assets by category
   const assetsByCategory = categories.map((category) => {
@@ -128,9 +138,9 @@ const AssetList = () => {
                                 <Badge variant="outline">{asset.code}</Badge>
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{asset.name}</td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm">{asset.unitOfMeasurement}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm">{asset.unit_of_measurement}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                <span>&#8377;</span>{asset.pricePerUnit.toFixed(2)}
+                                <span>&#8377;</span>{asset.price_per_unit}
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
                                 <div className="flex justify-end space-x-2">
