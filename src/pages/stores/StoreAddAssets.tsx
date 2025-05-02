@@ -1,18 +1,44 @@
 
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, Plus, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { getStoreById, mockAssets } from "@/data/mockData";
 import { Asset } from "@/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AssetToAdd extends Asset {
   selected: boolean;
   quantity: number;
+  customPrice?: number;
+}
+
+interface AssignedAsset {
+  id: string;
+  assetId: string;
+  name: string;
+  code: string;
+  quantity: number;
+  unit: string;
+  price: number;
+  isEditing?: boolean;
 }
 
 const StoreAddAssets = () => {
@@ -22,12 +48,22 @@ const StoreAddAssets = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [assetsToAdd, setAssetsToAdd] = useState<AssetToAdd[]>([]);
-
+  const [assignedAssets, setAssignedAssets] = useState<AssignedAsset[]>([]);
+  
+  // New state for quick asset assignment
+  const [selectedAssetId, setSelectedAssetId] = useState<string>("");
+  const [newAssetQuantity, setNewAssetQuantity] = useState<number>(1);
+  const [newAssetPrice, setNewAssetPrice] = useState<number | undefined>(undefined);
+  
   // Fetch store details
   const store = id ? getStoreById(id) : null;
   
   // Prepare assets list
   useEffect(() => {
+    // Load existing assigned assets if any
+    // In a real app, this would come from an API fetch
+    setAssignedAssets([]);
+    
     const preparedAssets = mockAssets.map(asset => ({
       ...asset,
       selected: false,
@@ -52,7 +88,7 @@ const StoreAddAssets = () => {
     );
   }
 
-  // Fix: Use correct property names (name and code instead of potentially non-existent properties)
+  // Filter assets for search functionality
   const filteredAssets = assetsToAdd.filter(asset => 
     asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,14 +112,100 @@ const StoreAddAssets = () => {
       )
     );
   };
+  
+  const handlePriceChange = (assetId: string, price: number) => {
+    if (price < 0) return;
+    
+    setAssetsToAdd(prev => 
+      prev.map(asset => 
+        asset.id === assetId ? { ...asset, customPrice: price } : asset
+      )
+    );
+  };
+
+  const handleQuickAdd = () => {
+    if (!selectedAssetId) {
+      toast({
+        title: "No asset selected",
+        description: "Please select an asset to assign.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const assetToAdd = assetsToAdd.find(asset => asset.id === selectedAssetId);
+    if (!assetToAdd) return;
+
+    const price = newAssetPrice !== undefined ? newAssetPrice : assetToAdd.pricePerUnit;
+
+    const newAssignedAsset: AssignedAsset = {
+      id: `temp-${Date.now()}`,
+      assetId: assetToAdd.id,
+      name: assetToAdd.name,
+      code: assetToAdd.code,
+      quantity: newAssetQuantity,
+      unit: assetToAdd.unitOfMeasurement,
+      price: price
+    };
+
+    setAssignedAssets(prev => [...prev, newAssignedAsset]);
+    
+    // Reset form
+    setSelectedAssetId("");
+    setNewAssetQuantity(1);
+    setNewAssetPrice(undefined);
+    
+    toast({
+      title: "Asset assigned",
+      description: `${assetToAdd.name} has been assigned to the list.`,
+    });
+  };
+  
+  const handleRemoveAssignedAsset = (id: string) => {
+    setAssignedAssets(prev => prev.filter(asset => asset.id !== id));
+    toast({
+      title: "Asset removed",
+      description: "Asset has been removed from the assignment list."
+    });
+  };
+  
+  const toggleEditMode = (id: string) => {
+    setAssignedAssets(prev => 
+      prev.map(asset => 
+        asset.id === id ? { ...asset, isEditing: !asset.isEditing } : asset
+      )
+    );
+  };
+  
+  const handleUpdateAssignedAsset = (id: string, field: 'quantity' | 'price', value: number) => {
+    if (value < 0) return;
+    
+    setAssignedAssets(prev => 
+      prev.map(asset => 
+        asset.id === id ? { ...asset, [field]: value } : asset
+      )
+    );
+  };
 
   const handleSubmit = () => {
-    const selectedAssets = assetsToAdd.filter(asset => asset.selected);
+    const selectedFromTable = assetsToAdd
+      .filter(asset => asset.selected)
+      .map(asset => ({
+        id: `selected-${asset.id}`,
+        assetId: asset.id,
+        name: asset.name,
+        code: asset.code,
+        quantity: asset.quantity,
+        unit: asset.unitOfMeasurement,
+        price: asset.customPrice !== undefined ? asset.customPrice : asset.pricePerUnit
+      }));
     
-    if (selectedAssets.length === 0) {
+    const allAssetsToSubmit = [...assignedAssets, ...selectedFromTable];
+    
+    if (allAssetsToSubmit.length === 0) {
       toast({
         title: "No assets selected",
-        description: "Please select at least one asset to add to the store.",
+        description: "Please select or add at least one asset to assign to the store.",
         variant: "destructive"
       });
       return;
@@ -93,17 +215,18 @@ const StoreAddAssets = () => {
     
     // Mock API call to add assets to store
     setTimeout(() => {
-      console.log("Adding assets to store:", {
+      console.log("Assigning assets to store:", {
         storeId: store.id,
-        assets: selectedAssets.map(asset => ({
-          assetId: asset.id,
-          quantity: asset.quantity
+        assets: allAssetsToSubmit.map(asset => ({
+          assetId: asset.assetId,
+          quantity: asset.quantity,
+          price: asset.price
         }))
       });
       
       toast({
-        title: "Assets added",
-        description: `${selectedAssets.length} assets have been added to ${store.name}.`
+        title: "Assets assigned",
+        description: `${allAssetsToSubmit.length} assets have been assigned to ${store.name}.`
       });
       
       setIsLoading(false);
@@ -126,13 +249,153 @@ const StoreAddAssets = () => {
             {store.name}
           </Link>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          <span>Add Assets</span>
+          <span>Assign Assets</span>
         </div>
-        <h1 className="text-3xl font-bold mt-1">Add Assets to {store.name}</h1>
+        <h1 className="text-3xl font-bold mt-1">Assign Assets to {store.name}</h1>
         <p className="text-muted-foreground">
-          Select assets and specify quantities to add to this store
+          Select assets and specify quantities to assign to this store
         </p>
       </div>
+      
+      {/* Currently Assigned Assets */}
+      {assignedAssets.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Currently Assigned Assets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Asset Name</TableHead>
+                  <TableHead>Asset Code</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead>Price (₹)</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {assignedAssets.map((asset) => (
+                  <TableRow key={asset.id}>
+                    <TableCell className="font-medium">{asset.name}</TableCell>
+                    <TableCell>{asset.code}</TableCell>
+                    <TableCell>
+                      {asset.isEditing ? (
+                        <Input
+                          type="number"
+                          min="1"
+                          className="w-20"
+                          value={asset.quantity}
+                          onChange={(e) => handleUpdateAssignedAsset(
+                            asset.id, 
+                            'quantity', 
+                            parseInt(e.target.value) || 1
+                          )}
+                        />
+                      ) : (
+                        asset.quantity
+                      )}
+                    </TableCell>
+                    <TableCell>{asset.unit}</TableCell>
+                    <TableCell>
+                      {asset.isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="w-24"
+                          value={asset.price}
+                          onChange={(e) => handleUpdateAssignedAsset(
+                            asset.id, 
+                            'price', 
+                            parseFloat(e.target.value) || 0
+                          )}
+                        />
+                      ) : (
+                        `₹${asset.price.toFixed(2)}`
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleEditMode(asset.id)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveAssignedAsset(asset.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Quick Asset Assignment */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Asset Assignment</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-12 gap-4">
+            <div className="md:col-span-5">
+              <label className="text-sm font-medium mb-1 block">Select Asset</label>
+              <Select value={selectedAssetId} onValueChange={setSelectedAssetId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an asset..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {assetsToAdd.map((asset) => (
+                    <SelectItem key={asset.id} value={asset.id}>
+                      {asset.name} ({asset.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">Quantity</label>
+              <Input
+                type="number"
+                min="1"
+                value={newAssetQuantity}
+                onChange={(e) => setNewAssetQuantity(parseInt(e.target.value) || 1)}
+              />
+            </div>
+            
+            <div className="md:col-span-3">
+              <label className="text-sm font-medium mb-1 block">Price (₹) (Optional)</label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={newAssetPrice !== undefined ? newAssetPrice : ''}
+                placeholder="Default price"
+                onChange={(e) => setNewAssetPrice(e.target.value === '' ? undefined : parseFloat(e.target.value))}
+              />
+            </div>
+            
+            <div className="md:col-span-2 flex items-end">
+              <Button onClick={handleQuickAdd} className="w-full">
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -154,29 +417,37 @@ const StoreAddAssets = () => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-muted/50">
-                    <th className="w-12 px-4 py-3"></th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Asset Code</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Asset Name</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Category</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Unit Cost (₹)</th>
+                    <th className="py-3 px-4 text-left text-sm font-medium">Custom Price</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Quantity</th>
+                    <th className="py-3 px-4 text-center text-sm font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => (
                       <tr key={asset.id} className="border-t">
-                        <td className="px-4 py-3 text-center">
-                          <Checkbox
-                            id={`asset-${asset.id}`}
-                            checked={asset.selected}
-                            onCheckedChange={() => handleToggleSelect(asset.id)}
-                          />
-                        </td>
                         <td className="py-3 px-4 text-sm">{asset.code}</td>
                         <td className="py-3 px-4 text-sm font-medium">{asset.name}</td>
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
                         <td className="py-3 px-4 text-sm">₹{asset.pricePerUnit.toFixed(2)}</td>
+                        <td className="py-3 px-4">
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="w-24"
+                            placeholder="Optional"
+                            value={asset.customPrice !== undefined ? asset.customPrice : ''}
+                            onChange={(e) => handlePriceChange(
+                              asset.id, 
+                              e.target.value === '' ? asset.pricePerUnit : parseFloat(e.target.value)
+                            )}
+                          />
+                        </td>
                         <td className="py-3 px-4">
                           <Input
                             type="number"
@@ -187,14 +458,41 @@ const StoreAddAssets = () => {
                               asset.id, 
                               parseInt(e.target.value) || 1
                             )}
-                            disabled={!asset.selected}
                           />
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Create assigned asset from the table row
+                              const newAssignedAsset: AssignedAsset = {
+                                id: `table-${asset.id}-${Date.now()}`,
+                                assetId: asset.id,
+                                name: asset.name,
+                                code: asset.code,
+                                quantity: asset.quantity,
+                                unit: asset.unitOfMeasurement,
+                                price: asset.customPrice !== undefined ? asset.customPrice : asset.pricePerUnit
+                              };
+                              
+                              setAssignedAssets(prev => [...prev, newAssignedAsset]);
+                              
+                              toast({
+                                title: "Asset assigned",
+                                description: `${asset.name} has been assigned to the list.`,
+                              });
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Assign
+                          </Button>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-muted-foreground">
+                      <td colSpan={7} className="py-6 text-center text-muted-foreground">
                         No assets found matching your search.
                       </td>
                     </tr>
@@ -213,9 +511,9 @@ const StoreAddAssets = () => {
             </Button>
             <Button 
               onClick={handleSubmit} 
-              disabled={isLoading || !assetsToAdd.some(asset => asset.selected)}
+              disabled={isLoading || assignedAssets.length === 0}
             >
-              {isLoading ? "Adding..." : "Add Selected Assets"}
+              {isLoading ? "Assigning..." : "Assign Assets"}
             </Button>
           </div>
         </CardContent>

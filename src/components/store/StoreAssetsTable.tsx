@@ -1,4 +1,5 @@
-import { AlertTriangle, Check, FileCheck, Package, Upload, X } from "lucide-react";
+
+import { AlertTriangle, Check, Download, FileCheck, Package, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +8,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { StoreAsset } from "@/types";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { useState } from "react";
 
 interface StoreAssetsTableProps {
   storeId: string;
@@ -16,6 +21,12 @@ interface StoreAssetsTableProps {
   onDocumentDialogOpen: (assetId: string, type: 'po' | 'invoice' | 'grn') => void;
   onInputChange: (value: string) => void;
   onSaveDocument: () => void;
+}
+
+interface FileUpload {
+  name: string;
+  url: string;
+  date?: Date;
 }
 
 export const StoreAssetsTable = ({
@@ -29,6 +40,72 @@ export const StoreAssetsTable = ({
 }: StoreAssetsTableProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // File uploads state management
+  const [fileUploads, setFileUploads] = useState<Record<string, Record<string, FileUpload[]>>>({});
+  const [invoiceDates, setInvoiceDates] = useState<Record<string, Date>>({});
+  const [invoiceAmounts, setInvoiceAmounts] = useState<Record<string, number>>({});
+
+  const handleFileUpload = (assetId: string, type: 'po' | 'invoice', event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+    
+    const newFiles = Array.from(event.target.files).map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+      date: new Date()
+    }));
+    
+    setFileUploads(prev => ({
+      ...prev,
+      [assetId]: {
+        ...(prev[assetId] || {}),
+        [type]: [...(prev[assetId]?.[type] || []), ...newFiles]
+      }
+    }));
+    
+    toast({
+      title: "Files uploaded",
+      description: `${newFiles.length} file(s) uploaded successfully.`,
+    });
+    
+    // Reset file input
+    event.target.value = '';
+  };
+  
+  const handleRemoveFile = (assetId: string, type: 'po' | 'invoice', index: number) => {
+    setFileUploads(prev => {
+      const assetFiles = {...prev[assetId]};
+      const typeFiles = [...(assetFiles[type] || [])];
+      typeFiles.splice(index, 1);
+      assetFiles[type] = typeFiles;
+      return {...prev, [assetId]: assetFiles};
+    });
+  };
+  
+  const handleInvoiceDateChange = (assetId: string, date: Date | undefined) => {
+    if (!date) return;
+    setInvoiceDates(prev => ({...prev, [assetId]: date}));
+  };
+  
+  const handleInvoiceAmountChange = (assetId: string, amount: string) => {
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount)) return;
+    setInvoiceAmounts(prev => ({...prev, [assetId]: numAmount}));
+  };
+  
+  const saveInvoiceDetails = (assetId: string) => {
+    const date = invoiceDates[assetId];
+    const amount = invoiceAmounts[assetId];
+    
+    console.log("Saving invoice details:", { assetId, date, amount });
+    
+    toast({
+      title: "Invoice details saved",
+      description: `Invoice details updated successfully.`,
+    });
+    
+    // In a real app, you would send this data to your backend
+  };
 
   return (
     <Card>
@@ -40,10 +117,10 @@ export const StoreAssetsTable = ({
           </div>
           <Button 
             variant="outline" 
-            onClick={() => navigate(`/assets/new?storeId=${storeId}`)}
+            onClick={() => navigate(`/stores/${storeId}/add-assets`)}
           >
             <Package className="mr-2 h-4 w-4" />
-            Add Assets
+            Assign Assets
           </Button>
         </div>
       </CardHeader>
@@ -80,7 +157,7 @@ export const StoreAssetsTable = ({
                         {storeAsset.quantity} {storeAsset.asset?.unitOfMeasurement}
                       </TableCell>
                       
-                      {/* PO Number */}
+                      {/* PO Number with file uploads */}
                       <TableCell>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -106,22 +183,65 @@ export const StoreAssetsTable = ({
                                   defaultValue={storeAsset.poNumber || ""}
                                   onChange={(e) => onInputChange(e.target.value)}
                                 />
-                                <div className="flex gap-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="w-full"
-                                    onClick={() => {
-                                      toast({
-                                        title: "Upload feature",
-                                        description: "File upload will be implemented soon"
-                                      });
-                                    }}
-                                  >
-                                    <Upload className="mr-2 h-4 w-4" /> 
-                                    Upload File
-                                  </Button>
+                                
+                                {/* File uploads */}
+                                <div className="space-y-2 pt-2">
+                                  <Label htmlFor={`po-upload-${storeAsset.id}`} className="text-sm font-medium">
+                                    Upload PO Documents
+                                  </Label>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      id={`po-upload-${storeAsset.id}`}
+                                      type="file"
+                                      multiple
+                                      className="hidden"
+                                      onChange={(e) => handleFileUpload(storeAsset.id, 'po', e)}
+                                    />
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="w-full"
+                                      onClick={() => document.getElementById(`po-upload-${storeAsset.id}`)?.click()}
+                                    >
+                                      <Upload className="mr-2 h-4 w-4" /> 
+                                      Upload Files
+                                    </Button>
+                                  </div>
+                                  
+                                  {/* File list */}
+                                  {fileUploads[storeAsset.id]?.po?.length > 0 && (
+                                    <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
+                                      <p className="text-xs font-medium">Uploaded files:</p>
+                                      {fileUploads[storeAsset.id].po.map((file, index) => (
+                                        <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
+                                          <div className="flex items-center text-xs truncate">
+                                            <FileCheck className="h-3 w-3 mr-1" />
+                                            <span className="truncate max-w-[150px]">{file.name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Button 
+                                              size="icon" 
+                                              variant="ghost" 
+                                              className="h-6 w-6"
+                                              onClick={() => window.open(file.url)}
+                                            >
+                                              <Download className="h-3 w-3" />
+                                            </Button>
+                                            <Button 
+                                              size="icon" 
+                                              variant="ghost" 
+                                              className="h-6 w-6"
+                                              onClick={() => handleRemoveFile(storeAsset.id, 'po', index)}
+                                            >
+                                              <X className="h-3 w-3" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
+                                
                                 <Button onClick={() => onDocumentDialogOpen(storeAsset.id, 'po')}>
                                   Save
                                 </Button>
@@ -131,7 +251,7 @@ export const StoreAssetsTable = ({
                         </Popover>
                       </TableCell>
                       
-                      {/* Invoice Number */}
+                      {/* Invoice Number with file uploads and additional fields */}
                       <TableCell>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -143,39 +263,134 @@ export const StoreAssetsTable = ({
                               {storeAsset.invoiceNumber || "Not Done"}
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-80">
+                          <PopoverContent className="w-96">
                             <div className="grid gap-4">
                               <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Invoice Number</h4>
+                                <h4 className="font-medium leading-none">Invoice Details</h4>
                                 <p className="text-sm text-muted-foreground">
-                                  Enter the invoice number for {storeAsset.asset?.name}
+                                  Enter invoice information for {storeAsset.asset?.name}
                                 </p>
                               </div>
                               <div className="grid gap-2">
+                                <Label htmlFor={`invoice-number-${storeAsset.id}`}>Invoice Number</Label>
                                 <Input 
+                                  id={`invoice-number-${storeAsset.id}`}
                                   placeholder="Enter invoice number"
                                   defaultValue={storeAsset.invoiceNumber || ""}
                                   onChange={(e) => onInputChange(e.target.value)}
                                 />
-                                <div className="flex gap-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    className="w-full"
-                                    onClick={() => {
-                                      toast({
-                                        title: "Upload feature",
-                                        description: "File upload will be implemented soon"
-                                      });
-                                    }}
+                                
+                                {/* Invoice Date */}
+                                <div className="space-y-1 pt-2">
+                                  <Label htmlFor={`invoice-date-${storeAsset.id}`}>Invoice Date</Label>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        id={`invoice-date-${storeAsset.id}`}
+                                        variant="outline"
+                                        className="w-full justify-start text-left font-normal"
+                                      >
+                                        {invoiceDates[storeAsset.id] ? 
+                                          format(invoiceDates[storeAsset.id], "PPP") : 
+                                          <span>Pick a date</span>
+                                        }
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                      <Calendar
+                                        mode="single"
+                                        selected={invoiceDates[storeAsset.id]}
+                                        onSelect={(date) => handleInvoiceDateChange(storeAsset.id, date)}
+                                        initialFocus
+                                        className="p-3 pointer-events-auto"
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                                
+                                {/* Invoice Amount */}
+                                <div className="space-y-1 pt-2">
+                                  <Label htmlFor={`invoice-amount-${storeAsset.id}`}>Invoice Amount (₹)</Label>
+                                  <Input
+                                    id={`invoice-amount-${storeAsset.id}`}
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="Enter invoice amount"
+                                    value={invoiceAmounts[storeAsset.id] || ''}
+                                    onChange={(e) => handleInvoiceAmountChange(storeAsset.id, e.target.value)}
+                                  />
+                                </div>
+                                
+                                {/* File uploads */}
+                                <div className="space-y-2 pt-2">
+                                  <Label htmlFor={`invoice-upload-${storeAsset.id}`} className="text-sm font-medium">
+                                    Upload Invoice Documents
+                                  </Label>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      id={`invoice-upload-${storeAsset.id}`}
+                                      type="file"
+                                      multiple
+                                      className="hidden"
+                                      onChange={(e) => handleFileUpload(storeAsset.id, 'invoice', e)}
+                                    />
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="w-full"
+                                      onClick={() => document.getElementById(`invoice-upload-${storeAsset.id}`)?.click()}
+                                    >
+                                      <Upload className="mr-2 h-4 w-4" /> 
+                                      Upload Files
+                                    </Button>
+                                  </div>
+                                  
+                                  {/* File list */}
+                                  {fileUploads[storeAsset.id]?.invoice?.length > 0 && (
+                                    <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
+                                      <p className="text-xs font-medium">Uploaded files:</p>
+                                      {fileUploads[storeAsset.id].invoice.map((file, index) => (
+                                        <div key={index} className="flex items-center justify-between bg-muted p-2 rounded-md">
+                                          <div className="flex items-center text-xs truncate">
+                                            <FileCheck className="h-3 w-3 mr-1" />
+                                            <span className="truncate max-w-[150px]">{file.name}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Button 
+                                              size="icon" 
+                                              variant="ghost" 
+                                              className="h-6 w-6"
+                                              onClick={() => window.open(file.url)}
+                                            >
+                                              <Download className="h-3 w-3" />
+                                            </Button>
+                                            <Button 
+                                              size="icon" 
+                                              variant="ghost" 
+                                              className="h-6 w-6"
+                                              onClick={() => handleRemoveFile(storeAsset.id, 'invoice', index)}
+                                            >
+                                              <X className="h-3 w-3" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="flex justify-end gap-2 pt-2">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => saveInvoiceDetails(storeAsset.id)}
                                   >
-                                    <Upload className="mr-2 h-4 w-4" /> 
-                                    Upload File
+                                    Save Details
+                                  </Button>
+                                  <Button onClick={() => onDocumentDialogOpen(storeAsset.id, 'invoice')}>
+                                    Save Number
                                   </Button>
                                 </div>
-                                <Button onClick={() => onDocumentDialogOpen(storeAsset.id, 'invoice')}>
-                                  Save
-                                </Button>
                               </div>
                             </div>
                           </PopoverContent>
@@ -305,10 +520,10 @@ export const StoreAssetsTable = ({
                           variant="outline" 
                           size="sm" 
                           className="mt-4"
-                          onClick={() => navigate(`/stores/${storeId}/assets`)}
+                          onClick={() => navigate(`/stores/${storeId}/add-assets`)}
                         >
                           <Package className="mr-2 h-4 w-4" />
-                          Add Assets
+                          Assign Assets
                         </Button>
                       </div>
                     </TableCell>
@@ -319,15 +534,6 @@ export const StoreAssetsTable = ({
           </div>
         </div>
       </CardContent>
-      {/* <CardFooter>
-        <Button 
-          variant="outline" 
-          onClick={() => navigate(`/assets?storeId=${storeId}`)}
-        >
-          <Package className="mr-2 h-4 w-4" />
-          Manage Assets
-        </Button>
-      </CardFooter> */}
     </Card>
   );
 };
