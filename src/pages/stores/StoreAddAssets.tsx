@@ -5,7 +5,6 @@ import { ChevronRight, Search, Plus, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { getStoreById, mockAssets } from "@/data/mockData";
 import { Asset } from "@/types";
@@ -39,6 +38,7 @@ interface AssignedAsset {
   quantity: number;
   unit: string;
   price: number;
+  isEditing?: boolean;
 }
 
 const StoreAddAssets = () => {
@@ -156,8 +156,8 @@ const StoreAddAssets = () => {
     setNewAssetPrice(undefined);
     
     toast({
-      title: "Asset added",
-      description: `${assetToAdd.name} has been added to the assignment list.`,
+      title: "Asset assigned",
+      description: `${assetToAdd.name} has been assigned to the list.`,
     });
   };
   
@@ -167,6 +167,14 @@ const StoreAddAssets = () => {
       title: "Asset removed",
       description: "Asset has been removed from the assignment list."
     });
+  };
+  
+  const toggleEditMode = (id: string) => {
+    setAssignedAssets(prev => 
+      prev.map(asset => 
+        asset.id === id ? { ...asset, isEditing: !asset.isEditing } : asset
+      )
+    );
   };
   
   const handleUpdateAssignedAsset = (id: string, field: 'quantity' | 'price', value: number) => {
@@ -273,41 +281,58 @@ const StoreAddAssets = () => {
                     <TableCell className="font-medium">{asset.name}</TableCell>
                     <TableCell>{asset.code}</TableCell>
                     <TableCell>
-                      <Input
-                        type="number"
-                        min="1"
-                        className="w-20"
-                        value={asset.quantity}
-                        onChange={(e) => handleUpdateAssignedAsset(
-                          asset.id, 
-                          'quantity', 
-                          parseInt(e.target.value) || 1
-                        )}
-                      />
+                      {asset.isEditing ? (
+                        <Input
+                          type="number"
+                          min="1"
+                          className="w-20"
+                          value={asset.quantity}
+                          onChange={(e) => handleUpdateAssignedAsset(
+                            asset.id, 
+                            'quantity', 
+                            parseInt(e.target.value) || 1
+                          )}
+                        />
+                      ) : (
+                        asset.quantity
+                      )}
                     </TableCell>
                     <TableCell>{asset.unit}</TableCell>
                     <TableCell>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        className="w-24"
-                        value={asset.price}
-                        onChange={(e) => handleUpdateAssignedAsset(
-                          asset.id, 
-                          'price', 
-                          parseFloat(e.target.value) || 0
-                        )}
-                      />
+                      {asset.isEditing ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="w-24"
+                          value={asset.price}
+                          onChange={(e) => handleUpdateAssignedAsset(
+                            asset.id, 
+                            'price', 
+                            parseFloat(e.target.value) || 0
+                          )}
+                        />
+                      ) : (
+                        `₹${asset.price.toFixed(2)}`
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveAssignedAsset(asset.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleEditMode(asset.id)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveAssignedAsset(asset.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -392,26 +417,19 @@ const StoreAddAssets = () => {
               <table className="w-full">
                 <thead>
                   <tr className="bg-muted/50">
-                    <th className="w-12 px-4 py-3"></th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Asset Code</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Asset Name</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Category</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Unit Cost (₹)</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Custom Price</th>
                     <th className="py-3 px-4 text-left text-sm font-medium">Quantity</th>
+                    <th className="py-3 px-4 text-center text-sm font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAssets.length > 0 ? (
                     filteredAssets.map((asset) => (
                       <tr key={asset.id} className="border-t">
-                        <td className="px-4 py-3 text-center">
-                          <Checkbox
-                            id={`asset-${asset.id}`}
-                            checked={asset.selected}
-                            onCheckedChange={() => handleToggleSelect(asset.id)}
-                          />
-                        </td>
                         <td className="py-3 px-4 text-sm">{asset.code}</td>
                         <td className="py-3 px-4 text-sm font-medium">{asset.name}</td>
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
@@ -428,7 +446,6 @@ const StoreAddAssets = () => {
                               asset.id, 
                               e.target.value === '' ? asset.pricePerUnit : parseFloat(e.target.value)
                             )}
-                            disabled={!asset.selected}
                           />
                         </td>
                         <td className="py-3 px-4">
@@ -441,8 +458,35 @@ const StoreAddAssets = () => {
                               asset.id, 
                               parseInt(e.target.value) || 1
                             )}
-                            disabled={!asset.selected}
                           />
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              // Create assigned asset from the table row
+                              const newAssignedAsset: AssignedAsset = {
+                                id: `table-${asset.id}-${Date.now()}`,
+                                assetId: asset.id,
+                                name: asset.name,
+                                code: asset.code,
+                                quantity: asset.quantity,
+                                unit: asset.unitOfMeasurement,
+                                price: asset.customPrice !== undefined ? asset.customPrice : asset.pricePerUnit
+                              };
+                              
+                              setAssignedAssets(prev => [...prev, newAssignedAsset]);
+                              
+                              toast({
+                                title: "Asset assigned",
+                                description: `${asset.name} has been assigned to the list.`,
+                              });
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Assign
+                          </Button>
                         </td>
                       </tr>
                     ))
@@ -467,9 +511,9 @@ const StoreAddAssets = () => {
             </Button>
             <Button 
               onClick={handleSubmit} 
-              disabled={isLoading || (assignedAssets.length === 0 && !assetsToAdd.some(asset => asset.selected))}
+              disabled={isLoading || assignedAssets.length === 0}
             >
-              {isLoading ? "Assigning..." : "Assign Selected Assets"}
+              {isLoading ? "Assigning..." : "Assign Assets"}
             </Button>
           </div>
         </CardContent>
