@@ -50,7 +50,7 @@ const AssetList = () => {
 
 
   // Categories for grouping
-  const categories = Array.from(new Set(mockAssets.map((asset) => asset.category)));
+  const categories = Array.from(new Set(filteredAssets.map((asset) => asset.category)));
 
   // Group assets by category
   const assetsByCategory = categories.map((category) => {
@@ -115,10 +115,10 @@ const AssetList = () => {
         </CardHeader>
         <CardContent>
           {assetsByCategory.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space">
               {assetsByCategory.map((group) => (
                 group.assets.length > 0 && (
-                  <div key={group.category} className="space-y-3">
+                  <div key={group.category} className="space">
                     <h3 className="font-medium text-lg">{group.category}</h3>
                     <div className="border rounded-md overflow-hidden">
                       <table className="min-w-full divide-y divide-border">
