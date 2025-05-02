@@ -112,9 +112,14 @@ export const assetAPI = {
   },
 
   // Create new asset
+  
   createAsset: async (assetData: Omit<Asset, 'id'>) => {
     try {
-      const response = await axios.post(`${API_URL}/assets`, assetData);
+      const response = await axios.post(`${API_URL}/assets`, assetData,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error creating asset:', error);

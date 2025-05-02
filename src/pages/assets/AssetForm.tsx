@@ -4,6 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { assetAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
+import { Asset} from '@/types';
+
 import { 
   Form, 
   FormControl, 
@@ -69,11 +72,18 @@ const AssetForm = () => {
         });
       } else {
         // Mock creating new asset
-        const newAsset = {
+        const newAsset:Asset = {
           id: generateId(),
-          ...values,
+          code: values.code || '',
+          name: values.name || '', // Fallback to empty string         
+          category: values.category || "",
+          unitOfMeasurement: values.unitOfMeasurement || "",
+          pricePerUnit: values.pricePerUnit || 0,
+          
         };
-        console.log("Creating asset:", newAsset);
+
+        const newlycreatedAssets = assetAPI.createAsset(newAsset);
+        console.log("Creating asset:", newlycreatedAssets);
         toast({
           title: "Asset created",
           description: `${values.name} has been created successfully.`,
