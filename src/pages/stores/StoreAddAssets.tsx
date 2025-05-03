@@ -143,10 +143,10 @@ const StoreAddAssets = () => {
           ? {
               ...asset,
               quantity,
-              customPrice:
-                asset.asset == undefined
-                  ? quantity * Number(asset.price_per_unit)
-                  : Number(asset.customPrice) * quantity,
+              // customPrice:
+              //   asset.asset == undefined
+              //     ? quantity * Number(asset.price_per_unit)
+              //     : Number(asset.customPrice) * quantity,
             }
           : asset
       )
@@ -159,7 +159,7 @@ const StoreAddAssets = () => {
 
     setAssetsToAdd((prev) =>
       prev.map((asset) =>
-        asset.id === assetId ? { ...asset, customPrice: price } : asset
+        asset.id === assetId ? { ...asset, price_per_unit: price } : asset
       )
     );
   };
@@ -549,13 +549,16 @@ const StoreAddAssets = () => {
                       Category
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
+                    UOM 
+                    </th>
+                    <th className="py-3 px-4 text-left text-sm font-medium">
                       Unit Cost (₹)
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
                       Quantity
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
-                      Custom Price
+                      Total Price
                     </th>
                     <th className="py-3 px-4 text-center text-sm font-medium">
                       Actions
@@ -575,8 +578,41 @@ const StoreAddAssets = () => {
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
 
                         <td className="py-3 px-4 text-sm">
-                          ₹{Number(asset.price_per_unit ?? "0").toFixed(2)}
+                        {asset.unit_of_measurement??"NA"}
                         </td>
+                        {/* <td className="py-3 px-4 text-sm">
+                          ₹{Number(asset.price_per_unit ?? "0").toFixed(2)}
+                        </td> */}
+                         {isEditing && asset.id == editingItemId ? (
+                          <td className="py-3 px-4">
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              className="w-24"
+                              placeholder="Optional"
+                              value={
+                               
+                                // asset.quantity *
+                                  Number(asset.price_per_unit ?? "0")
+                              }
+                              onChange={(e) =>
+                                handlePriceChange(
+                                  asset.id,
+                                  e.target.value === ""
+                                    ? parseFloat(asset.price_per_unit)
+                                    : parseFloat(e.target.value)
+                                )
+                              }
+                            />
+                          </td>
+                        ) : (
+                          <td className="py-3 px-4 text-sm">
+                            {asset.customPrice ??
+                              asset.quantity *
+                                Number(asset.price_per_unit ?? "0")}
+                          </td>
+                        )}
                         {isEditing && asset.id == editingItemId ? (
                           <td className="py-3 px-4">
                             <Input
@@ -598,7 +634,7 @@ const StoreAddAssets = () => {
                           </td>
                         )}
 
-                        {isEditing && asset.id == editingItemId ? (
+                        {/* {isEditing && asset.id == editingItemId ? (
                           <td className="py-3 px-4">
                             <Input
                               type="number"
@@ -627,13 +663,15 @@ const StoreAddAssets = () => {
                               asset.quantity *
                                 Number(asset.price_per_unit ?? "0")}
                           </td>
-                        )}
+                        )} */}
+                        <td>{asset.quantity *
+                                  Number(asset.price_per_unit ?? "0")}</td>
 
                         <td className="py-3 px-4 text-center">
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={isEditingLoading}
+                            disabled={isEditingLoading && asset.id == editingItemId&&isEditingLoading}
                             onClick={() => {
                               console.log("isEditing: ", isEditing);
 
@@ -657,12 +695,12 @@ const StoreAddAssets = () => {
                           >
                             {/* <Plus className="h-4 w-4 mr-1" /> */}
 
-                             {!isEditingLoading&& (isEditing && asset.id == editingItemId ? (
+                             { (isEditing && asset.id == editingItemId)&&(!isEditingLoading ) ? (
                               <Save className="h-4 w-4" />
                             ) : (
                               <Edit className="h-4 w-4" />
-                            ))}
-                            {isEditingLoading
+                            )}
+                            {isEditingLoading && asset.id == editingItemId
                               ? "Saving..."
                               : isEditing && asset.id == editingItemId
                               ? "Save"

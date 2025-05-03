@@ -13,6 +13,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProgressBadge } from "@/components/ui/progress-badge";
@@ -37,6 +38,7 @@ import {
 
 
 const Dashboard = () => {
+  const highProgressValue = 140 ;
   const [stores, setStores] = useState<Store[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
@@ -44,21 +46,21 @@ const Dashboard = () => {
   const randomPercentage = (min: number, max: number) => 
     Math.floor(Math.random() * (max - min + 1) + min);
 
+  const fetchStores = async () => {
+    try {
+      const allStores = await storeAPI.getAllStores();
+      const storedata = allStores.map((store) => ({
+        ...store,
+        grnCompletionPercentage: randomPercentage(50, 100),
+        financeBookingPercentage: randomPercentage(50, 90),
+      }));
+
+      setStores(storedata);
+    } catch (error) {
+      console.error("Failed to fetch stores", error);
+    }
+  };
   useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const allStores = await storeAPI.getAllStores();
-        const storedata = allStores.map((store) => ({
-          ...store,
-          grnCompletionPercentage: randomPercentage(50, 100),
-          financeBookingPercentage: randomPercentage(50, 90),
-        }));
-  
-        setStores(storedata);
-      } catch (error) {
-        console.error("Failed to fetch stores", error);
-      }
-    };
   
     fetchStores();
   }, []);
@@ -103,6 +105,38 @@ const Dashboard = () => {
     alert("Export to CSV functionality will be implemented in the next phase.");
   };
 
+
+
+
+
+  const handleStoreMarkAsComplete =async (storeId: string) => {
+try{
+  const res =await storeAPI.storeMarkAsComplete(storeId);
+  console.log('res: ', res);
+  if(res.data.length>0){
+    toast({
+      title: "Success",
+      description: `${res.data[0].name} has been marked as complete.`,
+    });
+  fetchStores(); // Refresh the store list after marking as complete
+  }else{
+    toast({
+      title: "Error",
+      description: `Failed to mark store as complete.`,
+    });
+  }
+}catch(error){
+
+  toast({
+    title: "Error",
+    description: `Failed to mark store as complete.`,
+    variant: "destructive",
+  });
+}
+
+
+  }
+    // Mock API call - would be replaced with real data deletion
   return (
     // <div className="space-y-6">
     <div className="space-y-6">
@@ -234,7 +268,7 @@ const Dashboard = () => {
                             />
                           </td>
                           <td className="py-3 px-4">
-                            <DropdownMenu>
+                            <DropdownMenu >
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm">
                                   <MoreHorizontal className="h-4 w-4" />
@@ -247,7 +281,8 @@ const Dashboard = () => {
                                 <DropdownMenuItem asChild>
                                   <Link to={`/stores/edit/${store.id}`}>Edit</Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                              
+                                <DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
                                   Mark as Complete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

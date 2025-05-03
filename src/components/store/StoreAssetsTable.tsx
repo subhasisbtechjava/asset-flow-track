@@ -1,5 +1,5 @@
 
-import { AlertTriangle, Check, Download, FileCheck, Package, Upload, X } from "lucide-react";
+import { AlertTriangle, Check, Download, FileCheck, Link, Package, Plus, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -115,12 +115,18 @@ export const StoreAssetsTable = ({
             <CardTitle>Store Assets</CardTitle>
             <CardDescription>Manage store assets and track purchasing progress</CardDescription>
           </div>
-          <Button 
+          {/* <Button 
             variant="outline" 
             onClick={() => navigate(`/stores/${storeId}/add-assets`)}
           >
             <Package className="mr-2 h-4 w-4" />
             Assign Assets
+          </Button> */}
+           <Button variant="default"    onClick={() => navigate(`/stores/${storeId}/add-assets`)}>
+          
+              <Plus className="mr-2 h-4 w-4" />
+              Manage Assets
+       
           </Button>
         </div>
       </CardHeader>

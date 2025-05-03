@@ -78,7 +78,7 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/assets" className="flex items-center cursor-pointer">
                     <Package className="mr-2 h-4 w-4" />
-                    <span>Manage Assets</span>
+                    <span> Manage Master Assets</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

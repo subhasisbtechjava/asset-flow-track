@@ -192,13 +192,8 @@ const StoreDetail = () => {
               Edit
             </Link>
           </Button>
-          <Button variant="default" asChild>
-            <Link to={`/stores/${store.id}/add-assets`}>
-              <Plus className="mr-2 h-4 w-4" />
-              Assign Assets
-            </Link>
-          </Button>
-          <AlertDialog>
+         
+          {/* <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -224,7 +219,7 @@ const StoreDetail = () => {
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
-          </AlertDialog>
+          </AlertDialog> */}
         </div>
       </div>
 

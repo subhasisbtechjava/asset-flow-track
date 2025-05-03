@@ -81,6 +81,23 @@ export const storeAPI = {
       throw error;
     }
   },
+  storeMarkAsComplete: async (storeId:string) => {
+    try {
+      //const response = await axios.get(`${API_URL}/stores`);
+      const response = await axios.get(`${API_URL}/stores/markcomplete/${storeId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+      throw error;
+    }
+  },
+
+
+
 
   // Get store by ID
   getStoreById: async (id: string) => {
