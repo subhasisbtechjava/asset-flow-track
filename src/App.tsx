@@ -18,6 +18,7 @@ import Login from "./pages/auth/Login";
 import NotFound from "./pages/NotFound";
 import UserList from "./pages/users/UserList";
 import ProfileSettings from "./pages/profile/ProfileSettings";
+import ChangePassword from "./pages/profile/ChangePassword";
 
 const App = () => {
   // Move QueryClient initialization inside the component
@@ -44,6 +45,7 @@ const App = () => {
                 <Route path="assets/edit/:id" element={<AssetForm />} />
                 <Route path="users" element={<UserList />} />
                 <Route path="profile" element={<ProfileSettings />} />
+                <Route path="changepassword" element={<ChangePassword />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

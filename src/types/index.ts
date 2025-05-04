@@ -27,6 +27,12 @@ export interface Asset {
   pricePerUnit: number;
 }
 
+export interface Changepass { 
+  currentpass: string;
+  newpass: string;
+  confirmmpass: string;
+}
+
 export interface StoreAsset {
   id: string;
   storeId: string;
