@@ -43,6 +43,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
   const [cityFilter, setCityFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string | null>("in_progress");
   const randomPercentage = (min: number, max: number) => 
     Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -79,6 +80,7 @@ const Dashboard = () => {
     Array.from(new Set(stores.map(store => store.city))),
   [stores]
   );
+  const [statuses] =useState<string[]>(["in_progress","closed",]);
 
   const filteredStores = stores.filter(store => {
     const matchesSearch = 
@@ -88,17 +90,36 @@ const Dashboard = () => {
     
     const matchesBrand = !brandFilter || store.brand === brandFilter;
     const matchesCity = !cityFilter || store.city === cityFilter;
+    const matchesStatus = !statusFilter || store.status === statusFilter;
     
-    return matchesSearch && matchesBrand && matchesCity;
+    return matchesSearch && matchesBrand && matchesCity &&matchesStatus;
   });
 
   const totalStores = filteredStores.length;
-  const highProgressStores = filteredStores.filter(store => 
-    store.grnCompletionPercentage > 75 && store.financeBookingPercentage > 75
-  ).length;
-  const lowProgressStores = filteredStores.filter(store => 
-    store.grnCompletionPercentage < 25 || store.financeBookingPercentage < 25
-  ).length;
+
+  
+  // const totalProgress = (grnCompletionPercentage + financeBookingPercentage) / 2 || 0;
+
+
+
+  
+  const highProgressStores = filteredStores.filter((store)=>{
+  const tempTotalCount = 10;
+const grnCompletionPercentage =  store.grn_progress / tempTotalCount * 100 || 0;
+const erpCompletionPercentage =  store.erp_progress / tempTotalCount * 100 || 0;
+const totalProgress = grnCompletionPercentage + erpCompletionPercentage;
+ const isHighProgress = totalProgress > highProgressValue;
+
+    return isHighProgress;
+  }  
+  );
+
+  // const highProgressStores = filteredStores.filter(store => 
+  //   store.grnCompletionPercentage > 75 && store.financeBookingPercentage > 75
+  // ).length;
+  // const lowProgressStores = filteredStores.filter(store => 
+  //   store.grnCompletionPercentage < 25 || store.financeBookingPercentage < 25
+  // ).length;
   
   const exportToCSV = () => {
     console.log("Exporting data to CSV...");
@@ -159,7 +180,7 @@ try{
             <CardTitle className="text-sm font-medium text-muted-foreground">High Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{highProgressStores}</div>
+            <div className="text-3xl font-bold text-green-600">{highProgressStores.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -167,7 +188,7 @@ try{
             <CardTitle className="text-sm font-medium text-muted-foreground">Low Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-amber-600">{lowProgressStores}</div>
+            <div className="text-3xl font-bold text-amber-600">{filteredStores.length-highProgressStores.length}</div>
           </CardContent>
         </Card>
       </div>
@@ -197,7 +218,7 @@ try{
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 md:w-1/2">
+              <div className="grid grid-cols-3 gap-4 md:w-1/2">
                 <Select onValueChange={(value) => setBrandFilter(value === "all" ? null : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Brand" />
@@ -224,6 +245,24 @@ try{
                     ))}
                   </SelectContent>
                 </Select>
+
+         
+                <Select onValueChange={(value) =>{
+                   setStatusFilter(value === "all" ? null : value)
+                }}>
+                     
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Status</SelectItem>
+                    {statuses.map((item,i) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -236,6 +275,7 @@ try{
                       <th className="py-3 px-4 text-left text-sm font-medium">Store Name</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">Brand</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">City</th>
+                      {/* <th className="py-3 px-4 text-left text-sm font-medium">Status</th> */}
                       <th className="py-3 px-4 text-left text-sm font-medium">GRN Progress</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">ERP Progress</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">Actions</th>
@@ -255,6 +295,7 @@ try{
                             <Badge variant="outline">{store.brand}</Badge>
                           </td>
                           <td className="py-3 px-4 text-sm">{store.city}</td>
+                          {/* <td className="py-3 px-4 text-sm">{store.status}</td> */}
                           <td className="py-3 px-4 min-w-[160px]">
                             <ProgressBadge 
                               percentage={store.grnCompletionPercentage} 

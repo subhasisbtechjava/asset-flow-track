@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,7 @@ const StoreDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>(() => 
-    id ? getStoreAssetsByStoreId(id) : []
-  );
+  const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState<'po' | 'invoice' | 'grn' | null>(null);
   const [inputValue, setInputValue] = useState("");
@@ -29,11 +27,32 @@ const StoreDetail = () => {
   const [searchTerm, setSearchTerm] = useState("");
   
   // Fetch store details
-  const store = id ? getStoreById(id) : null;
+  const [store,setStore] = useState(null)  ;
   
   // Fetch store assets
-  const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
-  
+
+
+  useEffect(() => {
+
+    if(id){
+      console.log('id: ', id);
+     
+      fetchStoreDetails()
+      fetchStoreAssets();
+      
+    }
+    
+      },[])
+    
+    
+    async function fetchStoreDetails() {
+      const storeDetails = await getStoreById(id);
+      setStore(storeDetails);
+    }
+     async function fetchStoreAssets() {
+      const assets = await getStoreAssetsByStoreId(id);
+      setStoreAssetsList(assets);
+     }
   if (!store) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -49,6 +68,8 @@ const StoreDetail = () => {
       </div>
     );
   }
+
+  
 
   // Handle delete store
   const handleDeleteStore = () => {
@@ -192,34 +213,7 @@ const StoreDetail = () => {
               Edit
             </Link>
           </Button>
-         
-          {/* <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  store and all of its associated assets and purchase records.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeleteStore}
-                  disabled={isDeleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog> */}
+          
         </div>
       </div>
 

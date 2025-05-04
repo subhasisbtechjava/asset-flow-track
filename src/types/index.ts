@@ -12,8 +12,11 @@ export interface Store {
   id: string;
   name: string;
   code: string;
+  status: string;
   brand: string;
   city: string;
+  grn_progress: number;
+  erp_progress: number;
   grnCompletionPercentage: number;
   financeBookingPercentage: number;
 }
