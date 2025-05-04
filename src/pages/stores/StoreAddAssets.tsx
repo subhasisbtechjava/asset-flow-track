@@ -433,7 +433,7 @@ const StoreAddAssets = () => {
                         <td className="py-3 px-4 text-sm">{asset.code}</td>
                         <td className="py-3 px-4 text-sm font-medium">{asset.name}</td>
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
-                        <td className="py-3 px-4 text-sm">₹{asset.pricePerUnit.toFixed(2)}</td>
+                        <td className="py-3 px-4 text-sm">₹{asset.pricePerUnit}</td>
                         <td className="py-3 px-4">
                           <Input
                             type="number"
