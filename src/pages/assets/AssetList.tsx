@@ -1,6 +1,6 @@
 
 import { useState,useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 import { Plus, Search, FileEdit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,16 +28,32 @@ import {
 import { toast } from "@/components/ui/use-toast";
 
 const AssetList = () => {
+  let pagedata = [];
   const [filteredAssets, setAssets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
       const fetchAssets = async () => {
         try {
           const allAssets = await assetAPI.getAllAssets();    
-          console.log(allAssets);         
+          //console.log(allAssets);         
+          setAssets(allAssets);
+        } catch (error) {
+          console.error("Failed to fetch stores", error);
+        }
+      };
+    
+      fetchAssets();
+    }, [deletingId]);
+
+
+    useEffect(() => {
+      const fetchAssets = async () => {
+        try {
+          const allAssets = await assetAPI.getAllAssets();    
+          //console.log(allAssets);         
           setAssets(allAssets);
         } catch (error) {
           console.error("Failed to fetch stores", error);
@@ -48,32 +64,40 @@ const AssetList = () => {
     }, []);
 
 
+    const searcResult = filteredAssets.filter(filterdata => {
+      const matchesSearch = 
+        searchTerm === "" || 
+        filterdata.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        filterdata.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        filterdata.category.toLowerCase().includes(searchTerm.toLowerCase())
+      return matchesSearch;
+    });
+
+     pagedata =(searcResult.length > 0)?  searcResult : filteredAssets;
 
   // Categories for grouping
-  const categories = Array.from(new Set(filteredAssets.map((asset) => asset.category)));
+  const categories = Array.from(new Set(pagedata.map((asset) => asset.category)));
 
   // Group assets by category
   const assetsByCategory = categories.map((category) => {
     return {
       category,
-      assets: filteredAssets.filter((asset) => asset.category === category),
+      assets: pagedata.filter((asset) => asset.category === category),
     };
   });
 
   // Handle delete asset
-  const handleDeleteAsset = (id: string) => {
-    setDeletingId(id);
-    
-    // Mock API call - would be replaced with real data deletion
-    setTimeout(() => {
+  const handleDeleteAsset = async(id: string) => {
+ 
       console.log("Deleting asset:", id);
-      setDeletingId(null);
       
+      const deleteAssets = await assetAPI.deleteAsset(id); 
       toast({
         title: "Asset deleted",
         description: "Asset has been deleted successfully.",
       });
-    }, 1000);
+      setDeletingId(id);   
+      navigate("/assets");
   };
 
   return (
@@ -115,10 +139,10 @@ const AssetList = () => {
         </CardHeader>
         <CardContent>
           {assetsByCategory.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space">
               {assetsByCategory.map((group) => (
                 group.assets.length > 0 && (
-                  <div key={group.category} className="space-y-3">
+                  <div key={group.category} className="space">
                     <h3 className="font-medium text-lg">{group.category}</h3>
                     <div className="border rounded-md overflow-hidden">
                       <table className="min-w-full divide-y divide-border">
@@ -165,7 +189,7 @@ const AssetList = () => {
                                       <AlertDialogHeader>
                                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                          This will delete the {asset.name} asset from your master list.
+                                          This will delete the {asset.name} asset from your assets master list and also delete the store assets of this item.
                                           This action cannot be undone.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>

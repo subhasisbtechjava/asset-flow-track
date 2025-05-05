@@ -193,7 +193,11 @@ export const assetAPI = {
   // Get asset by ID
   getAssetById: async (id: string) => {
     try {
-      const response = await axios.get(`${API_URL}/assets/${id}`);
+      const response = await axios.get(`${API_URL}/editassets/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
       return response.data;
     } catch (error) {
       console.error(`Error fetching asset ${id}:`, error);
@@ -219,8 +223,13 @@ export const assetAPI = {
 
   // Update asset
   updateAsset: async (id: string, assetData: Partial<Asset>) => {
+    console.log(assetData);
     try {
-      const response = await axios.put(`${API_URL}/assets/${id}`, assetData);
+      const response = await axios.post(`${API_URL}/assets/update/${id}`, assetData,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
       return response.data;
     } catch (error) {
       console.error(`Error updating asset ${id}:`, error);
@@ -231,7 +240,11 @@ export const assetAPI = {
   // Delete asset
   deleteAsset: async (id: string) => {
     try {
-      const response = await axios.delete(`${API_URL}/assets/${id}`);
+      const response = await axios.get(`${API_URL}/delete/assets/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
       return response.data;
     } catch (error) {
       console.error(`Error deleting asset ${id}:`, error);

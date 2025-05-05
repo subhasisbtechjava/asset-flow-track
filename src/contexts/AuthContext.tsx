@@ -113,6 +113,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   //   localStorage.removeItem("user");
   //   navigate("/login");
   // };
+  // const login = async (email: string, password: string) => {
+  //   setIsLoading(true);
+  //   try {
+  //     // Call the actual API instead of mock
+  //     const user = await authAPI.login(email, password);
+  //     console.log(user)
+  //     setUser(user);
+  //     localStorage.setItem("user", JSON.stringify(user));
+  //     navigate("/");
+  //   } catch (error) {
+  //     console.error("Login failed:", error);
+  //     throw error; // Re-throw to let the login form handle it
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {

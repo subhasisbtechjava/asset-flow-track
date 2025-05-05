@@ -3,7 +3,7 @@
 // These would be implemented on a Node.js backend
 
 import axios from 'axios';
-import { User } from '@/types';
+import { User,Changepass } from '@/types';
 
 //const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 
@@ -83,5 +83,20 @@ export const authAPI = {
     },
 
 
+    userpasswordchange: async (id,passwordUpdateData) => {
+      try {
+        console.log(passwordUpdateData);
+        //const response = await axios.get(`${API_URL}/stores`);  
+        const response = await axios.post(`${API_URL}/users/changepassword/${id}`, passwordUpdateData,{
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+                }
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+        throw error;
+      }
+    },
 
 };

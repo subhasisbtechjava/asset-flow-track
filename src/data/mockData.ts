@@ -6,11 +6,13 @@ import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
 const randomPercentage = (min: number, max: number) => 
   Math.floor(Math.random() * (max - min + 1) + min);
 
+const id = localStorage.getItem('id') || '';
+
 
 
 
 // pending developer sk ismile 
- const allstores = await storeAPI.getAllStores();
+ const allstores = id? await storeAPI.getAllStores():[];
 
  const data=[];
 
@@ -64,56 +66,56 @@ export const mockAssets: Asset[] = [
     code: 'EQ-001',
     name: 'Commercial Deep Fryer',
     category: 'Kitchen Equipment',
-    unitOfMeasurement: 'pcs',
-    pricePerUnit: 2500
+    unit_of_measurement: 'pcs',
+    price_per_unit: 2500
   },
   {
-    id: '2',
+    id: '857933f0-1bb9-43da-b621-5d8ada99c6ef',
     code: 'EQ-002',
     name: 'Industrial Refrigerator',
     category: 'Kitchen Equipment',
-    unitOfMeasurement: 'pcs',
-    pricePerUnit: 4200
+    unit_of_measurement: 'pcs',
+    price_per_unit: 4200
   },
   {
     id: '3',
     code: 'EQ-003',
     name: 'POS System Terminal',
     category: 'Technology',
-    unitOfMeasurement: 'pcs',
-    pricePerUnit: 1800
+    unit_of_measurement: 'pcs',
+    price_per_unit: 1800
   },
   {
     id: '4',
     code: 'EQ-004',
     name: 'Kitchen Countertop',
     category: 'Furniture',
-    unitOfMeasurement: 'sq ft',
-    pricePerUnit: 65
+    unit_of_measurement: 'sq ft',
+    price_per_unit: 65
   },
   {
     id: '5',
     code: 'EQ-005',
     name: 'Customer Seating Set',
     category: 'Furniture',
-    unitOfMeasurement: 'set',
-    pricePerUnit: 850
+    unit_of_measurement: 'set',
+    price_per_unit: 850
   },
   {
     id: '6',
     code: 'EQ-006',
     name: 'Food Warmer Display',
     category: 'Kitchen Equipment',
-    unitOfMeasurement: 'pcs',
-    pricePerUnit: 1200
+    unit_of_measurement: 'pcs',
+    price_per_unit: 1200
   },
   {
     id: '7',
     code: 'EQ-007',
     name: 'Digital Menu Board',
     category: 'Technology',
-    unitOfMeasurement: 'pcs',
-    pricePerUnit: 950
+    unit_of_measurement: 'pcs',
+    price_per_unit: 950
   },
 ];
 

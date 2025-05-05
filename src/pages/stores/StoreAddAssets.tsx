@@ -45,8 +45,9 @@ const StoreAddAssets = () => {
   const { toast } = useToast();
   const [allAssets, setAssets] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [assignedAssets, setAssignedAssets] = useState<AssignedAsset[]>([]);
+  const [assignedAssets, setAssignedAssets] = useState([]);
 
 
   // Fetch store details
@@ -464,7 +465,7 @@ const StoreAddAssets = () => {
                 }
                 onValueChange={(value) => {
                   console.log("value: ", value);
-                  const assetValue = JSON.parse(value) as Asset;
+                  const assetValue = JSON.parse(value) ;
                   setSelectedAssignAsset(assetValue);
                   setSelectedAssignAssetPrice(+assetValue.price_per_unit);
                 }}
@@ -495,7 +496,7 @@ const StoreAddAssets = () => {
                 onChange={(e) => {
                   setSelectedAssignAssetQuantity(+e.target.value);
                   setSelectedAssignAssetPrice(
-                    +e.target.value * selectedAssignAsset?.price_per_unit ?? 0
+                    +e.target.value * selectedAssignAsset?.price_per_unit 
                   );
                 }}
               />

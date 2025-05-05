@@ -12,6 +12,7 @@ import NotFound from "../NotFound";
 import UserList from "../users/UserList";
 import ProfileSettings from "../profile/ProfileSettings";
 import AuthGuard from "../../components/ui/privateRoute";
+import ChangePassword from "../profile/ChangePassword";
 const AllRoutes = () => {
   return (
     <Routes>
@@ -42,6 +43,7 @@ const AllRoutes = () => {
         <Route path="assets/edit/:id" element={<AssetForm />} />
         <Route path="users" element={<UserList />} />
         <Route path="profile" element={<ProfileSettings />} />
+        <Route path="/changepassword" element={<ChangePassword/>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

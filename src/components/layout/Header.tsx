@@ -112,6 +112,12 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile">Profile Settings</Link>
                 </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/changepassword">Change Password</Link>
+                </DropdownMenuItem>
+
+
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log Out</span>

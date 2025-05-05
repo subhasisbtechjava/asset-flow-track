@@ -27,7 +27,14 @@ export interface Asset {
   name: string;
   category: string;
   unitOfMeasurement: string;
+  unit_of_measurement: string;
   pricePerUnit: number;
+}
+
+export interface Changepass { 
+  currentpass: string;
+  newpass: string;
+  confirmmpass: string;
 }
 
 export interface StoreAsset {
