@@ -36,6 +36,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getFileIconComponent, getFileNameFromUrl, getFileTypeCategory } from "@/utility/get_file_type";
+import FileCard from "./fileCard";
 
 interface AssetTableRow {
   storeId: string;
@@ -148,12 +150,26 @@ const AssetTableRow = ({
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">PO Number : {storeAsset.po_number}</h4>
-                <p className="text-sm text-muted-foreground">
-                  Enter the purchase order number for {storeAsset.assets_name}
-                </p>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <button onClick={()=>{
+          setIsPoPopoverOpen(false);
+      }}>
+        <X size={24} />
+      </button>
+    </div>
+    <div className="space-y-2">
+    <FileCard fileUrl={storeAsset.po_attachment_url} />
+
+
+  <h4 className="font-medium leading-none">
+    PO Number : {storeAsset.po_number}
+  </h4>
+  <p className="text-sm text-muted-foreground">
+    Enter the purchase order number for {storeAsset.assets_name}
+  </p>
+</div>
+
+           
               <div className="grid gap-2">
                 {/* File uploads */}
                 <div className="space-y-2 pt-2">
@@ -482,6 +498,7 @@ const AssetTableRow = ({
           </Tooltip>
           <PopoverContent className="w-80">
             <div className="grid gap-4">
+           
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">
                   GRN Number : {storeAsset.grn_number}
