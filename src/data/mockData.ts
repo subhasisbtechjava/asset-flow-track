@@ -7,7 +7,10 @@ const randomPercentage = (min: number, max: number) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
 
-//  const allstores = await storeAPI.getAllStores();
+
+
+// pending developer sk ismile 
+ const allstores = await storeAPI.getAllStores();
 
  const data=[];
 

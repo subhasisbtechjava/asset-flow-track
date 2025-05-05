@@ -153,7 +153,7 @@ export const StoreAssetsTable = ({
                     <TableRow key={storeAsset.id}>
                       <TableCell>
                         <div className="font-medium">
-                          {storeAsset.asset?.name}
+                          {storeAsset?.assets_name}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {storeAsset.asset?.code}
@@ -469,9 +469,9 @@ export const StoreAssetsTable = ({
                           onClick={() => onToggleStatus(storeAsset.id, 'isProjectHeadApproved')}
                           disabled={isLoading}
                         >
-                          {storeAsset.isProjectHeadApproved === null ? (
+                          {storeAsset.is_project_head_approved === null ? (
                             "Pending"
-                          ) : storeAsset.isProjectHeadApproved ? (
+                          ) : storeAsset.is_project_head_approved ? (
                             <>
                               <Check className="mr-1 h-4 w-4" /> Approved
                             </>
@@ -491,7 +491,7 @@ export const StoreAssetsTable = ({
                           onClick={() => onToggleStatus(storeAsset.id, 'isAuditDone')}
                           disabled={isLoading}
                         >
-                          {storeAsset.isAuditDone ? (
+                          {storeAsset.is_audit_done ? (
                             <>
                               <Check className="mr-1 h-4 w-4" /> Done
                             </>
@@ -502,12 +502,12 @@ export const StoreAssetsTable = ({
                       <TableCell>
                         <Button
                           size="sm" 
-                          variant={storeAsset.isFinanceBooked ? "default" : "outline"}
+                          variant={storeAsset.is_finance_booked ? "default" : "outline"}
                           className="w-full"
                           onClick={() => onToggleStatus(storeAsset.id, 'isFinanceBooked')}
                           disabled={isLoading}
                         >
-                          {storeAsset.isFinanceBooked ? (
+                          {storeAsset.is_finance_booked ? (
                             <>
                               <Check className="mr-1 h-4 w-4" /> Done
                             </>

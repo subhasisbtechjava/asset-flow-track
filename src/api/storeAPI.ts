@@ -10,6 +10,20 @@ const API_URL = import.meta.env.VITE_API_URL; // ADDED ON 30-04-2025//////
 
 // Store related endpoints
 export const storeAPI = {
+
+  getStoreDetailsAssetsByStoreId: async (storeId: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/storeassets/${storeId}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching assets for store ${storeId}:`, error);
+      throw error;
+    }
+  },
   assignAssetToStore: async (
     storeId: string,
     assetId: string,
@@ -238,6 +252,7 @@ export const storeAssetAPI = {
       throw error;
     }
   },
+
 
   // Add assets to store
   assignAssetsToStore: async (

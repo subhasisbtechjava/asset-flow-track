@@ -13,6 +13,7 @@ import { StoreProgressCards } from "@/components/store/StoreProgressCards";
 import { DocumentEntryDialog } from "@/components/store/DocumentEntryDialog";
 import { StoreAssetsTable } from "@/components/store/StoreAssetsTable";
 import { StoreAsset } from "@/types";
+import { storeAPI } from "@/api/storeAPI";
 
 const StoreDetail = () => {
   const { id } = useParams();
@@ -30,13 +31,13 @@ const StoreDetail = () => {
   const [store,setStore] = useState(null)  ;
   
   // Fetch store assets
-
+  const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
 
   useEffect(() => {
 
     if(id){
       console.log('id: ', id);
-     
+      fetchStoreAssetss();
       fetchStoreDetails()
       fetchStoreAssets();
       
@@ -47,11 +48,31 @@ const StoreDetail = () => {
     
     async function fetchStoreDetails() {
       const storeDetails = await getStoreById(id);
-      setStore(storeDetails);
+      // setStore(storeDetails,);
+      setStore( {
+        id: id,
+        name: 'Acropolis',
+        code: 'KOL246',
+        brand: 'Wow! Kulfi',
+        city: 'Kolkata',
+        grnCompletionPercentage: 100,
+        financeBookingPercentage:80
+      },);
     }
      async function fetchStoreAssets() {
-      const assets = await getStoreAssetsByStoreId(id);
+      const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
       setStoreAssetsList(assets);
+      
+      console.log('storeAssetsList: ', storeAssetsList);
+     }
+    //  async function fetchStoreAssets() {
+    //   const assets = await getStoreAssetsByStoreId(id);
+    //   setStoreAssetsList(assets);
+    //  }
+     async function fetchStoreAssetss() {
+      const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
+      console.log('assets: ', assets);
+      // setStoreAssetsList(assets);
      }
   if (!store) {
     return (
@@ -85,9 +106,11 @@ const StoreDetail = () => {
   };
 
   // Filter assets based on search term
-  const filteredAssets = storeAssetsList.filter(asset => 
-    asset.asset?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAssets = storeAssetsList
+  .filter(asset => 
+    asset?.assets_name?.toLowerCase().includes(searchTerm.toLowerCase()) 
+    // ||
+    // asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate summary statistics
@@ -194,7 +217,7 @@ const StoreDetail = () => {
         <div>
           <div className="flex items-center gap-2">
             <Link to="/" className="text-muted-foreground hover:text-foreground">
-              Dashboard
+              Dashboard ${storeAssetsList.length}
             </Link>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <span>{store.name}</span>

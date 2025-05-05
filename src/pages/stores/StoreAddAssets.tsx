@@ -50,7 +50,16 @@ const StoreAddAssets = () => {
 
 
   // Fetch store details
-  const store = id ? getStoreById(id) : null;
+  const store = id ? {
+    id: id,
+    name: 'Acropolis',
+    code: 'KOL246',
+    brand: 'Wow! Kulfi',
+    city: 'Kolkata',
+    grnCompletionPercentage: 100,
+    financeBookingPercentage:80
+  } : null;
+  // const store = id ? getStoreById(id) : null;
   // -------------------------ismile--------------------
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingLoading, setIsEditingLoading] = useState(false);
