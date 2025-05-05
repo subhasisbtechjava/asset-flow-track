@@ -73,7 +73,7 @@ const AssetList = () => {
       return matchesSearch;
     });
 
-     pagedata =(searcResult.length > 0)?  searcResult : filteredAssets;
+     pagedata =(searcResult.length > 0)?  searcResult : [];
 
   // Categories for grouping
   const categories = Array.from(new Set(pagedata.map((asset) => asset.category)));

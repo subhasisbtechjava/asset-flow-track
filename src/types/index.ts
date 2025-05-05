@@ -42,16 +42,17 @@ export interface StoreAsset {
   storeId: string;
   assetId: string;
   quantity: number;
-  poNumber?: string;
-  poAttachment?: string;
+  po_number?: string;
+  po_attachment_url?: string;
   invoiceNumber?: string;
   invoiceAttachment?: string;
-  grnNumber?: string;
+  grn_number?: string;
   isGrnDone: boolean;
-  isTaggingDone: boolean;
-  isProjectHeadApproved: boolean | null;
-  isAuditDone: boolean;
-  isFinanceBooked: boolean;
+  is_tagging_done: boolean;
+  is_project_head_approved: boolean | null;
+  is_audit_done: boolean;
+  is_finance_booked: boolean;
+  assets_name:string;
   asset?: Asset;
 }
 

@@ -4,7 +4,17 @@ import { ChevronRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { FileEdit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getStoreById, getStoreAssetsByStoreId } from "@/data/mockData";
@@ -22,58 +32,66 @@ const StoreDetail = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
-  const [documentType, setDocumentType] = useState<'po' | 'invoice' | 'grn' | null>(null);
+  const [documentType, setDocumentType] = useState<
+    "po" | "invoice" | "grn" | null
+  >(null);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Fetch store details
-  const [store,setStore] = useState(null)  ;
-  
+  const [store, setStore] = useState(null);
+
   // Fetch store assets
   const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
 
-  useEffect(() => {
+  // -----------------------------
+  const highProgressValue = 140;
 
-    if(id){
-      console.log('id: ', id);
-      fetchStoreAssetss();
-      fetchStoreDetails()
-      fetchStoreAssets();
-      
+  // -------------------------
+  useEffect(() => {
+    if (id) {
+      console.log("id: ", id);
+      initialService();
     }
-    
-      },[])
-    
-    
-    async function fetchStoreDetails() {
-      const storeDetails = await getStoreById(id);
-      // setStore(storeDetails,);
-      setStore( {
-        id: id,
-        name: 'Acropolis',
-        code: 'KOL246',
-        brand: 'Wow! Kulfi',
-        city: 'Kolkata',
-        grnCompletionPercentage: 100,
-        financeBookingPercentage:80
-      },);
-    }
-     async function fetchStoreAssets() {
-      const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-      setStoreAssetsList(assets);
-      
-      console.log('storeAssetsList: ', storeAssetsList);
-     }
-    //  async function fetchStoreAssets() {
-    //   const assets = await getStoreAssetsByStoreId(id);
-    //   setStoreAssetsList(assets);
-    //  }
-     async function fetchStoreAssetss() {
-      const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-      console.log('assets: ', assets);
-      // setStoreAssetsList(assets);
-     }
+  }, []);
+
+  function initialService() {
+    fetchStoreDetails();
+    fetchStoreAssets();
+  }
+  async function fetchStoreDetails() {
+    const storeDetails = await storeAPI.getStoreById(id);
+    console.log("====================================");
+    console.log("storeDetails: ", storeDetails);
+
+    console.log("====================================");
+    setStore(storeDetails);
+    // setStore({
+    //   id: id,
+    //   name: "Acropolis",
+    //   code: "KOL246",
+    //   brand: "Wow! Kulfi",
+    //   city: "Kolkata",
+    //   grnCompletionPercentage: 100,
+    //   financeBookingPercentage: 80,
+    // });
+  }
+  async function fetchStoreAssets() {
+    const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
+    setStoreAssetsList(assets);
+
+    console.log("storeAssetsList: ", storeAssetsList);
+  }
+  //  async function fetchStoreAssets() {
+  //   const assets = await getStoreAssetsByStoreId(id);
+  //   setStoreAssetsList(assets);
+  //  }
+  // async function fetchStoreAssetss() {
+  //   const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
+  //   console.log("assets: ", assets);
+  //   // setStoreAssetsList(assets);
+  // }
   if (!store) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -90,8 +108,6 @@ const StoreDetail = () => {
     );
   }
 
-  
-
   // Handle delete store
   const handleDeleteStore = () => {
     setIsDeleting(true);
@@ -106,55 +122,76 @@ const StoreDetail = () => {
   };
 
   // Filter assets based on search term
-  const filteredAssets = storeAssetsList
-  .filter(asset => 
-    asset?.assets_name?.toLowerCase().includes(searchTerm.toLowerCase()) 
+  const filteredAssets = storeAssetsList.filter(
+    (asset) =>
+      asset?.assets_name?.toLowerCase().includes(searchTerm.toLowerCase())
     // ||
     // asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate summary statistics
   const totalAssets = storeAssetsList.length;
+
+  // ---------------------------
+
+  const highProgressStores = filteredAssets.filter((store) => {
+    const grnCompletionPercentage =
+      (store.grn_progress / totalAssets) * 100 || 0;
+    const erpCompletionPercentage =
+      (store.erp_progress / totalAssets) * 100 || 0;
+    const totalProgress = grnCompletionPercentage + erpCompletionPercentage;
+    const isHighProgress = totalProgress > highProgressValue;
+
+    return isHighProgress;
+  });
+
+  const lowProgressStores = totalAssets - highProgressStores.length;
+
+  // ---------------------------
+
   const assetsInProgress = storeAssetsList.filter(
-    sa => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
+    (sa) => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
   ).length;
   const assetsCompleted = storeAssetsList.filter(
-    sa => sa.isGrnDone && sa.isFinanceBooked
+    (sa) => sa.isGrnDone && sa.isFinanceBooked
   ).length;
 
   // Handle document dialog
-  const openDocumentDialog = (assetId: string, type: 'po' | 'invoice' | 'grn') => {
+  const openDocumentDialog = (
+    assetId: string,
+    type: "po" | "invoice" | "grn"
+  ) => {
     setSelectedAsset(assetId);
     setDocumentType(type);
-    const asset = storeAssetsList.find(a => a.id === assetId);
+    const asset = storeAssetsList.find((a) => a.id === assetId);
     if (asset) {
-      if (type === 'po') setInputValue(asset.poNumber || '');
-      if (type === 'invoice') setInputValue(asset.invoiceNumber || '');
-      if (type === 'grn') setInputValue(asset.grnNumber || '');
+      if (type === "po") setInputValue(asset.poNumber || "");
+      if (type === "invoice") setInputValue(asset.invoiceNumber || "");
+      if (type === "grn") setInputValue(asset.grnNumber || "");
     }
   };
 
   const closeDocumentDialog = () => {
     setSelectedAsset(null);
     setDocumentType(null);
-    setInputValue('');
+    setInputValue("");
   };
 
   // Save document number
   const saveDocumentNumber = () => {
     if (!selectedAsset || !documentType || !inputValue) return;
-    
+
     setIsLoading(true);
     setTimeout(() => {
-      setStoreAssetsList(prev => 
-        prev.map(asset => {
+      setStoreAssetsList((prev) =>
+        prev.map((asset) => {
           if (asset.id === selectedAsset) {
             const updatedAsset = { ...asset };
-            if (documentType === 'po') {
+            if (documentType === "po") {
               updatedAsset.poNumber = inputValue;
-            } else if (documentType === 'invoice') {
+            } else if (documentType === "invoice") {
               updatedAsset.invoiceNumber = inputValue;
-            } else if (documentType === 'grn') {
+            } else if (documentType === "grn") {
               updatedAsset.grnNumber = inputValue;
             }
             return updatedAsset;
@@ -162,62 +199,58 @@ const StoreDetail = () => {
           return asset;
         })
       );
-      
+
       toast({
         title: "Update successful",
         description: `${documentType.toUpperCase()} number updated successfully.`,
       });
-      
+
       setIsLoading(false);
       closeDocumentDialog();
     }, 800);
   };
 
   // Toggle status
-  const toggleStatus = (assetId: string, field: string) => {
+  const toggleStatus = async (assetId: string, updateParam: string, body) => {
     setIsLoading(true);
-    setTimeout(() => {
-      setStoreAssetsList(prev => 
-        prev.map(asset => {
-          if (asset.id === assetId) {
-            const updatedAsset = { ...asset };
-            if (field === 'isGrnDone') {
-              updatedAsset.isGrnDone = !asset.isGrnDone;
-            } else if (field === 'isTaggingDone') {
-              updatedAsset.isTaggingDone = !asset.isTaggingDone;
-            } else if (field === 'isProjectHeadApproved') {
-              if (asset.isProjectHeadApproved === null) {
-                updatedAsset.isProjectHeadApproved = true;
-              } else {
-                updatedAsset.isProjectHeadApproved = !asset.isProjectHeadApproved;
-              }
-            } else if (field === 'isAuditDone') {
-              updatedAsset.isAuditDone = !asset.isAuditDone;
-            } else if (field === 'isFinanceBooked') {
-              updatedAsset.isFinanceBooked = !asset.isFinanceBooked;
-            }
-            return updatedAsset;
-          }
-          return asset;
-        })
-      );
-      
-      toast({
-        title: "Status updated",
-        description: "Asset status has been updated successfully.",
-      });
-      
-      setIsLoading(false);
-    }, 500);
+
+    const res = await storeAPI.storeAssetTrackingStatusUpdate(
+      assetId,
+      updateParam,
+      body
+    );
+    fetchStoreAssets();
+
+    toast({
+      title: "Status updated",
+      description: "Asset status has been updated successfully.",
+    });
+
+    setIsLoading(false);
   };
 
+  const grnCompletionPercentage = filteredAssets.filter((asset)=>{
+
+    return asset.grn_number!="" && asset.grn_number!=null;
+
+
+  })
+  const erpCompletionPercentage = filteredAssets.filter((asset)=>{
+
+    return asset.is_finance_booked!=null && asset.is_finance_booked!=false;
+
+
+  })
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Link to="/" className="text-muted-foreground hover:text-foreground">
-              Dashboard ${storeAssetsList.length}
+            <Link
+              to="/"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Dashboard
             </Link>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <span>{store.name}</span>
@@ -236,7 +269,6 @@ const StoreDetail = () => {
               Edit
             </Link>
           </Button>
-          
         </div>
       </div>
 
@@ -247,8 +279,8 @@ const StoreDetail = () => {
       />
 
       <StoreProgressCards
-        grnCompletionPercentage={store.grnCompletionPercentage}
-        financeBookingPercentage={store.financeBookingPercentage}
+        grnCompletionPercentage={(grnCompletionPercentage.length/filteredAssets.length)*100}
+        financeBookingPercentage={(erpCompletionPercentage.length/filteredAssets.length)*100}
       />
 
       <div className="mb-4">

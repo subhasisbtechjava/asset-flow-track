@@ -95,17 +95,19 @@ const Dashboard = () => {
     return matchesSearch && matchesBrand && matchesCity &&matchesStatus;
   });
 
-  const totalStores = filteredStores.length;
-
+  
   
   // const totalProgress = (grnCompletionPercentage + financeBookingPercentage) / 2 || 0;
-
-
-
+  
+  
+  
+  const totalStores = filteredStores.length;
   
   const highProgressStores = filteredStores.filter((store)=>{
-  const tempTotalCount = 10;
+  const tempTotalCount = store.total_assets_cnt || 0; // Avoid division by zero
+  console.log('tempTotalCount: ', tempTotalCount);
 const grnCompletionPercentage =  store.grn_progress / tempTotalCount * 100 || 0;
+
 const erpCompletionPercentage =  store.erp_progress / tempTotalCount * 100 || 0;
 const totalProgress = grnCompletionPercentage + erpCompletionPercentage;
  const isHighProgress = totalProgress > highProgressValue;
@@ -113,7 +115,9 @@ const totalProgress = grnCompletionPercentage + erpCompletionPercentage;
     return isHighProgress;
   }  
   );
-
+const highProgressStoresCount = highProgressStores.length;
+const lowProgressStoresCount = filteredStores.length - highProgressStoresCount;
+  
   // const highProgressStores = filteredStores.filter(store => 
   //   store.grnCompletionPercentage > 75 && store.financeBookingPercentage > 75
   // ).length;
@@ -180,7 +184,7 @@ try{
             <CardTitle className="text-sm font-medium text-muted-foreground">High Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{highProgressStores.length}</div>
+            <div className="text-3xl font-bold text-green-600">{highProgressStoresCount}</div>
           </CardContent>
         </Card>
         <Card>
@@ -188,7 +192,7 @@ try{
             <CardTitle className="text-sm font-medium text-muted-foreground">Low Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-amber-600">{filteredStores.length-highProgressStores.length}</div>
+            <div className="text-3xl font-bold text-amber-600">{lowProgressStoresCount}</div>
           </CardContent>
         </Card>
       </div>
@@ -252,13 +256,15 @@ try{
                 }}>
                      
                   <SelectTrigger>
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="In Progress" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Status</SelectItem>
+                    {/* <SelectItem value="all">Status</SelectItem> */}
                     {statuses.map((item,i) => (
                       <SelectItem key={item} value={item}>
-                        {item}
+                        {/* {item} */}
+                        {item==="in_progress"?"In Progress":item==="closed"?"Closed":item}
+                        
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -283,54 +289,62 @@ try{
                   </thead>
                   <tbody>
                     {filteredStores.length > 0 ? (
-                      filteredStores.map((store) => (
-                        <tr key={store.id} className="border-t">
-                          <td className="py-3 px-4 text-sm">{store.code}</td>
-                          <td className="py-3 px-4 text-sm font-medium">
-                            <Link to={`/stores/${store.id}`} className="hover:underline">
-                              {store.name}
-                            </Link>
-                          </td>
-                          <td className="py-3 px-4">
-                            <Badge variant="outline">{store.brand}</Badge>
-                          </td>
-                          <td className="py-3 px-4 text-sm">{store.city}</td>
-                          {/* <td className="py-3 px-4 text-sm">{store.status}</td> */}
-                          <td className="py-3 px-4 min-w-[160px]">
-                            <ProgressBadge 
-                              percentage={store.grnCompletionPercentage} 
-                              size="sm"
-                            />
-                          </td>
-                          <td className="py-3 px-4 min-w-[160px]">
-                            <ProgressBadge 
-                              percentage={store.financeBookingPercentage} 
-                              size="sm"
-                            />
-                          </td>
-                          <td className="py-3 px-4">
-                            <DropdownMenu >
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link to={`/stores/${store.id}`}>View Details</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                  <Link to={`/stores/edit/${store.id}`}>Edit</Link>
-                                </DropdownMenuItem>
+                      filteredStores.map((store) => {
+
+                        const tempTotalCount = store.total_assets_cnt || 0; // Avoid division by zero
+                        const grnCompletionPercentage =  store.grn_progress / tempTotalCount * 100 || 0;
+                        const erpCompletionPercentage =  store.erp_progress / tempTotalCount * 100 || 0;
+                        return (
+                          <tr key={store.id} className="border-t">
+                            <td className="py-3 px-4 text-sm">{store.code}</td>
+                            <td className="py-3 px-4 text-sm font-medium">
+                              <Link to={`/stores/${store.id}`} className="hover:underline">
+                                {store.name}
+                              </Link>
+                            </td>
+                            <td className="py-3 px-4">
+                              <Badge variant="outline">{store.brand}</Badge>
+                            </td>
+                            <td className="py-3 px-4 text-sm">{store.city}</td>
+                            {/* <td className="py-3 px-4 text-sm">{store.status}</td> */}
+                            <td className="py-3 px-4 min-w-[160px]">
+  
                               
-                                <DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
-                                  Mark as Complete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </td>
-                        </tr>
-                      ))
+                              <ProgressBadge 
+                                percentage={grnCompletionPercentage} 
+                                size="sm"
+                              />
+                            </td>
+                            <td className="py-3 px-4 min-w-[160px]">
+                              <ProgressBadge 
+                                percentage={erpCompletionPercentage} 
+                                size="sm"
+                              />
+                            </td>
+                            <td className="py-3 px-4">
+                              <DropdownMenu >
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem asChild>
+                                    <Link to={`/stores/${store.id}`}>View Details</Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <Link to={`/stores/edit/${store.id}`}>Edit</Link>
+                                  </DropdownMenuItem>
+                                
+                                  <DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
+                                    Mark as Complete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan={7} className="py-6 text-center text-muted-foreground">

@@ -127,6 +127,19 @@ export const storeAPI = {
       throw error;
     }
   },
+  storeAssetTrackingStatusUpdate: async (id: string,updateParam:string,body) => {
+    try {
+      const response = await axios.post(`${API_URL}/assets/update/store_tracking_details/${updateParam}/${id}`,body, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching store ${id}:`, error);
+      throw error;
+    }
+  },
 
   // Create new store
   createStore: async (storeData: Store) => {

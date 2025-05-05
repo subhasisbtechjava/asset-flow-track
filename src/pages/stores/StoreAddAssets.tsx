@@ -47,21 +47,14 @@ const StoreAddAssets = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [assignedAssets, setAssignedAssets] = useState([]);
 
 
   // Fetch store details
-  const store = id ? {
-    id: id,
-    name: 'Acropolis',
-    code: 'KOL246',
-    brand: 'Wow! Kulfi',
-    city: 'Kolkata',
-    grnCompletionPercentage: 100,
-    financeBookingPercentage:80
-  } : null;
+
+  
   // const store = id ? getStoreById(id) : null;
   // -------------------------ismile--------------------
+  const [store,setStore] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingLoading, setIsEditingLoading] = useState(false);
   const [isAssignAssetLoading, setIsAssignAssetLoading] = useState(false);
@@ -97,13 +90,23 @@ const StoreAddAssets = () => {
       console.error("Failed to fetch stores", error);
     }
   };
+  const fetchStoreDetails = async () => {
+    try {
+      const res = await storeAPI.getStoreById(id);
+   setStore(res);
+      // setAssets(allAssets);
+    } catch (error) {
+      console.error("Failed to fetch stores", error);
+    }
+  };
   useEffect(() => {
     // Load existing assigned assets if any
     // In a real app, this would come from an API fetch
 
     fetchMasterAssets();
     fetchStoreAssets();
-    setAssignedAssets([]);
+    // setAssignedAssets([]);
+    fetchStoreDetails();
 
     // const preparedAssets = mockAssets.map(asset => ({
     //   ...asset,
@@ -226,21 +229,8 @@ const StoreAddAssets = () => {
     }
   };
 
-  const handleRemoveAssignedAsset = (id: string) => {
-    setAssignedAssets((prev) => prev.filter((asset) => asset.id !== id));
-    toast({
-      title: "Asset removed",
-      description: "Asset has been removed from the assignment list.",
-    });
-  };
+ 
 
-  const toggleEditMode = (id: string) => {
-    setAssignedAssets((prev) =>
-      prev.map((asset) =>
-        asset.id === id ? { ...asset, isEditing: !asset.isEditing } : asset
-      )
-    );
-  };
 
   const handleUpdateAssignedAsset = async (asset) => {
     try {
@@ -280,66 +270,6 @@ const StoreAddAssets = () => {
     } finally {
       setIsEditingLoading(false);
     }
-  };
-  // const handleUpdateAssignedAsset = (id: string, field: 'quantity' | 'price', value: number) => {
-  //   if (value < 0) return;
-
-  //   setAssignedAssets(prev =>
-  //     prev.map(asset =>
-  //       asset.id === id ? { ...asset, [field]: value } : asset
-  //     )
-  //   );
-  // };
-
-  const handleSubmit = () => {
-    const selectedFromTable = assetsToAdd
-      .filter((asset) => asset.selected)
-      .map((asset) => ({
-        id: `selected-${asset.id}`,
-        assetId: asset.id,
-        name: asset.name,
-        code: asset.code,
-        quantity: asset.quantity,
-        unit: asset.unitOfMeasurement,
-        price:
-          asset.customPrice !== undefined
-            ? asset.customPrice
-            : asset.pricePerUnit,
-      }));
-
-    const allAssetsToSubmit = [...assignedAssets, ...selectedFromTable];
-
-    if (allAssetsToSubmit.length === 0) {
-      toast({
-        title: "No assets selected",
-        description:
-          "Please select or add at least one asset to assign to the store.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Mock API call to add assets to store
-    setTimeout(() => {
-      console.log("Assigning assets to store:", {
-        storeId: store.id,
-        assets: allAssetsToSubmit.map((asset) => ({
-          assetId: asset.assetId,
-          quantity: asset.quantity,
-          price: asset.price,
-        })),
-      });
-
-      toast({
-        title: "Assets assigned",
-        description: `${allAssetsToSubmit.length} assets have been assigned to ${store.name}.`,
-      });
-
-      setIsLoading(false);
-      navigate(`/stores/${store.id}`);
-    }, 1000);
   };
 
   return (
@@ -487,20 +417,7 @@ const StoreAddAssets = () => {
               </Select>
             </div>
 
-            <div className="md:col-span-2">
-              <label className="text-sm font-medium mb-1 block">Quantity</label>
-              <Input
-                type="number"
-                min="1"
-                value={selectedAssignAssetQuantity}
-                onChange={(e) => {
-                  setSelectedAssignAssetQuantity(+e.target.value);
-                  setSelectedAssignAssetPrice(
-                    +e.target.value * selectedAssignAsset?.price_per_unit 
-                  );
-                }}
-              />
-            </div>
+           
 
             <div className="md:col-span-3">
               <label className="text-sm font-medium mb-1 block">
@@ -516,11 +433,26 @@ const StoreAddAssets = () => {
               />
             </div>
 
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">Quantity</label>
+              <Input
+                type="number"
+                min="1"
+                value={selectedAssignAssetQuantity}
+                onChange={(e) => {
+                  setSelectedAssignAssetQuantity(+e.target.value);
+                  // setSelectedAssignAssetPrice(
+                  //   +e.target.value * selectedAssignAsset?.price_per_unit 
+                  // );
+                }}
+              />
+            </div>
+
             <div className="md:col-span-2 flex items-end">
               <Button
                 onClick={handleQuickAdd}
                 className="w-full"
-                disabled={isAssignAssetLoading}
+                disabled={isAssignAssetLoading ||!selectedAssignAsset?.id}
               >
               {!isAssignAssetLoading&&  <Plus className="h-4 w-4 mr-1" />}
                 {isAssignAssetLoading ? "Assigning..." : "Add"}
@@ -618,9 +550,7 @@ const StoreAddAssets = () => {
                           </td>
                         ) : (
                           <td className="py-3 px-4 text-sm">
-                            {asset.customPrice ??
-                              asset.quantity *
-                                Number(asset.price_per_unit ?? "0")}
+                            {Number(asset.price_per_unit ?? "0")}
                           </td>
                         )}
                         {isEditing && asset.id == editingItemId ? (
