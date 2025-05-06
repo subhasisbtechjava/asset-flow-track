@@ -311,13 +311,13 @@ try{
   
                               
                               <ProgressBadge 
-                                percentage={grnCompletionPercentage} 
+                                percentage={+grnCompletionPercentage.toFixed(2)} 
                                 size="sm"
                               />
                             </td>
                             <td className="py-3 px-4 min-w-[160px]">
                               <ProgressBadge 
-                                percentage={erpCompletionPercentage} 
+                                percentage={+erpCompletionPercentage.toFixed(2)} 
                                 size="sm"
                               />
                             </td>

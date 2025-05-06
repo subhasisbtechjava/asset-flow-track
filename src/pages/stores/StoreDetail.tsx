@@ -272,15 +272,15 @@ const StoreDetail = () => {
         </div>
       </div>
 
-      <StoreSummaryCards
+      {/* <StoreSummaryCards
         totalAssets={totalAssets}
         assetsInProgress={assetsInProgress}
         assetsCompleted={assetsCompleted}
-      />
+      /> */}
 
       <StoreProgressCards
-        grnCompletionPercentage={(grnCompletionPercentage.length/filteredAssets.length)*100}
-        financeBookingPercentage={(erpCompletionPercentage.length/filteredAssets.length)*100}
+        grnCompletionPercentage={grnCompletionPercentage.length>0?((grnCompletionPercentage.length/filteredAssets.length)*100):0}
+        financeBookingPercentage={erpCompletionPercentage.length>0?((erpCompletionPercentage.length/filteredAssets.length)*100):0}
       />
 
       <div className="mb-4">

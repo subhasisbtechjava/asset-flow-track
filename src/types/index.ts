@@ -44,8 +44,10 @@ export interface StoreAsset {
   quantity: number;
   po_number?: string;
   po_attachment_url?: string;
-  invoiceNumber?: string;
-  invoiceAttachment?: string;
+  invoice_number?: string;
+  invoice_date?:string
+  invoice_attachment_url?: string;
+  invoice_amount?: string;
   grn_number?: string;
   isGrnDone: boolean;
   is_tagging_done: boolean;

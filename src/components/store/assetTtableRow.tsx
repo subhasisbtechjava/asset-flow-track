@@ -36,9 +36,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getFileIconComponent, getFileNameFromUrl, getFileTypeCategory } from "@/utility/get_file_type";
+import {
+  getFileIconComponent,
+  getFileNameFromUrl,
+  getFileTypeCategory,
+} from "@/utility/get_file_type";
 import FileCard from "./fileCard";
-
+import { isSameDay } from "date-fns";
 interface AssetTableRow {
   storeId: string;
   storeAsset: StoreAsset;
@@ -77,6 +81,26 @@ const AssetTableRow = ({
   const [grnValue, setGrnValue] = useState(storeAsset.grn_number);
   const [poValue, setPoValue] = useState(null);
   const [poAttachment, setPoAttachmentValue] = useState(null);
+  const [invoiceValue, setInvoiceValue] = useState({
+    invoiceNumber: null,
+    invoiceDate: null,
+    invoiceDateRow:new Date(new Date().setHours(0, 0, 0, 0)),
+    invoiceAmount: "",
+    invoiceFileDetails: {
+      name: "",
+      base64: "",
+    },
+  });
+
+
+  function isInvoiceUploadValidated(){
+
+
+    if(!invoiceValue.invoiceNumber || !invoiceValue.invoiceAmount ||!invoiceValue.invoiceFileDetails .name || !invoiceValue.invoiceDate ){
+      return false;
+    }
+return true;
+  }
   const existingBody = {
     // approve_val: storeAsset.is_project_head_approved?true:false,
     // audit_val: storeAsset.is_audit_done?true:false,
@@ -87,23 +111,22 @@ const AssetTableRow = ({
   function fileToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-  
+
       reader.onload = () => resolve(reader.result); // base64 string
-      reader.onerror = error => reject(error);
-  
+      reader.onerror = (error) => reject(error);
+
       reader.readAsDataURL(file); // This encodes the file as base64
     });
   }
 
   async function getFileDetails(file: File) {
-
     const base64 = await fileToBase64(file);
-    const formatedBase64List =  base64.toString().trim().split("base64,")
-    const formatedBase64 =  formatedBase64List[formatedBase64List.length-1]
+    const formatedBase64List = base64.toString().trim().split("base64,");
+    const formatedBase64 = formatedBase64List[formatedBase64List.length - 1];
 
-    console.log('====================================');
+    console.log("====================================");
     console.log(formatedBase64List);
-    console.log('====================================');
+    console.log("====================================");
     return {
       name: file.name,
       size: file.size,
@@ -114,6 +137,7 @@ const AssetTableRow = ({
   }
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isPoPopoverOpen, setIsPoPopoverOpen] = useState(false);
+  const [isInvoicePopoverOpen, setIsInvoicePopoverOpen] = useState(false);
   useEffect(() => {
     setGrnValue(storeAsset.grn_number);
   }, []);
@@ -131,45 +155,50 @@ const AssetTableRow = ({
 
       {/* PO Number with file uploads */}
       <TableCell>
-        <Popover  
-       open={isPoPopoverOpen}
-       onOpenChange={() => {
+
+
+          <Popover
+          open={isPoPopoverOpen}
+          onOpenChange={(val) => {
             setPoValue(storeAsset.po_number);
-            setIsPoPopoverOpen(true);
+            setIsPoPopoverOpen(val);
           }}
-          
-          >
+        >
           <PopoverTrigger asChild>
             <Button
               variant={storeAsset.po_number ? "default" : "outline"}
               size="sm"
-              className={  storeAsset.po_number ? "w-full bg-green-500" : "w-full"}
+              className={
+                storeAsset.po_number ? "w-full bg-green-500" : "w-full"
+              }
             >
-              {storeAsset.po_number?"Done": "Not Done"}
+              {storeAsset.po_number ? "Done" : "Not Done"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <div className="grid gap-4">
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <button onClick={()=>{
-          setIsPoPopoverOpen(false);
-      }}>
-        <X size={24} />
-      </button>
-    </div>
-    <div className="space-y-2">
-    <FileCard fileUrl={storeAsset.po_attachment_url} />
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => {
+                    setIsPoPopoverOpen(false);
+                  }}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {storeAsset?.po_attachment_url && (
+                  <FileCard fileUrl={storeAsset.po_attachment_url} />
+                )}
 
+                <h4 className="font-medium leading-none">
+                  PO Number : {storeAsset.po_number}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Enter the purchase order number for {storeAsset.assets_name}
+                </p>
+              </div>
 
-  <h4 className="font-medium leading-none">
-    PO Number : {storeAsset.po_number}
-  </h4>
-  <p className="text-sm text-muted-foreground">
-    Enter the purchase order number for {storeAsset.assets_name}
-  </p>
-</div>
-
-           
               <div className="grid gap-2">
                 {/* File uploads */}
                 <div className="space-y-2 pt-2">
@@ -183,7 +212,7 @@ const AssetTableRow = ({
                   <div className="grid gap-2">
                     <Input
                       placeholder="Enter PO number"
-                       defaultValue={poValue || ""}
+                      defaultValue={poValue || ""}
                       onChange={(e) => setPoValue(e.target.value)}
                     />
                   </div>
@@ -206,21 +235,16 @@ const AssetTableRow = ({
                     />
                     <Input
                       type="file"
-                     
-                      onChange={
-                        async (e) => {
-                          const fileDetails = await getFileDetails(
-                            e.target.files[0]
-                          );
-                          setPoAttachmentValue(fileDetails);
-                          console.log("====================================");
-                          console.log(fileDetails);
-                          console.log("====================================");
-                        }
-                        
-                      }
+                      onChange={async (e) => {
+                        const fileDetails = await getFileDetails(
+                          e.target.files[0]
+                        );
+                        setPoAttachmentValue(fileDetails);
+                        console.log("====================================");
+                        console.log(fileDetails);
+                        console.log("====================================");
+                      }}
                     />
-                    
                   </div>
 
                   {/* File list */}
@@ -265,7 +289,7 @@ const AssetTableRow = ({
                 </div>
 
                 <Button
-                disabled = {!poValue || !poAttachment}
+                  disabled={!poValue || !poAttachment}
                   onClick={() => {
                     // onDocumentDialogOpen(storeAsset.id, "po")
                     onToggleStatus(storeAsset.id, "po", {
@@ -281,19 +305,29 @@ const AssetTableRow = ({
               </div>
             </div>
           </PopoverContent>
+      
         </Popover>
       </TableCell>
 
       {/* Invoice Number with file uploads and additional fields */}
       <TableCell>
-        <Popover>
+        <Popover
+          onOpenChange={() => {
+            setInvoiceValue({
+              ...invoiceValue,
+              invoiceNumber: storeAsset?.invoice_number,
+              invoiceDate:storeAsset?.invoice_date? new Date(storeAsset?.invoice_date):null,
+              invoiceAmount: storeAsset?.invoice_amount ?? "",
+            });
+          }}
+        >
           <PopoverTrigger asChild>
             <Button
-              variant={storeAsset.invoiceNumber ? "secondary" : "outline"}
+              variant={storeAsset?.invoice_amount ? "default" : "outline"}
               size="sm"
-              className="w-full"
+              className={storeAsset?.invoice_amount?"w-full bg-green-500":"w-full"}
             >
-              {storeAsset.invoiceNumber || "Not Done"}
+              {storeAsset?.invoice_amount ?"Done": "Not Done"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-96">
@@ -301,18 +335,24 @@ const AssetTableRow = ({
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">Invoice Details</h4>
                 <p className="text-sm text-muted-foreground">
-                  Enter invoice information for {storeAsset.asset?.name}
+                  Enter invoice information for {storeAsset?.assets_name}
                 </p>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor={`invoice-number-${storeAsset.id}`}>
                   Invoice Number
                 </Label>
+                {/* {JSON.stringify(invoiceValue)} */}
                 <Input
                   id={`invoice-number-${storeAsset.id}`}
                   placeholder="Enter invoice number"
-                  defaultValue={storeAsset.invoiceNumber || ""}
-                  onChange={(e) => onInputChange(e.target.value)}
+                  defaultValue={storeAsset.invoice_number || ""}
+                  onChange={(e) => {
+                    setInvoiceValue({
+                      ...invoiceValue,
+                      invoiceNumber: e.target.value,
+                    });
+                  }}
                 />
 
                 {/* Invoice Date */}
@@ -320,15 +360,21 @@ const AssetTableRow = ({
                   <Label htmlFor={`invoice-date-${storeAsset.id}`}>
                     Invoice Date
                   </Label>
-                  <Popover>
+                  <Popover  open={isInvoicePopoverOpen} onOpenChange={(val)=>{
+                    setIsInvoicePopoverOpen(val)
+                  }}>
                     <PopoverTrigger asChild>
                       <Button
                         id={`invoice-date-${storeAsset.id}`}
                         variant="outline"
                         className="w-full justify-start text-left font-normal"
                       >
-                        {invoiceDates[storeAsset.id] ? (
-                          format(invoiceDates[storeAsset.id], "PPP")
+
+                        {/* {`${invoiceValue?.invoiceDate}`} */}
+{/* {format(invoiceValue?.invoiceDate.setHours(0, 0, 0, 0),"PPP")} */}
+                        {/* {format(new Date(new Date().setHours(0, 0, 0, 0)), "PPP")} */}
+                        {invoiceValue?.invoiceDate ? (
+                          format(invoiceValue?.invoiceDate, "PPP")
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -336,11 +382,23 @@ const AssetTableRow = ({
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
+                   disabled={{ after: new Date() }} 
                         mode="single"
-                        selected={invoiceDates[storeAsset.id]}
-                        onSelect={(date) =>
-                          handleInvoiceDateChange(storeAsset.id, date)
-                        }
+                        selected={invoiceValue?.invoiceDate ?? undefined}
+                        // selected={invoiceDates[storeAsset.id]}
+                        onSelect={(date) => {
+                          if (!date) return;
+
+
+                          console.log("date: ", date);
+
+                          setInvoiceValue({
+                            ...invoiceValue,
+                            invoiceDate: new Date(date),
+                          });
+
+                         setIsInvoicePopoverOpen(false);
+                        }}
                         initialFocus
                         className="p-3 pointer-events-auto"
                       />
@@ -354,111 +412,81 @@ const AssetTableRow = ({
                     Invoice Amount (₹)
                   </Label>
                   <Input
-                    id={`invoice-amount-${storeAsset.id}`}
+                    // id={`invoice-amount-${storeAsset.id}`}
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="1"
+                    defaultValue={storeAsset?.invoice_amount}
                     placeholder="Enter invoice amount"
-                    value={invoiceAmounts[storeAsset.id] || ""}
+                    // value={invoiceAmounts[storeAsset.id] || ""}
                     onChange={(e) =>
-                      handleInvoiceAmountChange(storeAsset.id, e.target.value)
+                      // handleInvoiceAmountChange(storeAsset.id, e.target.value)
+                      setInvoiceValue({
+                        ...invoiceValue,
+                        invoiceAmount: e.target.value,
+                      })
                     }
                   />
                 </div>
 
                 {/* File uploads */}
-                <div className="space-y-2 pt-2">
-                  <Label
-                    htmlFor={`invoice-upload-${storeAsset.id}`}
-                    className="text-sm font-medium"
-                  >
-                    Upload Invoice Documents
+                <div>
+                  <Label htmlFor={`invoice-amount-${storeAsset.id}`}>
+                    Upload file
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id={`invoice-upload-${storeAsset.id}`}
-                      type="file"
-                      multiple
-                      className="hidden"
-                      onChange={(e) =>
-                        handleFileUpload(storeAsset.id, "invoice", e)
-                      }
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() =>
-                        document
-                          .getElementById(`invoice-upload-${storeAsset.id}`)
-                          ?.click()
-                      }
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Files
-                    </Button>
-                  </div>
 
-                  {/* File list */}
-                  {fileUploads[storeAsset.id]?.invoice?.length > 0 && (
-                    <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
-                      <p className="text-xs font-medium">Uploaded files:</p>
-                      {fileUploads[storeAsset.id].invoice.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-muted p-2 rounded-md"
-                        >
-                          <div className="flex items-center text-xs truncate">
-                            <FileCheck className="h-3 w-3 mr-1" />
-                            <span className="truncate max-w-[150px]">
-                              {file.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-6 w-6"
-                              onClick={() => window.open(file.url)}
-                            >
-                              <Download className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-6 w-6"
-                              onClick={() =>
-                                handleRemoveFile(
-                                  storeAsset.id,
-                                  "invoice",
-                                  index
-                                )
-                              }
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <Input
+                    style={{ marginTop: "5px" }}
+                    id={`invoice-upload-${storeAsset.id}`}
+                    type="file"
+                    // multiple
+                    // className="hidden"
+                    onChange={async (e) =>
+                      // handleFileUpload(storeAsset.id, "invoice", e)
+
+                      {
+                        const fileDetails = await getFileDetails(
+                          e.target.files[0]
+                        );
+                        setInvoiceValue({
+                          ...invoiceValue,
+                          invoiceFileDetails: fileDetails,
+                        });
+                      }
+                    }
+                  />
                 </div>
-
+                {storeAsset?.invoice_attachment_url &&<FileCard fileUrl={storeAsset?.invoice_attachment_url} />}
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
+                  disabled ={!isInvoiceUploadValidated()}
                     variant="outline"
-                    // onClick={() =>
-                    //   // saveInvoiceDetails(storeAsset.id)
-                    // }
+                    onClick={() => {
+                      console.log("====================================");
+                      console.log(isInvoiceUploadValidated());
+                      console.log(invoiceValue);
+                      console.log("====================================");
+                      const isoString = invoiceValue.invoiceDate;
+                      const dateOnly = new Date(isoString)
+                        .toISOString()
+                        .split("T")[0];
+                      console.log(dateOnly);
+                      onToggleStatus(storeAsset.id, "invoice", {
+                        invoice_no: invoiceValue.invoiceNumber,
+
+                        invoice_attachment:
+                          invoiceValue.invoiceFileDetails?.base64,
+
+                        invoice_attachment_name:
+                          invoiceValue.invoiceFileDetails?.name,
+
+                        invoice_date: dateOnly,
+                        invoice_amount: invoiceValue.invoiceAmount,
+                      });
+                      // setIsPoPopoverOpen(!isPoPopoverOpen);
+                    }}
                   >
                     Save Details
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      onDocumentDialogOpen(storeAsset.id, "invoice")
-                    }
-                  >
-                    Save Number
                   </Button>
                 </div>
               </div>
@@ -498,7 +526,6 @@ const AssetTableRow = ({
           </Tooltip>
           <PopoverContent className="w-80">
             <div className="grid gap-4">
-           
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">
                   GRN Number : {storeAsset.grn_number}
@@ -515,7 +542,7 @@ const AssetTableRow = ({
                   onChange={(e) => setGrnValue(e.target.value)}
                 />
                 <Button
-                disabled = {!grnValue}
+                  disabled={!grnValue}
                   onClick={() => {
                     onToggleStatus(storeAsset.id, "grn", {
                       grn_val: grnValue,

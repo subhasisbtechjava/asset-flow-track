@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { authAPI } from '../../api/authAPI';  // ADDED ON 30-04-2025//////
 import { Changepass} from '@/types';
 import { toast } from "@/components/ui/use-toast";
+
 import { 
   Form, 
   FormControl, 
@@ -20,6 +21,7 @@ import {
   FormLabel, 
   FormMessage 
 } from "@/components/ui/form";
+import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
 
 
 
@@ -113,7 +115,7 @@ const ChangePassword = () => {
                     name="currentpass"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Current Password</FormLabel>
+                        <h4>Current Password<LabelMandatorySymbol/></h4>
                         <FormControl>
                           <Input type="password" placeholder="Current Password" {...field} />
                         </FormControl>
@@ -127,7 +129,7 @@ const ChangePassword = () => {
                     name="newpass"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>New Password</FormLabel>
+                        <h4>New Password<LabelMandatorySymbol/></h4>
                         <FormControl>
                           <Input type="password" placeholder="New Password" {...field} />
                         </FormControl>
@@ -141,7 +143,7 @@ const ChangePassword = () => {
                   name="confirmmpass"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <h4>Confirm Password<LabelMandatorySymbol/> </h4>
                       <FormControl>
                         <Input type="password" placeholder="Confirm Password" {...field} />
                       </FormControl>

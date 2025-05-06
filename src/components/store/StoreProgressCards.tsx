@@ -24,11 +24,11 @@ export const StoreProgressCards = ({
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="text-sm font-medium">GRN Completion</div>
-            <ProgressBadge percentage={grnCompletionPercentage} size="lg" />
+            <ProgressBadge percentage={+grnCompletionPercentage.toFixed(2)} size="lg" />
           </div>
           <div className="space-y-2">
             <div className="text-sm font-medium">ERP Booking</div>
-            <ProgressBadge percentage={financeBookingPercentage} size="lg" />
+            <ProgressBadge percentage={+financeBookingPercentage.toFixed(2)} size="lg" />
           </div>
         </div>
       </CardContent>
