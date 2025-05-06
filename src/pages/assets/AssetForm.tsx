@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAssetById, generateId } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
 
 const assetFormSchema = z.object({
   code: z.string().min(1, { message: "Asset code is required" })
@@ -167,7 +168,7 @@ const AssetForm = () => {
                   name="code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Asset Code</FormLabel>
+                      <h4>Asset Code<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="EQ-001" {...field} />
                       </FormControl>
@@ -181,7 +182,7 @@ const AssetForm = () => {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <h4>Category<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="Kitchen Equipment" {...field} />
                       </FormControl>
@@ -196,7 +197,7 @@ const AssetForm = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Asset Name</FormLabel>
+                    <h4>Asset Name<LabelMandatorySymbol/></h4>
                     <FormControl>
                       <Input placeholder="Commercial Deep Fryer" {...field} />
                     </FormControl>
@@ -211,7 +212,7 @@ const AssetForm = () => {
                   name="unitOfMeasurement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit of Measurement</FormLabel>
+                      <h4>Unit of Measurement<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="pcs" {...field} />
                       </FormControl>
@@ -225,7 +226,7 @@ const AssetForm = () => {
                   name="pricePerUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price per Unit (<span>&#8377;</span>)</FormLabel>
+                      <h4>Price per Unit (<span>&#8377;</span>)<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input 
                           type="number" 

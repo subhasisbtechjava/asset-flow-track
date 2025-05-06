@@ -6,22 +6,27 @@ import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
 const randomPercentage = (min: number, max: number) => 
   Math.floor(Math.random() * (max - min + 1) + min);
 
+const id = localStorage.getItem('id') || '';
 
- const allstores = await storeAPI.getAllStores();
 
- let data=[];
 
-for (let i = 0; i < allstores.length; i++) { 
-  data.push({
-    id:allstores[i].id,
-    code:allstores[i].code,
-    name:allstores[i].name,
-    brand:allstores[i].brand,
-    city: allstores[i].city,
-    grnCompletionPercentage:  randomPercentage(50, 100), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
-    financeBookingPercentage: randomPercentage(50, 90), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
-  });
-}
+
+// pending developer sk ismile 
+ const allstores = id? await storeAPI.getAllStores():[];
+
+ const data=[];
+
+// for (let i = 0; i < allstores.length; i++) { 
+//   data.push({
+//     id:allstores[i].id,
+//     code:allstores[i].code,
+//     name:allstores[i].name,
+//     brand:allstores[i].brand,
+//     city: allstores[i].city,
+//     grnCompletionPercentage:  randomPercentage(50, 100), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+//     financeBookingPercentage: randomPercentage(50, 90), // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
+//   });
+// }
 
 export const mockStores: Store[] = data;
 
@@ -116,70 +121,7 @@ export const mockAssets: Asset[] = [
 
 // Mock StoreAssets Data
 export const mockStoreAssets: StoreAsset[] = [
-  {
-    id: '1',
-    storeId: '1',
-    assetId: '1',
-    quantity: 2,
-    poNumber: 'PO-2023-001',
-    poAttachment: 'po_attachment_1.pdf',
-    invoiceNumber: 'INV-2023-001',
-    invoiceAttachment: 'invoice_attachment_1.pdf',
-    grnNumber: 'GRN-2023-001',
-    isGrnDone: true,
-    isTaggingDone: true,
-    isProjectHeadApproved: true,
-    isAuditDone: true,
-    isFinanceBooked: false,
-  },
-  {
-    id: '2',
-    storeId: '1',
-    assetId: '2',
-    quantity: 1,
-    poNumber: 'PO-2023-002',
-    poAttachment: 'po_attachment_2.pdf',
-    invoiceNumber: 'INV-2023-002',
-    invoiceAttachment: 'invoice_attachment_2.pdf',
-    grnNumber: 'GRN-2023-002',
-    isGrnDone: true,
-    isTaggingDone: false,
-    isProjectHeadApproved: null,
-    isAuditDone: false,
-    isFinanceBooked: false,
-  },
-  {
-    id: '3',
-    storeId: '1',
-    assetId: '3',
-    quantity: 3,
-    poNumber: 'PO-2023-003',
-    poAttachment: undefined,
-    invoiceNumber: undefined,
-    invoiceAttachment: undefined,
-    grnNumber: undefined,
-    isGrnDone: false,
-    isTaggingDone: false,
-    isProjectHeadApproved: null,
-    isAuditDone: false,
-    isFinanceBooked: false,
-  },
-  {
-    id: '4',
-    storeId: '2',
-    assetId: '1',
-    quantity: 2,
-    poNumber: 'PO-2023-004',
-    poAttachment: 'po_attachment_4.pdf',
-    invoiceNumber: 'INV-2023-004',
-    invoiceAttachment: 'invoice_attachment_4.pdf',
-    grnNumber: 'GRN-2023-004',
-    isGrnDone: true,
-    isTaggingDone: true,
-    isProjectHeadApproved: true,
-    isAuditDone: true,
-    isFinanceBooked: true,
-  }
+  
 ];
 
 // Function to get a store by ID
