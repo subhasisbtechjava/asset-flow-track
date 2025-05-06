@@ -1,33 +1,41 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { storeAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
-import { Store} from '@/types';
+import { storeAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
+import { Store } from "@/types";
 
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getStoreById, generateId, mockStores } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
 
 const storeFormSchema = z.object({
   name: z.string().min(1, { message: "Store name is required" }),
   brand: z.string().min(1, { message: "Brand is required" }),
   city: z.string().min(1, { message: "City is required" }),
-  code: z.string().min(1, { message: "Store code is required" })
-    .regex(/^[A-Za-z0-9-]+$/, { 
-      message: "Store code can only contain letters, numbers, and hyphens" 
+  code: z
+    .string()
+    .min(1, { message: "Store code is required" })
+    .regex(/^[A-Za-z0-9-]+$/, {
+      message: "Store code can only contain letters, numbers, and hyphens",
     }),
 });
 
@@ -38,25 +46,40 @@ const StoreForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const isEditing = !!id;
+  const [storeData, setStoreData] = useState<Partial<StoreFormValues>>({});
 
-  // If editing, find the store data
-
-  //const editStoreDetails = storeAPI.getStoreById(id);  
-
-  const storeData = isEditing ? getStoreById(id) : null;
-  //const storeData = isEditing ? editStoreDetails : null;
-console.log(storeData);
   const form = useForm<StoreFormValues>({
     resolver: zodResolver(storeFormSchema),
     defaultValues: {
-      name: storeData?.name || "",
-      brand: storeData?.brand || "",
-      city: storeData?.city || "",
-      //code: storeData?.code || `KOL${String(mockStores.length + 1).padStart(3, '0')}`,
-      code: storeData?.code || "",
+      name: "",
+      brand: "",
+      city: "",
+      code: "",
     },
   });
   
+  const { reset } = form;
+  
+  useEffect(() => {
+    if (isEditing) {
+      fetchStoreDetails();
+    }
+  }, []);
+  
+  async function fetchStoreDetails() {
+    const res = await storeAPI.getStoreById(id);
+    setStoreData(res);
+  
+    // Reset form values after fetching
+    reset({
+      name: res.name ?? "",
+      brand: res.brand ?? "",
+      city: res.city ?? "",
+      code: res.code ?? "",
+    });
+  }
+
+
   type newStore = Store;
 
   const onSubmit = async (values: StoreFormValues) => {
@@ -66,16 +89,16 @@ console.log(storeData);
     setTimeout(() => {
       if (isEditing && storeData) {
         // Mock update existing store
-        const updateStoreValues= {                   
-          name: values.name || '', // Fallback to empty string
-          code: values.code || '',
-          brand: values.brand || '',
-          city: values.city || '',
+        const updateStoreValues = {
+          name: values.name || "", // Fallback to empty string
+          code: values.code || "",
+          brand: values.brand || "",
+          city: values.city || "",
           grnCompletionPercentage: 0,
-          financeBookingPercentage: 0
+          financeBookingPercentage: 0,
         };
 
-        const updatedStore = storeAPI.updateStore(id,updateStoreValues);
+        const updatedStore = storeAPI.updateStore(id, updateStoreValues);
         console.log("Updating store:", { id, ...values });
         toast({
           title: "Store updated",
@@ -83,48 +106,53 @@ console.log(storeData);
         });
       } else {
         // Mock creating new store
-        const newStore:Store = {
+        const newStore: Store = {
           // id: generateId(),
           // ...values,
           // grnCompletionPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
           // financeBookingPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
 
-
           id: generateId(),
-          name: values.name || '', // Fallback to empty string
-          code: values.code || '',
-          brand: values.brand || '',
-          city: values.city || '',
+          name: values.name || "", // Fallback to empty string
+          code: values.code || "",
+          brand: values.brand || "",
+          city: values.city || "",
           grnCompletionPercentage: 0,
-          financeBookingPercentage: 0
+          financeBookingPercentage: 0,
         };
 
         const newlycreatedStore = storeAPI.createStore(newStore);
-      
+
         console.log("Creating store:", newlycreatedStore);
         toast({
           title: "Store created",
           description: `${values.name} has been created successfully.`,
         });
       }
-      
+
       setIsLoading(false);
       navigate("/stores");
-    }, 1000);    
+    }, 1000);
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{isEditing ? "Edit Store" : "Add New Store"}</h1>
+        <h1 className="text-3xl font-bold">
+          {isEditing ? "Edit Store" : "Add New Store"}
+        </h1>
         <p className="text-muted-foreground">
-          {isEditing ? "Update store information" : "Create a new store location"}
+          {isEditing
+            ? "Update store information"
+            : "Create a new store location"}
         </p>
       </div>
 
       <Card className="max-w-2xl">
         <CardHeader>
-          <CardTitle>{isEditing ? "Edit Store Details" : "Store Details"}</CardTitle>
+          <CardTitle>
+            {isEditing ? "Edit Store Details" : "Store Details"}
+          </CardTitle>
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -134,9 +162,12 @@ console.log(storeData);
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Store Name</FormLabel>
+                    <h4>
+                      Store Name
+                      <LabelMandatorySymbol />
+                    </h4>
                     <FormControl>
-                      <Input placeholder="Store Name" {...field} />
+                      <Input placeholder="Accropolish Store" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,9 +180,12 @@ console.log(storeData);
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Brand</FormLabel>
+                      <h4>
+                        Brand
+                        <LabelMandatorySymbol />
+                      </h4>
                       <FormControl>
-                        <Input placeholder="Brand" {...field} />
+                        <Input placeholder="WoW China" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -163,9 +197,12 @@ console.log(storeData);
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <h4>
+                        City
+                        <LabelMandatorySymbol />
+                      </h4>
                       <FormControl>
-                        <Input placeholder="City" {...field} />
+                        <Input placeholder="Kolkata" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -178,10 +215,12 @@ console.log(storeData);
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Store Code</FormLabel>
+                    <h4>
+                      Store Code
+                      <LabelMandatorySymbol />
+                    </h4>
                     <FormControl>
-                      <Input 
-                        placeholder="KOL001" {...field} />
+                      <Input placeholder="KOL001" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -189,18 +228,21 @@ console.log(storeData);
               />
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => navigate("/stores")}
               >
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading 
-                  ? (isEditing ? "Updating..." : "Creating...") 
-                  : (isEditing ? "Update Store" : "Create Store")
-                }
+                {isLoading
+                  ? isEditing
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEditing
+                  ? "Update Store"
+                  : "Create Store"}
               </Button>
             </CardFooter>
           </form>

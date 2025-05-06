@@ -78,7 +78,7 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/assets" className="flex items-center cursor-pointer">
                     <Package className="mr-2 h-4 w-4" />
-                    <span>Manage Assets</span>
+                    <span> Manage Master Assets</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -112,6 +112,12 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile">Profile Settings</Link>
                 </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/changepassword">Change Password</Link>
+                </DropdownMenuItem>
+
+
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log Out</span>

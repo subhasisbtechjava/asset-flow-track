@@ -12,8 +12,11 @@ export interface Store {
   id: string;
   name: string;
   code: string;
+  status: string;
   brand: string;
   city: string;
+  grn_progress: number;
+  erp_progress: number;
   grnCompletionPercentage: number;
   financeBookingPercentage: number;
 }
@@ -24,7 +27,14 @@ export interface Asset {
   name: string;
   category: string;
   unitOfMeasurement: string;
+  unit_of_measurement: string;
   pricePerUnit: number;
+}
+
+export interface Changepass { 
+  currentpass: string;
+  newpass: string;
+  confirmmpass: string;
 }
 
 export interface StoreAsset {
@@ -32,16 +42,19 @@ export interface StoreAsset {
   storeId: string;
   assetId: string;
   quantity: number;
-  poNumber?: string;
-  poAttachment?: string;
-  invoiceNumber?: string;
-  invoiceAttachment?: string;
-  grnNumber?: string;
+  po_number?: string;
+  po_attachment_url?: string;
+  invoice_number?: string;
+  invoice_date?:string
+  invoice_attachment_url?: string;
+  invoice_amount?: string;
+  grn_number?: string;
   isGrnDone: boolean;
-  isTaggingDone: boolean;
-  isProjectHeadApproved: boolean | null;
-  isAuditDone: boolean;
-  isFinanceBooked: boolean;
+  is_tagging_done: boolean;
+  is_project_head_approved: boolean | null;
+  is_audit_done: boolean;
+  is_finance_booked: boolean;
+  assets_name:string;
   asset?: Asset;
 }
 

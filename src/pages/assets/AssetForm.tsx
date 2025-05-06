@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAssetById, generateId } from "@/data/mockData";
 import { toast } from "@/components/ui/use-toast";
+import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
 
 const assetFormSchema = z.object({
   code: z.string().min(1, { message: "Asset code is required" })
@@ -42,10 +43,10 @@ const AssetForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [assetData, setAssetData] = useState<Asset | null>(null);
   const isEditing = !!id;
 
   // If editing, find the asset data
-  const assetData = isEditing ? getAssetById(id) : null;
 
   const form = useForm<AssetFormValues>({
     resolver: zodResolver(assetFormSchema),
@@ -58,13 +59,63 @@ const AssetForm = () => {
     },
   });
 
+
+  useEffect(() => {
+    if (assetData) {
+      form.reset({
+        code: assetData.code || "",
+        name: assetData.name || "",
+        category: assetData.category || "",
+        unitOfMeasurement: assetData.unitOfMeasurement || "",
+        pricePerUnit: assetData.pricePerUnit || 0,
+      });
+    }
+  }, [assetData, form]);
+
+  useEffect(() => {
+    const fetchAsset = async () => {
+      if (isEditing) {
+        try {
+          const data = await assetAPI.getAssetById(id);
+          console.log(data)
+           const edited_data = {
+            "id": data.id,
+            "name":data.name,
+            "category": data.category,
+            "code":data.code,
+            "pricePerUnit": data.price_per_unit,
+            "unitOfMeasurement": data.unit_of_measurement,
+            "created_at": data.created_at,
+            "updated_at": data.updated_at
+          }
+          setAssetData(edited_data);
+        } catch (err) {
+          console.error("Error fetching asset:", err);
+        }
+      }
+    };
+    fetchAsset();
+  }, [id]);  
+
+  //const assetData = isEditing ? getAssetById(id) : null;
+
+
+
   const onSubmit = async (values: AssetFormValues) => {
     setIsLoading(true);
 
     // Mock API call - would be replaced with real data persistence
     setTimeout(() => {
       if (isEditing) {
-        // Mock update existing asset
+        const updateStoreValues= {                   
+                  name: values.name || '', // Fallback to empty string
+                  code: values.code || '',
+                  category: values.category || '',
+                  price_per_unit: values.pricePerUnit || '',
+                  unit_of_measurement: values.unitOfMeasurement||''                 
+                };
+        
+        const updatedAssets = assetAPI.updateAsset(id,updateStoreValues);
         console.log("Updating asset:", { id, ...values });
         toast({
           title: "Asset updated",
@@ -117,7 +168,7 @@ const AssetForm = () => {
                   name="code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Asset Code</FormLabel>
+                      <h4>Asset Code<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="EQ-001" {...field} />
                       </FormControl>
@@ -131,7 +182,7 @@ const AssetForm = () => {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <h4>Category<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="Kitchen Equipment" {...field} />
                       </FormControl>
@@ -146,7 +197,7 @@ const AssetForm = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Asset Name</FormLabel>
+                    <h4>Asset Name<LabelMandatorySymbol/></h4>
                     <FormControl>
                       <Input placeholder="Commercial Deep Fryer" {...field} />
                     </FormControl>
@@ -161,7 +212,7 @@ const AssetForm = () => {
                   name="unitOfMeasurement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit of Measurement</FormLabel>
+                      <h4>Unit of Measurement<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input placeholder="pcs" {...field} />
                       </FormControl>
@@ -175,7 +226,7 @@ const AssetForm = () => {
                   name="pricePerUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price per Unit (<span>&#8377;</span>)</FormLabel>
+                      <h4>Price per Unit (<span>&#8377;</span>)<LabelMandatorySymbol/></h4>
                       <FormControl>
                         <Input 
                           type="number" 
