@@ -1,10 +1,8 @@
 
-import React from 'react'
+import React from "react";
 
-const LabelMandatorySymbol = () => {
-  return (
-    <span style={{color:"red"}}> *</span>
-  )
-}
+const LabelMandatorySymbol: React.FC = () => {
+  return <span className="text-red-500">*</span>;
+};
 
-export default LabelMandatorySymbol
+export default LabelMandatorySymbol;
