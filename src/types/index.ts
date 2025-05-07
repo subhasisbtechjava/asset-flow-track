@@ -19,6 +19,7 @@ export interface Store {
   erp_progress: number;
   grnCompletionPercentage: number;
   financeBookingPercentage: number;
+  total_assets_cnt?: number; // Added to fix Dashboard.tsx errors
 }
 
 export interface Asset {
@@ -26,9 +27,10 @@ export interface Asset {
   code: string;
   name: string;
   category: string;
-  unitOfMeasurement: string;
-  unit_of_measurement: string;
-  pricePerUnit: number;
+  unitOfMeasurement: string; // Camel case
+  unit_of_measurement: string; // Snake case - keeping both for compatibility
+  pricePerUnit: number; // Camel case
+  price_per_unit?: number; // Snake case - adding for compatibility
 }
 
 export interface Changepass { 
@@ -55,6 +57,16 @@ export interface StoreAsset {
   is_audit_done: boolean;
   is_finance_booked: boolean;
   assets_name:string;
+  // Add these for compatibility with existing code
+  poNumber?: string;
+  invoiceNumber?: string;
+  grnNumber?: string;
+  isTaggingDone?: boolean;
+  isProjectHeadApproved?: boolean | null;
+  isAuditDone?: boolean;
+  isFinanceBooked?: boolean;
+  grn_progress?: number;
+  erp_progress?: number;
   asset?: Asset;
 }
 

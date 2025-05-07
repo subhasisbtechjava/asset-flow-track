@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { storeAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
-import { Store } from "@/types";
-
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,235 +17,257 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getStoreById, generateId, mockStores } from "@/data/mockData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
+import { Store } from "@/types";
+import { storeAPI } from "@/api/storeAPI";
+import { generateId } from "@/data/mockData";
 
 const storeFormSchema = z.object({
-  name: z.string().min(1, { message: "Store name is required" }),
-  brand: z.string().min(1, { message: "Brand is required" }),
-  city: z.string().min(1, { message: "City is required" }),
-  code: z
-    .string()
-    .min(1, { message: "Store code is required" })
-    .regex(/^[A-Za-z0-9-]+$/, {
-      message: "Store code can only contain letters, numbers, and hyphens",
-    }),
+  name: z.string().min(2, {
+    message: "Store name must be at least 2 characters.",
+  }),
+  code: z.string().min(3, {
+    message: "Store code must be at least 3 characters.",
+  }),
+  brand: z.string().min(2, {
+    message: "Brand name must be at least 2 characters.",
+  }),
+  city: z.string().min(2, {
+    message: "City name must be at least 2 characters.",
+  }),
+  status: z.string().optional(),
+  grnCompletionPercentage: z.number().optional(),
+  financeBookingPercentage: z.number().optional(),
 });
 
 type StoreFormValues = z.infer<typeof storeFormSchema>;
 
 const StoreForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const isEditing = !!id;
-  const [storeData, setStoreData] = useState<Partial<StoreFormValues>>({});
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [store, setStore] = useState<Store>({
+    id: "",
+    name: "",
+    code: "",
+    brand: "",
+    city: "",
+    status: "in_progress",
+    grnCompletionPercentage: 0,
+    financeBookingPercentage: 0,
+    erp_progress: 0,
+    grn_progress: 0,
+  });
 
   const form = useForm<StoreFormValues>({
     resolver: zodResolver(storeFormSchema),
     defaultValues: {
       name: "",
+      code: "",
       brand: "",
       city: "",
-      code: "",
+      status: "in_progress",
+      grnCompletionPercentage: 0,
+      financeBookingPercentage: 0,
     },
   });
-  
-  const { reset } = form;
-  
+
   useEffect(() => {
-    if (isEditing) {
-      fetchStoreDetails();
+    if (id) {
+      setIsUpdate(true);
+      fetchStoreData(id);
     }
-  }, []);
-  
-  async function fetchStoreDetails() {
-    const res = await storeAPI.getStoreById(id);
-    setStoreData(res);
-  
-    // Reset form values after fetching
-    reset({
-      name: res.name ?? "",
-      brand: res.brand ?? "",
-      city: res.city ?? "",
-      code: res.code ?? "",
-    });
-  }
+  }, [id]);
 
-
-  type newStore = Store;
-
-  const onSubmit = async (values: StoreFormValues) => {
+  const fetchStoreData = async (id: string) => {
     setIsLoading(true);
-
-    // Mock API call - would be replaced with real data persistence
-    setTimeout(() => {
-      if (isEditing && storeData) {
-        // Mock update existing store
-        const updateStoreValues = {
-          name: values.name || "", // Fallback to empty string
-          code: values.code || "",
-          brand: values.brand || "",
-          city: values.city || "",
-          grnCompletionPercentage: 0,
-          financeBookingPercentage: 0,
-        };
-
-        const updatedStore = storeAPI.updateStore(id, updateStoreValues);
-        console.log("Updating store:", { id, ...values });
-        toast({
-          title: "Store updated",
-          description: `Store has been updated successfully.`,
-        });
-      } else {
-        // Mock creating new store
-        const newStore: Store = {
-          // id: generateId(),
-          // ...values,
-          // grnCompletionPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
-          // financeBookingPercentage: 0, // THIS LINE WILL BE CHNAGED AFTER DISCUSSION
-
-          id: generateId(),
-          name: values.name || "", // Fallback to empty string
-          code: values.code || "",
-          brand: values.brand || "",
-          city: values.city || "",
-          grnCompletionPercentage: 0,
-          financeBookingPercentage: 0,
-        };
-
-        const newlycreatedStore = storeAPI.createStore(newStore);
-
-        console.log("Creating store:", newlycreatedStore);
-        toast({
-          title: "Store created",
-          description: `${values.name} has been created successfully.`,
-        });
-      }
-
+    try {
+      const response = await storeAPI.getStoreById(id);
+      setStore(response);
+      form.setValue("name", response.name);
+      form.setValue("code", response.code);
+      form.setValue("brand", response.brand);
+      form.setValue("city", response.city);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch store data.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      navigate("/stores");
-    }, 1000);
+    }
   };
 
+  async function onSubmit(data: StoreFormValues) {
+    setIsLoading(true);
+    try {
+      const storeData: Store = {
+        id: id || generateId(),
+        name: data.name,
+        code: data.code,
+        brand: data.brand,
+        city: data.city,
+        status: data.status || "in_progress",
+        grnCompletionPercentage: data.grnCompletionPercentage || 0,
+        financeBookingPercentage: data.financeBookingPercentage || 0,
+        erp_progress: 0,
+        grn_progress: 0,
+      };
+
+      if (isUpdate) {
+        await storeAPI.updateStore(id, storeData);
+        toast({
+          title: "Success",
+          description: "Store updated successfully.",
+        });
+      } else {
+        const newStore = await storeAPI.createStore(storeData);
+        toast({
+          title: "Success",
+          description: "Store created successfully.",
+        });
+        setStore(newStore);
+      }
+
+      navigate("/stores", {
+        state: {
+          id: store.id,
+          name: store.name,
+          code: store.code,
+          brand: store.brand,
+          city: store.city,
+          status: store.status || 'in_progress', // Adding missing property
+          grn_progress: store.grn_progress || 0, // Adding missing property
+          erp_progress: store.erp_progress || 0, // Adding missing property
+          grnCompletionPercentage: store.grnCompletionPercentage,
+          financeBookingPercentage: store.financeBookingPercentage,
+        },
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save store. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          {isEditing ? "Edit Store" : "Add New Store"}
-        </h1>
-        <p className="text-muted-foreground">
-          {isEditing
-            ? "Update store information"
-            : "Create a new store location"}
-        </p>
-      </div>
-
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>
-            {isEditing ? "Edit Store Details" : "Store Details"}
-          </CardTitle>
-        </CardHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <h4>
-                      Store Name
-                      <LabelMandatorySymbol />
-                    </h4>
-                    <FormControl>
-                      <Input placeholder="Accropolish Store" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <div className="space-y-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Link
+              to="/stores"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 inline mr-1" />
+              Back to Stores
+            </Link>
+          </div>
+          <h1 className="text-3xl font-bold">
+            {isUpdate ? "Edit Store" : "New Store"}
+          </h1>
+          <p className="text-muted-foreground">
+            {isUpdate
+              ? "Update store details."
+              : "Create a new store to track."}
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>{isUpdate ? "Edit Store" : "Create Store"}</CardTitle>
+            <CardDescription>
+              {isUpdate
+                ? "Modify store details and save changes."
+                : "Enter the store information to create a new store."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Store Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Store Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Store Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Store Code" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <h4>
-                        Brand
-                        <LabelMandatorySymbol />
-                      </h4>
+                      <FormLabel>Brand</FormLabel>
                       <FormControl>
-                        <Input placeholder="WoW China" {...field} />
+                        <Input placeholder="Brand" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <h4>
-                        City
-                        <LabelMandatorySymbol />
-                      </h4>
+                      <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input placeholder="Kolkata" {...field} />
+                        <Input placeholder="City" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <h4>
-                      Store Code
-                      <LabelMandatorySymbol />
-                    </h4>
-                    <FormControl>
-                      <Input placeholder="KOL001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/stores")}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading
-                  ? isEditing
-                    ? "Updating..."
-                    : "Creating..."
-                  : isEditing
-                  ? "Update Store"
-                  : "Create Store"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
+                <div className="flex justify-end">
+                  <Button disabled={isLoading} type="submit">
+                    {isLoading ? "Saving..." : "Save Store"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

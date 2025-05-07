@@ -8,13 +8,10 @@ const randomPercentage = (min: number, max: number) =>
 
 const id = localStorage.getItem('id') || '';
 
-
-
-
 // pending developer sk ismile 
- const allstores = id? await storeAPI.getAllStores():[];
+const allstores = id ? await storeAPI.getAllStores() : [];
 
- const data=[];
+const data = [];
 
 // for (let i = 0; i < allstores.length; i++) { 
 //   data.push({
@@ -67,7 +64,8 @@ export const mockAssets: Asset[] = [
     name: 'Commercial Deep Fryer',
     category: 'Kitchen Equipment',
     unit_of_measurement: 'pcs',
-    price_per_unit: 2500
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 2500
   },
   {
     id: '857933f0-1bb9-43da-b621-5d8ada99c6ef',
@@ -75,7 +73,8 @@ export const mockAssets: Asset[] = [
     name: 'Industrial Refrigerator',
     category: 'Kitchen Equipment',
     unit_of_measurement: 'pcs',
-    price_per_unit: 4200
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 4200
   },
   {
     id: '3',
@@ -83,7 +82,8 @@ export const mockAssets: Asset[] = [
     name: 'POS System Terminal',
     category: 'Technology',
     unit_of_measurement: 'pcs',
-    price_per_unit: 1800
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 1800
   },
   {
     id: '4',
@@ -91,7 +91,8 @@ export const mockAssets: Asset[] = [
     name: 'Kitchen Countertop',
     category: 'Furniture',
     unit_of_measurement: 'sq ft',
-    price_per_unit: 65
+    unitOfMeasurement: 'sq ft',
+    pricePerUnit: 65
   },
   {
     id: '5',
@@ -99,7 +100,8 @@ export const mockAssets: Asset[] = [
     name: 'Customer Seating Set',
     category: 'Furniture',
     unit_of_measurement: 'set',
-    price_per_unit: 850
+    unitOfMeasurement: 'set',
+    pricePerUnit: 850
   },
   {
     id: '6',
@@ -107,7 +109,8 @@ export const mockAssets: Asset[] = [
     name: 'Food Warmer Display',
     category: 'Kitchen Equipment',
     unit_of_measurement: 'pcs',
-    price_per_unit: 1200
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 1200
   },
   {
     id: '7',
@@ -115,7 +118,8 @@ export const mockAssets: Asset[] = [
     name: 'Digital Menu Board',
     category: 'Technology',
     unit_of_measurement: 'pcs',
-    price_per_unit: 950
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 950
   },
 ];
 

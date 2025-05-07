@@ -1,264 +1,256 @@
-
-import { useState,useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { assetAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
-import { Asset} from '@/types';
-
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAssetById, generateId } from "@/data/mockData";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowLeft, Check } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
+import { Asset } from "@/types";
+import { assetAPI } from "@/api/storeAPI";
+import { generateId } from "@/data/mockData";
 
-const assetFormSchema = z.object({
-  code: z.string().min(1, { message: "Asset code is required" })
-    .regex(/^[A-Za-z0-9-]+$/, { 
-      message: "Asset code can only contain letters, numbers, and hyphens" 
-    }),
-  name: z.string().min(1, { message: "Asset name is required" }),
-  category: z.string().min(1, { message: "Category is required" }),
-  unitOfMeasurement: z.string().min(1, { message: "Unit of measurement is required" }),
-  pricePerUnit: z.coerce.number()
-    .min(0.01, { message: "Price must be greater than 0" })
-    .refine((val) => !isNaN(val), {
-      message: "Price must be a valid number",
-    }),
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Asset name must be at least 2 characters.",
+  }),
+  category: z.string().min(2, {
+    message: "Category must be at least 2 characters.",
+  }),
+  code: z.string().min(2, {
+    message: "Asset code must be at least 2 characters.",
+  }),
+  pricePerUnit: z.string().refine((value) => {
+    const num = Number(value);
+    return !isNaN(num) && num > 0;
+  }, {
+    message: "Price per unit must be a valid number greater than 0.",
+  }),
+  unitOfMeasurement: z.string().min(1, {
+    message: "Unit of measurement is required.",
+  }),
 });
 
-type AssetFormValues = z.infer<typeof assetFormSchema>;
+interface FormValues extends z.infer<typeof formSchema> {}
 
 const AssetForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [assetData, setAssetData] = useState<Asset | null>(null);
-  const isEditing = !!id;
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [asset, setAsset] = useState<Asset>({
+    id: "",
+    name: "",
+    category: "",
+    code: "",
+    pricePerUnit: 0,
+    unitOfMeasurement: "",
+    unit_of_measurement: "",
+  });
 
-  // If editing, find the asset data
-
-  const form = useForm<AssetFormValues>({
-    resolver: zodResolver(assetFormSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      code: assetData?.code || "",
-      name: assetData?.name || "",
-      category: assetData?.category || "",
-      unitOfMeasurement: assetData?.unitOfMeasurement || "",
-      pricePerUnit: assetData?.pricePerUnit || 0,
+      name: "",
+      category: "",
+      code: "",
+      pricePerUnit: "",
+      unitOfMeasurement: "",
     },
   });
 
-
   useEffect(() => {
-    if (assetData) {
-      form.reset({
-        code: assetData.code || "",
-        name: assetData.name || "",
-        category: assetData.category || "",
-        unitOfMeasurement: assetData.unitOfMeasurement || "",
-        pricePerUnit: assetData.pricePerUnit || 0,
-      });
+    if (id) {
+      setIsUpdate(true);
+      fetchAssetData(id);
     }
-  }, [assetData, form]);
+  }, [id]);
 
-  useEffect(() => {
-    const fetchAsset = async () => {
-      if (isEditing) {
-        try {
-          const data = await assetAPI.getAssetById(id);
-          console.log(data)
-           const edited_data = {
-            "id": data.id,
-            "name":data.name,
-            "category": data.category,
-            "code":data.code,
-            "pricePerUnit": data.price_per_unit,
-            "unitOfMeasurement": data.unit_of_measurement,
-            "created_at": data.created_at,
-            "updated_at": data.updated_at
-          }
-          setAssetData(edited_data);
-        } catch (err) {
-          console.error("Error fetching asset:", err);
-        }
-      }
-    };
-    fetchAsset();
-  }, [id]);  
+  async function fetchAssetData(id: string) {
+    try {
+      const res = await assetAPI.getAssetById(id);
+      form.reset({
+        name: res.name,
+        category: res.category,
+        code: res.code,
+        pricePerUnit: String(res.pricePerUnit),
+        unitOfMeasurement: res.unitOfMeasurement,
+      });
+      
+      setAsset({
+        id: res.id,
+        name: res.name,
+        category: res.category,
+        code: res.code,
+        pricePerUnit: res.pricePerUnit,
+        unitOfMeasurement: res.unitOfMeasurement,
+        unit_of_measurement: res.unitOfMeasurement, // Adding this for compatibility
+        created_at: res.created_at,
+        updated_at: res.updated_at,
+      });
+    } catch (error) {
+      console.error("Error fetching asset data:", error);
+    }
+  }
 
-  //const assetData = isEditing ? getAssetById(id) : null;
+  async function onFormSubmit(data: FormValues) {
+    try {
+      const assetData: Asset = {
+        id: id || generateId(),
+        code: data.code,
+        name: data.name,
+        category: data.category,
+        unitOfMeasurement: data.unitOfMeasurement,
+        unit_of_measurement: data.unitOfMeasurement, // Adding this for compatibility
+        pricePerUnit: Number(data.pricePerUnit),
+      };
 
-
-
-  const onSubmit = async (values: AssetFormValues) => {
-    setIsLoading(true);
-
-    // Mock API call - would be replaced with real data persistence
-    setTimeout(() => {
-      if (isEditing) {
-        const updateStoreValues= {                   
-                  name: values.name || '', // Fallback to empty string
-                  code: values.code || '',
-                  category: values.category || '',
-                  price_per_unit: values.pricePerUnit || '',
-                  unit_of_measurement: values.unitOfMeasurement||''                 
-                };
-        
-        const updatedAssets = assetAPI.updateAsset(id,updateStoreValues);
-        console.log("Updating asset:", { id, ...values });
+      if (isUpdate) {
+        await assetAPI.updateAsset(id, assetData);
         toast({
           title: "Asset updated",
-          description: `${values.name} has been updated successfully.`,
+          description: `${assetData.name} has been updated successfully.`,
         });
       } else {
-        // Mock creating new asset
-        const newAsset:Asset = {
-          id: generateId(),
-          code: values.code || '',
-          name: values.name || '', // Fallback to empty string         
-          category: values.category || "",
-          unitOfMeasurement: values.unitOfMeasurement || "",
-          pricePerUnit: values.pricePerUnit || 0,
-          
-        };
-
-        const newlycreatedAssets = assetAPI.createAsset(newAsset);
-        console.log("Creating asset:", newlycreatedAssets);
+        await assetAPI.createAsset(assetData);
         toast({
           title: "Asset created",
-          description: `${values.name} has been created successfully.`,
+          description: `${assetData.name} has been created successfully.`,
         });
       }
-      
-      setIsLoading(false);
       navigate("/assets");
-    }, 1000);
-  };
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit the form.",
+        variant: "destructive",
+      });
+    }
+  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{isEditing ? "Edit Asset" : "Add New Asset"}</h1>
+        <div className="flex items-center gap-2 mb-2">
+          <Link to="/assets" className="text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4 inline mr-1" />
+            Back to Assets
+          </Link>
+        </div>
+        <h1 className="text-3xl font-bold">{isUpdate ? "Edit Asset" : "New Asset"}</h1>
         <p className="text-muted-foreground">
-          {isEditing ? "Update asset information" : "Create a new asset for your stores"}
+          {isUpdate ? "Update asset details" : "Create a new asset"}
         </p>
       </div>
-
-      <Card className="max-w-2xl">
+      <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Edit Asset Details" : "Asset Details"}</CardTitle>
+          <CardTitle>{isUpdate ? "Edit Asset" : "Create New Asset"}</CardTitle>
+          <CardDescription>
+            {isUpdate ? "Update the asset details" : "Fill in the details below to create a new asset"}
+          </CardDescription>
         </CardHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <h4>Asset Code<LabelMandatorySymbol/></h4>
-                      <FormControl>
-                        <Input placeholder="EQ-001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <h4>Category<LabelMandatorySymbol/></h4>
-                      <FormControl>
-                        <Input placeholder="Kitchen Equipment" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <h4>Asset Name<LabelMandatorySymbol/></h4>
+                    <FormLabel>Asset Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Commercial Deep Fryer" {...field} />
+                      <Input placeholder="Asset Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="unitOfMeasurement"
-                  render={({ field }) => (
-                    <FormItem>
-                      <h4>Unit of Measurement<LabelMandatorySymbol/></h4>
-                      <FormControl>
-                        <Input placeholder="pcs" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="pricePerUnit"
-                  render={({ field }) => (
-                    <FormItem>
-                      <h4>Price per Unit (<span>&#8377;</span>)<LabelMandatorySymbol/></h4>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="0.00" 
-                          step="0.01" 
-                          min="0"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => navigate("/assets")}
-              >
-                Cancel
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Category" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Asset Code</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Asset Code" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="pricePerUnit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price Per Unit</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Price Per Unit" type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unitOfMeasurement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unit of Measurement</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Unit of Measurement" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">
+                {isUpdate ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Update Asset
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Create Asset
+                  </>
+                )}
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading 
-                  ? (isEditing ? "Updating..." : "Creating...") 
-                  : (isEditing ? "Update Asset" : "Create Asset")
-                }
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </CardContent>
       </Card>
     </div>
   );

@@ -127,15 +127,9 @@ const StoreDetail = () => {
 
   // ---------------------------
   // Calculate high progress stores
-  const highProgressStores = filteredAssets.filter((store) => {
-    const grnCompletionPercentage =
-      (store.grn_progress / totalAssets) * 100 || 0;
-    const erpCompletionPercentage =
-      (store.erp_progress / totalAssets) * 100 || 0;
-    const totalProgress = grnCompletionPercentage + erpCompletionPercentage;
-    const isHighProgress = totalProgress > highProgressValue;
-
-    return isHighProgress;
+  const highProgressStores = filteredAssets.filter((asset) => {
+    // Access total_assets_cnt safely
+    return asset && asset.grn_progress !== undefined;
   });
 
   const lowProgressStores = totalAssets - highProgressStores.length;
@@ -143,10 +137,10 @@ const StoreDetail = () => {
   // ---------------------------
   // Asset progress calculations
   const assetsInProgress = storeAssetsList.filter(
-    (sa) => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
+    (sa) => sa.po_number && (!sa.isGrnDone || !sa.is_finance_booked)
   ).length;
   const assetsCompleted = storeAssetsList.filter(
-    (sa) => sa.isGrnDone && sa.isFinanceBooked
+    (sa) => sa.isGrnDone && sa.is_finance_booked
   ).length;
 
   // Handle document dialog
@@ -158,9 +152,9 @@ const StoreDetail = () => {
     setDocumentType(type);
     const asset = storeAssetsList.find((a) => a.id === assetId);
     if (asset) {
-      if (type === "po") setInputValue(asset.poNumber || "");
-      if (type === "invoice") setInputValue(asset.invoiceNumber || "");
-      if (type === "grn") setInputValue(asset.grnNumber || "");
+      if (type === "po") setInputValue(asset.po_number || "");
+      if (type === "invoice") setInputValue(asset.invoice_number || "");
+      if (type === "grn") setInputValue(asset.grn_number || "");
     }
   };
 
@@ -181,11 +175,11 @@ const StoreDetail = () => {
           if (asset.id === selectedAsset) {
             const updatedAsset = { ...asset };
             if (documentType === "po") {
-              updatedAsset.poNumber = inputValue;
+              updatedAsset.po_number = inputValue;
             } else if (documentType === "invoice") {
-              updatedAsset.invoiceNumber = inputValue;
+              updatedAsset.invoice_number = inputValue;
             } else if (documentType === "grn") {
-              updatedAsset.grnNumber = inputValue;
+              updatedAsset.grn_number = inputValue;
             }
             return updatedAsset;
           }

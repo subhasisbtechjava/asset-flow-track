@@ -214,14 +214,14 @@ const StoreAssets = () => {
     
     if (storeAsset) {
       workflowStepForm.reset({
-        poNumber: storeAsset.poNumber || "",
-        invoiceNumber: storeAsset.invoiceNumber || "",
-        grnNumber: storeAsset.grnNumber || "",
+        poNumber: storeAsset.po_number || "",
+        invoiceNumber: storeAsset.invoice_number || "",
+        grnNumber: storeAsset.grn_number || "",
         isGrnDone: storeAsset.isGrnDone,
-        isTaggingDone: storeAsset.isTaggingDone,
-        isProjectHeadApproved: storeAsset.isProjectHeadApproved,
-        isAuditDone: storeAsset.isAuditDone,
-        isFinanceBooked: storeAsset.isFinanceBooked,
+        isTaggingDone: storeAsset.is_tagging_done,
+        isProjectHeadApproved: storeAsset.is_project_head_approved,
+        isAuditDone: storeAsset.is_audit_done,
+        isFinanceBooked: storeAsset.is_finance_booked,
       });
     }
   };
