@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
@@ -94,6 +95,7 @@ const AssetForm = () => {
         unitOfMeasurement: res.unitOfMeasurement,
       });
       
+      // Update the asset state with all required properties
       setAsset({
         id: res.id,
         name: res.name,
@@ -101,7 +103,8 @@ const AssetForm = () => {
         code: res.code,
         pricePerUnit: res.pricePerUnit,
         unitOfMeasurement: res.unitOfMeasurement,
-        unit_of_measurement: res.unitOfMeasurement, // Adding this for compatibility
+        unit_of_measurement: res.unitOfMeasurement,
+        // Only include these properties if they exist in the response
         created_at: res.created_at,
         updated_at: res.updated_at,
       });
@@ -123,12 +126,21 @@ const AssetForm = () => {
       };
 
       if (isUpdate) {
+        // For updates, preserve the created_at and updated_at if they exist
+        if (asset.created_at) {
+          assetData.created_at = asset.created_at;
+        }
+        assetData.updated_at = new Date().toISOString();
+        
         await assetAPI.updateAsset(id, assetData);
         toast({
           title: "Asset updated",
           description: `${assetData.name} has been updated successfully.`,
         });
       } else {
+        assetData.created_at = new Date().toISOString();
+        assetData.updated_at = new Date().toISOString();
+        
         await assetAPI.createAsset(assetData);
         toast({
           title: "Asset created",

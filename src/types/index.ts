@@ -19,7 +19,7 @@ export interface Store {
   erp_progress: number;
   grnCompletionPercentage: number;
   financeBookingPercentage: number;
-  total_assets_cnt?: number; // Added to fix Dashboard.tsx errors
+  total_assets_cnt?: number;
 }
 
 export interface Asset {
@@ -27,10 +27,12 @@ export interface Asset {
   code: string;
   name: string;
   category: string;
-  unitOfMeasurement: string; // Camel case
-  unit_of_measurement: string; // Snake case - keeping both for compatibility
-  pricePerUnit: number; // Camel case
-  price_per_unit?: number; // Snake case - adding for compatibility
+  unitOfMeasurement: string;
+  unit_of_measurement: string;
+  pricePerUnit: number;
+  price_per_unit?: number;
+  created_at?: string;  // Added this property
+  updated_at?: string;  // Added this property
 }
 
 export interface Changepass { 
