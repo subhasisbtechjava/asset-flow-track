@@ -24,6 +24,59 @@ export const storeAPI = {
       throw error;
     }
   },
+  
+  // Get all store documents (POs, Invoices, GRNs)
+  getStoreDocuments: async (storeId: string, assetId: string, documentType: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/store/${storeId}/asset/${assetId}/documents/${documentType}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching ${documentType} documents:`, error);
+      throw error;
+    }
+  },
+  
+  // Add new document (PO, Invoice, GRN)
+  addStoreDocument: async (storeId: string, assetId: string, documentType: string, documentData: any) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/store/${storeId}/asset/${assetId}/documents/${documentType}`,
+        documentData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error adding ${documentType} document:`, error);
+      throw error;
+    }
+  },
+  
+  // Delete document
+  deleteStoreDocument: async (storeId: string, assetId: string, documentType: string, documentId: string) => {
+    try {
+      const response = await axios.delete(
+        `${API_URL}/store/${storeId}/asset/${assetId}/documents/${documentType}/${documentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting ${documentType} document:`, error);
+      throw error;
+    }
+  },
+  
   assignAssetToStore: async (
     storeId: string,
     assetId: string,

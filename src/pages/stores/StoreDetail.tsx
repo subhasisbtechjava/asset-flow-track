@@ -24,6 +24,7 @@ import { DocumentEntryDialog } from "@/components/store/DocumentEntryDialog";
 import { StoreAssetsTable } from "@/components/store/StoreAssetsTable";
 import { StoreAsset } from "@/types";
 import { storeAPI } from "@/api/storeAPI";
+import EnhancedStoreAssetsTable from "@/components/store/EnhancedStoreAssetsTable";
 
 const StoreDetail = () => {
   const { id } = useParams();
@@ -38,12 +39,10 @@ const StoreDetail = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [useEnhancedTable, setUseEnhancedTable] = useState(true);
 
   // Fetch store details
   const [store, setStore] = useState(null);
-
-  // Fetch store assets
-  const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
 
   // -----------------------------
   const highProgressValue = 140;
@@ -51,7 +50,6 @@ const StoreDetail = () => {
   // -------------------------
   useEffect(() => {
     if (id) {
-      console.log("id: ", id);
       initialService();
     }
   }, []);
@@ -60,38 +58,35 @@ const StoreDetail = () => {
     fetchStoreDetails();
     fetchStoreAssets();
   }
+  
   async function fetchStoreDetails() {
-    const storeDetails = await storeAPI.getStoreById(id);
-    console.log("====================================");
-    console.log("storeDetails: ", storeDetails);
-
-    console.log("====================================");
-    setStore(storeDetails);
-    // setStore({
-    //   id: id,
-    //   name: "Acropolis",
-    //   code: "KOL246",
-    //   brand: "Wow! Kulfi",
-    //   city: "Kolkata",
-    //   grnCompletionPercentage: 100,
-    //   financeBookingPercentage: 80,
-    // });
+    try {
+      const storeDetails = await storeAPI.getStoreById(id);
+      setStore(storeDetails);
+    } catch (error) {
+      console.error("Error fetching store details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load store details",
+        variant: "destructive"
+      });
+    }
   }
+  
   async function fetchStoreAssets() {
-    const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-    setStoreAssetsList(assets);
-
-    console.log("storeAssetsList: ", storeAssetsList);
+    try {
+      const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
+      setStoreAssetsList(assets);
+    } catch (error) {
+      console.error("Error fetching store assets:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load store assets",
+        variant: "destructive"
+      });
+    }
   }
-  //  async function fetchStoreAssets() {
-  //   const assets = await getStoreAssetsByStoreId(id);
-  //   setStoreAssetsList(assets);
-  //  }
-  // async function fetchStoreAssetss() {
-  //   const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-  //   console.log("assets: ", assets);
-  //   // setStoreAssetsList(assets);
-  // }
+
   if (!store) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -125,15 +120,13 @@ const StoreDetail = () => {
   const filteredAssets = storeAssetsList.filter(
     (asset) =>
       asset?.assets_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    // ||
-    // asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate summary statistics
   const totalAssets = storeAssetsList.length;
 
   // ---------------------------
-
+  // Calculate high progress stores
   const highProgressStores = filteredAssets.filter((store) => {
     const grnCompletionPercentage =
       (store.grn_progress / totalAssets) * 100 || 0;
@@ -148,7 +141,7 @@ const StoreDetail = () => {
   const lowProgressStores = totalAssets - highProgressStores.length;
 
   // ---------------------------
-
+  // Asset progress calculations
   const assetsInProgress = storeAssetsList.filter(
     (sa) => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
   ).length;
@@ -211,36 +204,36 @@ const StoreDetail = () => {
   };
 
   // Toggle status
-  const toggleStatus = async (assetId: string, updateParam: string, body) => {
+  const toggleStatus = async (assetId: string, updateParam: string, body: any) => {
     setIsLoading(true);
-
-    const res = await storeAPI.storeAssetTrackingStatusUpdate(
-      assetId,
-      updateParam,
-      body
-    );
-    fetchStoreAssets();
-
-    toast({
-      title: "Status updated",
-      description: "Asset status has been updated successfully.",
-    });
-
-    setIsLoading(false);
+    try {
+      await storeAPI.storeAssetTrackingStatusUpdate(assetId, updateParam, body);
+      await fetchStoreAssets();
+      toast({
+        title: "Status updated",
+        description: "Asset status has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const grnCompletionPercentage = filteredAssets.filter((asset)=>{
+  // Calculate completion percentages
+  const grnCompletionPercentage = filteredAssets.filter((asset) => 
+    asset.grn_number !== "" && asset.grn_number !== null
+  );
+  
+  const erpCompletionPercentage = filteredAssets.filter((asset) =>
+    asset.is_finance_booked !== null && asset.is_finance_booked !== false
+  );
 
-    return asset.grn_number!="" && asset.grn_number!=null;
-
-
-  })
-  const erpCompletionPercentage = filteredAssets.filter((asset)=>{
-
-    return asset.is_finance_booked!=null && asset.is_finance_booked!=false;
-
-
-  })
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -272,22 +265,20 @@ const StoreDetail = () => {
         </div>
       </div>
 
-      {/* <StoreSummaryCards
-        totalAssets={totalAssets}
-        assetsInProgress={assetsInProgress}
-        assetsCompleted={assetsCompleted}
-      /> */}
-
       <StoreProgressCards
-        grnCompletionPercentage={grnCompletionPercentage.length>0?((grnCompletionPercentage.length/filteredAssets.length)*100):0}
-        financeBookingPercentage={erpCompletionPercentage.length>0?((erpCompletionPercentage.length/filteredAssets.length)*100):0}
+        grnCompletionPercentage={grnCompletionPercentage.length > 0 
+          ? ((grnCompletionPercentage.length/filteredAssets.length) * 100) 
+          : 0}
+        financeBookingPercentage={erpCompletionPercentage.length > 0 
+          ? ((erpCompletionPercentage.length/filteredAssets.length) * 100) 
+          : 0}
       />
 
       <div className="mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search assets by name or code..."
+            placeholder="Search assets by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -295,15 +286,32 @@ const StoreDetail = () => {
         </div>
       </div>
 
-      <StoreAssetsTable
-        storeId={store.id}
-        storeAssets={filteredAssets}
-        isLoading={isLoading}
-        onToggleStatus={toggleStatus}
-        onDocumentDialogOpen={openDocumentDialog}
-        onInputChange={setInputValue}
-        onSaveDocument={saveDocumentNumber}
-      />
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Asset Tracking</h2>
+        <Button variant="outline" onClick={() => setUseEnhancedTable(!useEnhancedTable)}>
+          {useEnhancedTable ? "Switch to Classic View" : "Switch to Enhanced View"}
+        </Button>
+      </div>
+
+      {useEnhancedTable ? (
+        <EnhancedStoreAssetsTable
+          storeId={store.id}
+          storeAssets={filteredAssets}
+          isLoading={isLoading}
+          onToggleStatus={toggleStatus}
+          onRefresh={fetchStoreAssets}
+        />
+      ) : (
+        <StoreAssetsTable
+          storeId={store.id}
+          storeAssets={filteredAssets}
+          isLoading={isLoading}
+          onToggleStatus={toggleStatus}
+          onDocumentDialogOpen={openDocumentDialog}
+          onInputChange={setInputValue}
+          onSaveDocument={saveDocumentNumber}
+        />
+      )}
 
       <DocumentEntryDialog
         isOpen={!!selectedAsset && !!documentType}
