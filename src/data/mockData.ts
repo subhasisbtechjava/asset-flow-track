@@ -1,6 +1,6 @@
 
 import { Store, Asset, StoreAsset } from '@/types';
-import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
+import { storeAPI } from '../api/storeAPI';
 
 // Generate random percentage between min and max
 const randomPercentage = (min: number, max: number) => 
@@ -27,37 +27,89 @@ const data = [];
 
 export const mockStores: Store[] = data;
 
-// Mock Stores Data (uncomment for testing without API)
+// Enhanced Mock Stores Data with more realistic values
 export const mockStoresOffline: Store[] = [
   {
     id: '1',
-    name: 'Acropolis',
+    name: 'Acropolis Mall',
     code: 'KOL246',
     brand: 'Wow! Kulfi',
     city: 'Kolkata',
     status: 'active',
-    grnCompletionPercentage: randomPercentage(50, 100),
-    financeBookingPercentage: randomPercentage(30, 90),
+    grnCompletionPercentage: 75,
+    financeBookingPercentage: 60,
     grn_progress: 75,
     erp_progress: 60,
     total_assets_cnt: 12
   },
   {
     id: '2',
-    name: 'Avishikta',
+    name: 'Avishikta Complex',
     code: 'KOL214',
     brand: 'Wow! Momo',
     city: 'Kolkata',
     status: 'active',
-    grnCompletionPercentage: randomPercentage(50, 100),
-    financeBookingPercentage: randomPercentage(30, 90),
+    grnCompletionPercentage: 82,
+    financeBookingPercentage: 78,
     grn_progress: 82,
     erp_progress: 78,
     total_assets_cnt: 8
-  }  
+  },
+  {
+    id: '3',
+    name: 'South City Mall',
+    code: 'KOL321',
+    brand: 'Wow! China',
+    city: 'Kolkata',
+    status: 'pending',
+    grnCompletionPercentage: 45,
+    financeBookingPercentage: 20,
+    grn_progress: 45,
+    erp_progress: 20,
+    total_assets_cnt: 15
+  },
+  {
+    id: '4',
+    name: 'DLF Cyber City',
+    code: 'GUR101',
+    brand: 'Wow! Momo',
+    city: 'Gurugram',
+    status: 'active',
+    grnCompletionPercentage: 95,
+    financeBookingPercentage: 90,
+    grn_progress: 95,
+    erp_progress: 90,
+    total_assets_cnt: 10
+  },
+  {
+    id: '5',
+    name: 'Phoenix Marketcity',
+    code: 'BLR425',
+    brand: 'Wow! Kulfi',
+    city: 'Bangalore',
+    status: 'active',
+    grnCompletionPercentage: 88,
+    financeBookingPercentage: 82,
+    grn_progress: 88,
+    erp_progress: 82,
+    total_assets_cnt: 7
+  },
+  {
+    id: '6',
+    name: 'Oberoi Mall',
+    code: 'MUM512',
+    brand: 'Wow! China',
+    city: 'Mumbai',
+    status: 'pending',
+    grnCompletionPercentage: 30,
+    financeBookingPercentage: 15,
+    grn_progress: 30,
+    erp_progress: 15,
+    total_assets_cnt: 18
+  },
 ];
 
-// Mock Assets Data
+// Enhanced Mock Assets Data with more variety
 export const mockAssets: Asset[] = [
   {
     id: '1',
@@ -143,10 +195,47 @@ export const mockAssets: Asset[] = [
     created_at: '2025-01-20T10:30:00Z',
     updated_at: '2025-01-20T10:30:00Z'
   },
+  {
+    id: '8',
+    code: 'EQ-008',
+    name: 'Stainless Steel Prep Table',
+    category: 'Kitchen Equipment',
+    unit_of_measurement: 'pcs',
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 750,
+    price_per_unit: 750,
+    created_at: '2025-02-05T10:30:00Z',
+    updated_at: '2025-02-05T10:30:00Z'
+  },
+  {
+    id: '9',
+    code: 'EQ-009',
+    name: 'Commercial Blender',
+    category: 'Kitchen Equipment',
+    unit_of_measurement: 'pcs',
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 320,
+    price_per_unit: 320,
+    created_at: '2025-02-10T10:30:00Z',
+    updated_at: '2025-02-10T10:30:00Z'
+  },
+  {
+    id: '10',
+    code: 'EQ-010',
+    name: 'Indoor Dining Chairs',
+    category: 'Furniture',
+    unit_of_measurement: 'pcs',
+    unitOfMeasurement: 'pcs',
+    pricePerUnit: 95,
+    price_per_unit: 95,
+    created_at: '2025-02-15T10:30:00Z',
+    updated_at: '2025-02-15T10:30:00Z'
+  },
 ];
 
-// Mock StoreAssets Data with multiple documents for each type
+// Enhanced Mock StoreAssets Data with more entries and varied statuses
 export const mockStoreAssets: StoreAsset[] = [
+  // Store 1 Assets (Acropolis Mall)
   {
     id: '101',
     storeId: '1',
@@ -233,9 +322,9 @@ export const mockStoreAssets: StoreAsset[] = [
   },
   {
     id: '104',
-    storeId: '2',
-    assetId: '4',
-    quantity: 20,
+    storeId: '1',
+    assetId: '8',
+    quantity: 2,
     po_number: 'PO-2025-004',
     poNumber: 'PO-2025-004',
     po_attachment_url: 'https://example.com/docs/po_2025_004.pdf',
@@ -257,16 +346,76 @@ export const mockStoreAssets: StoreAsset[] = [
     isFinanceBooked: false,
     grn_progress: 25,
     erp_progress: 0,
+    assets_name: 'Stainless Steel Prep Table'
+  },
+  
+  // Store 2 Assets (Avishikta Complex)
+  {
+    id: '201',
+    storeId: '2',
+    assetId: '4',
+    quantity: 20,
+    po_number: 'PO-2025-101',
+    poNumber: 'PO-2025-101',
+    po_attachment_url: 'https://example.com/docs/po_2025_101.pdf',
+    invoice_number: 'INV-2025-2001',
+    invoiceNumber: 'INV-2025-2001',
+    invoice_date: '2025-02-22',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_2001.pdf',
+    invoice_amount: '1300',
+    grn_number: 'GRN-2025-101',
+    grnNumber: 'GRN-2025-101',
+    isGrnDone: true,
+    is_tagging_done: true,
+    isTaggingDone: true,
+    is_project_head_approved: true,
+    isProjectHeadApproved: true,
+    is_audit_done: true,
+    isAuditDone: true,
+    is_finance_booked: true,
+    isFinanceBooked: true,
+    grn_progress: 100,
+    erp_progress: 100,
     assets_name: 'Kitchen Countertop'
   },
   {
-    id: '105',
+    id: '202',
     storeId: '2',
     assetId: '5',
     quantity: 5,
-    po_number: null,
-    poNumber: null,
-    po_attachment_url: null,
+    po_number: 'PO-2025-102',
+    poNumber: 'PO-2025-102',
+    po_attachment_url: 'https://example.com/docs/po_2025_102.pdf',
+    invoice_number: 'INV-2025-2002',
+    invoiceNumber: 'INV-2025-2002',
+    invoice_date: '2025-02-25',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_2002.pdf',
+    invoice_amount: '4250',
+    grn_number: 'GRN-2025-102',
+    grnNumber: 'GRN-2025-102',
+    isGrnDone: true,
+    is_tagging_done: true,
+    isTaggingDone: true,
+    is_project_head_approved: true,
+    isProjectHeadApproved: true,
+    is_audit_done: false,
+    isAuditDone: false,
+    is_finance_booked: false,
+    isFinanceBooked: false,
+    grn_progress: 75,
+    erp_progress: 50,
+    assets_name: 'Customer Seating Set'
+  },
+  
+  // Store 3 Assets (South City Mall)
+  {
+    id: '301',
+    storeId: '3',
+    assetId: '6',
+    quantity: 3,
+    po_number: 'PO-2025-201',
+    poNumber: 'PO-2025-201',
+    po_attachment_url: 'https://example.com/docs/po_2025_201.pdf',
     invoice_number: null,
     invoiceNumber: null,
     invoice_date: null,
@@ -283,10 +432,126 @@ export const mockStoreAssets: StoreAsset[] = [
     isAuditDone: false,
     is_finance_booked: false,
     isFinanceBooked: false,
-    grn_progress: 0,
+    grn_progress: 25,
     erp_progress: 0,
-    assets_name: 'Customer Seating Set'
-  }
+    assets_name: 'Food Warmer Display'
+  },
+  {
+    id: '302',
+    storeId: '3',
+    assetId: '7',
+    quantity: 2,
+    po_number: 'PO-2025-202',
+    poNumber: 'PO-2025-202',
+    po_attachment_url: 'https://example.com/docs/po_2025_202.pdf',
+    invoice_number: 'INV-2025-3001',
+    invoiceNumber: 'INV-2025-3001',
+    invoice_date: '2025-03-10',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_3001.pdf',
+    invoice_amount: '1900',
+    grn_number: 'GRN-2025-201',
+    grnNumber: 'GRN-2025-201',
+    isGrnDone: true,
+    is_tagging_done: false,
+    isTaggingDone: false,
+    is_project_head_approved: null,
+    isProjectHeadApproved: null,
+    is_audit_done: false,
+    isAuditDone: false,
+    is_finance_booked: false,
+    isFinanceBooked: false,
+    grn_progress: 50,
+    erp_progress: 25,
+    assets_name: 'Digital Menu Board'
+  },
+  {
+    id: '303',
+    storeId: '3',
+    assetId: '9',
+    quantity: 4,
+    po_number: 'PO-2025-203',
+    poNumber: 'PO-2025-203',
+    po_attachment_url: 'https://example.com/docs/po_2025_203.pdf',
+    invoice_number: 'INV-2025-3002',
+    invoiceNumber: 'INV-2025-3002',
+    invoice_date: '2025-03-15',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_3002.pdf',
+    invoice_amount: '1280',
+    grn_number: null,
+    grnNumber: null,
+    isGrnDone: false,
+    is_tagging_done: false,
+    isTaggingDone: false,
+    is_project_head_approved: false,
+    isProjectHeadApproved: false,
+    is_audit_done: false,
+    isAuditDone: false,
+    is_finance_booked: false,
+    isFinanceBooked: false,
+    grn_progress: 50,
+    erp_progress: 25,
+    assets_name: 'Commercial Blender'
+  },
+  
+  // Store 4 Assets (DLF Cyber City)
+  {
+    id: '401',
+    storeId: '4',
+    assetId: '10',
+    quantity: 24,
+    po_number: 'PO-2025-301',
+    poNumber: 'PO-2025-301',
+    po_attachment_url: 'https://example.com/docs/po_2025_301.pdf',
+    invoice_number: 'INV-2025-4001',
+    invoiceNumber: 'INV-2025-4001',
+    invoice_date: '2025-03-20',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_4001.pdf',
+    invoice_amount: '2280',
+    grn_number: 'GRN-2025-301',
+    grnNumber: 'GRN-2025-301',
+    isGrnDone: true,
+    is_tagging_done: true,
+    isTaggingDone: true,
+    is_project_head_approved: true,
+    isProjectHeadApproved: true,
+    is_audit_done: true,
+    isAuditDone: true,
+    is_finance_booked: true,
+    isFinanceBooked: true,
+    grn_progress: 100,
+    erp_progress: 100,
+    assets_name: 'Indoor Dining Chairs'
+  },
+  
+  // More assets for Store 1 to demonstrate variety
+  {
+    id: '105',
+    storeId: '1',
+    assetId: '9',
+    quantity: 2,
+    po_number: 'PO-2025-005',
+    poNumber: 'PO-2025-005',
+    po_attachment_url: 'https://example.com/docs/po_2025_005.pdf',
+    invoice_number: 'INV-2025-1004',
+    invoiceNumber: 'INV-2025-1004',
+    invoice_date: '2025-03-25',
+    invoice_attachment_url: 'https://example.com/docs/inv_2025_1004.pdf',
+    invoice_amount: '640',
+    grn_number: 'GRN-2025-005',
+    grnNumber: 'GRN-2025-005',
+    isGrnDone: true,
+    is_tagging_done: true,
+    isTaggingDone: true,
+    is_project_head_approved: false,
+    isProjectHeadApproved: false,
+    is_audit_done: false,
+    isAuditDone: false,
+    is_finance_booked: false,
+    isFinanceBooked: false,
+    grn_progress: 60,
+    erp_progress: 30,
+    assets_name: 'Commercial Blender'
+  },
 ];
 
 // Function to get a store by ID
@@ -324,28 +589,77 @@ export const generateId = (): string => {
 
 // Mock function to simulate API for document management
 export const getMockDocuments = (storeId: string, assetId: string, docType: 'po' | 'invoice' | 'grn') => {
-  // For demo purposes, we'll generate a few documents based on the asset ID
-  const baseDocuments = [
-    {
-      id: `${docType}-${assetId}-1`,
-      documentNumber: `${docType.toUpperCase()}-2025-${assetId}01`,
-      documentDate: new Date('2025-02-15'),
-      documentAmount: docType === 'invoice' ? '1250' : undefined,
-      attachmentUrl: `https://example.com/docs/${docType}_${assetId}_1.pdf`,
-      attachmentName: `${docType}_document_1.pdf`
-    }
-  ];
+  // For demo purposes, we'll generate documents based on the store and asset ID
+  const baseDocuments = [];
   
-  // For some assets, add multiple documents
-  if (['101', '102'].includes(assetId)) {
-    baseDocuments.push({
-      id: `${docType}-${assetId}-2`,
-      documentNumber: `${docType.toUpperCase()}-2025-${assetId}02`,
-      documentDate: new Date('2025-03-10'),
-      documentAmount: docType === 'invoice' ? '2500' : undefined,
-      attachmentUrl: `https://example.com/docs/${docType}_${assetId}_2.pdf`,
-      attachmentName: `${docType}_document_2.pdf`
-    });
+  // Get the specific store asset to create realistic documents
+  const storeAsset = mockStoreAssets.find(sa => sa.storeId === storeId && sa.assetId === assetId);
+  
+  if (storeAsset) {
+    if (docType === 'po' && storeAsset.po_number) {
+      baseDocuments.push({
+        id: `${docType}-${assetId}-1`,
+        documentNumber: storeAsset.po_number,
+        documentDate: new Date('2025-02-15'),
+        attachmentUrl: storeAsset.po_attachment_url || `https://example.com/docs/${docType}_${assetId}_1.pdf`,
+        attachmentName: `${storeAsset.po_number}.pdf`
+      });
+      
+      // Add a second PO document for some assets
+      if (['101', '201', '401'].includes(storeAsset.id)) {
+        baseDocuments.push({
+          id: `${docType}-${assetId}-2`,
+          documentNumber: `${storeAsset.po_number}-Rev1`,
+          documentDate: new Date('2025-02-20'),
+          attachmentUrl: `https://example.com/docs/${docType}_${assetId}_2.pdf`,
+          attachmentName: `${storeAsset.po_number}_revision.pdf`
+        });
+      }
+    }
+    
+    if (docType === 'invoice' && storeAsset.invoice_number) {
+      baseDocuments.push({
+        id: `${docType}-${assetId}-1`,
+        documentNumber: storeAsset.invoice_number,
+        documentDate: storeAsset.invoice_date ? new Date(storeAsset.invoice_date) : new Date('2025-03-05'),
+        documentAmount: storeAsset.invoice_amount,
+        attachmentUrl: storeAsset.invoice_attachment_url || `https://example.com/docs/${docType}_${assetId}_1.pdf`,
+        attachmentName: `${storeAsset.invoice_number}.pdf`
+      });
+      
+      // Add a second invoice for some assets (e.g. split invoices)
+      if (['102', '202', '302'].includes(storeAsset.id)) {
+        baseDocuments.push({
+          id: `${docType}-${assetId}-2`,
+          documentNumber: `${storeAsset.invoice_number}-B`,
+          documentDate: new Date('2025-03-10'),
+          documentAmount: (Number(storeAsset.invoice_amount) * 0.2).toString(), // 20% of the original amount
+          attachmentUrl: `https://example.com/docs/${docType}_${assetId}_2.pdf`,
+          attachmentName: `${storeAsset.invoice_number}_part2.pdf`
+        });
+      }
+    }
+    
+    if (docType === 'grn' && storeAsset.grn_number) {
+      baseDocuments.push({
+        id: `${docType}-${assetId}-1`,
+        documentNumber: storeAsset.grn_number,
+        documentDate: new Date('2025-03-15'),
+        attachmentUrl: `https://example.com/docs/${docType}_${assetId}_1.pdf`,
+        attachmentName: `${storeAsset.grn_number}.pdf`
+      });
+      
+      // Add a second GRN for some assets (e.g. partial delivery)
+      if (['101', '201', '401'].includes(storeAsset.id)) {
+        baseDocuments.push({
+          id: `${docType}-${assetId}-2`,
+          documentNumber: `${storeAsset.grn_number}-P2`,
+          documentDate: new Date('2025-03-25'),
+          attachmentUrl: `https://example.com/docs/${docType}_${assetId}_2.pdf`,
+          attachmentName: `${storeAsset.grn_number}_part2.pdf`
+        });
+      }
+    }
   }
   
   return baseDocuments;

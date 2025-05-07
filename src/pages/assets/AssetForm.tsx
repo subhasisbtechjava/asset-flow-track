@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
@@ -27,6 +28,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Asset } from "@/types";
 import { assetAPI } from "@/api/storeAPI";
 import { generateId } from "@/data/mockData";
+import LabelMandatorySymbol from "@/components/ui/labeMandatorySymbol";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -189,7 +191,7 @@ const AssetForm = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Asset Name</FormLabel>
+                    <FormLabel>Asset Name<LabelMandatorySymbol /></FormLabel>
                     <FormControl>
                       <Input placeholder="Asset Name" {...field} />
                     </FormControl>
@@ -202,7 +204,7 @@ const AssetForm = () => {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>Category<LabelMandatorySymbol /></FormLabel>
                     <FormControl>
                       <Input placeholder="Category" {...field} />
                     </FormControl>
@@ -215,7 +217,7 @@ const AssetForm = () => {
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Asset Code</FormLabel>
+                    <FormLabel>Asset Code<LabelMandatorySymbol /></FormLabel>
                     <FormControl>
                       <Input placeholder="Asset Code" {...field} />
                     </FormControl>
@@ -228,7 +230,7 @@ const AssetForm = () => {
                 name="pricePerUnit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price Per Unit</FormLabel>
+                    <FormLabel>Price Per Unit<LabelMandatorySymbol /></FormLabel>
                     <FormControl>
                       <Input placeholder="Price Per Unit" type="number" {...field} />
                     </FormControl>
@@ -241,7 +243,7 @@ const AssetForm = () => {
                 name="unitOfMeasurement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Unit of Measurement</FormLabel>
+                    <FormLabel>Unit of Measurement<LabelMandatorySymbol /></FormLabel>
                     <FormControl>
                       <Input placeholder="Unit of Measurement" {...field} />
                     </FormControl>
