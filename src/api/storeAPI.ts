@@ -1,3 +1,4 @@
+
 import { Store, Asset, StoreAsset, Changepass } from '@/types';
 import axios from 'axios';
 
@@ -28,11 +29,13 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Main storeAPI object
 export const storeAPI = {
   getAllStores: async (): Promise<Store[]> => {
     try {
-      const response = await axiosInstance.get<Store[]>('/stores');
-      return response.data;
+      // Use mock data in development
+      const { mockStoresOffline } = await import('../data/mockData');
+      return mockStoresOffline;
     } catch (error) {
       console.error('Error fetching stores:', error);
       throw error;
@@ -41,8 +44,9 @@ export const storeAPI = {
 
   getStoreById: async (id: string): Promise<Store> => {
     try {
-      const response = await axiosInstance.get<Store>(`/stores/${id}`);
-      return response.data;
+      // Use mock data in development
+      const { getStoreById } = await import('../data/mockData');
+      return getStoreById(id);
     } catch (error) {
       console.error(`Error fetching store with ID ${id}:`, error);
       throw error;
@@ -78,69 +82,11 @@ export const storeAPI = {
     }
   },
 
-  getAllAssets: async (): Promise<Asset[]> => {
-    try {
-      const response = await axiosInstance.get<Asset[]>('/assets');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching assets:', error);
-      throw error;
-    }
-  },
-
-  getAssetById: async (id: string): Promise<Asset> => {
-    try {
-      const response = await axiosInstance.get<Asset>(`/assets/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching asset with ID ${id}:`, error);
-      throw error;
-    }
-  },
-
-  createAsset: async (assetData: Asset): Promise<Asset> => {
-    try {
-      const response = await axiosInstance.post<Asset>('/assets', assetData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating asset:', error);
-      throw error;
-    }
-  },
-
-  updateAsset: async (id: string, assetData: Asset): Promise<Asset> => {
-    try {
-      const response = await axiosInstance.put<Asset>(`/assets/${id}`, assetData);
-      return response.data;
-    } catch (error) {
-      console.error(`Error updating asset with ID ${id}:`, error);
-      throw error;
-    }
-  },
-
-  deleteAsset: async (id: string): Promise<void> => {
-    try {
-      await axiosInstance.delete(`/assets/${id}`);
-    } catch (error) {
-      console.error(`Error deleting asset with ID ${id}:`, error);
-      throw error;
-    }
-  },
-  
-   changePass: async (passData: Changepass): Promise<Changepass> => {
-    try {
-      const response = await axiosInstance.post<Changepass>('/change-password', passData);
-      return response.data;
-    } catch (error) {
-      console.error('Error changing password:', error);
-      throw error;
-    }
-  },
-
   getStoreDetailsAssetsByStoreId: async (storeId: string): Promise<StoreAsset[]> => {
     try {
-      const response = await axiosInstance.get<StoreAsset[]>(`/stores/${storeId}/assets`);
-      return response.data;
+      // Use mock data in development
+      const { getStoreAssetsByStoreId } = await import('../data/mockData');
+      return getStoreAssetsByStoreId(storeId);
     } catch (error) {
       console.error(`Error fetching store details assets with store ID ${storeId}:`, error);
       throw error;
@@ -180,6 +126,7 @@ export const storeAPI = {
       throw error;
     }
   },
+  
   storeAssetTrackingStatusUpdate: async (assetId: string, updateParam: string, body: any) => {
     try {
       const response = await axiosInstance.put(`/assets/${assetId}/tracking/${updateParam}`, body);
@@ -189,7 +136,61 @@ export const storeAPI = {
       throw error;
     }
   },
-  // New methods for document management
+  
+  changePass: async (passData: Changepass): Promise<Changepass> => {
+    try {
+      const response = await axiosInstance.post<Changepass>('/change-password', passData);
+      return response.data;
+    } catch (error) {
+      console.error('Error changing password:', error);
+      throw error;
+    }
+  },
+  
+  // Methods needed by StoreAddAssets.tsx
+  fetchStoreWiseAssetsList: async (storeId: string): Promise<any[]> => {
+    try {
+      // Use mock data in development
+      const { getStoreAssetsByStoreId } = await import('../data/mockData');
+      return getStoreAssetsByStoreId(storeId);
+    } catch (error) {
+      console.error(`Error fetching store wise assets list for store ID ${storeId}:`, error);
+      throw error;
+    }
+  },
+  
+  assignAssetToStore: async (storeId: string, assetId: string, quantity: number, price: number): Promise<any> => {
+    try {
+      console.log('Assigning asset to store:', { storeId, assetId, quantity, price });
+      return { success: true, message: 'Asset assigned successfully' };
+    } catch (error) {
+      console.error(`Error assigning asset ${assetId} to store ${storeId}:`, error);
+      throw error;
+    }
+  },
+  
+  updateAssignedAssets: async (assetId: string, quantity: number, price: number): Promise<any> => {
+    try {
+      console.log('Updating assigned asset:', { assetId, quantity, price });
+      return { success: true, message: 'Asset updated successfully' };
+    } catch (error) {
+      console.error(`Error updating asset ${assetId}:`, error);
+      throw error;
+    }
+  },
+  
+  // Methods for Dashboard.tsx
+  storeMarkAsComplete: async (storeId: string): Promise<any> => {
+    try {
+      console.log('Marking store as complete:', storeId);
+      return { success: true, message: 'Store marked as complete' };
+    } catch (error) {
+      console.error(`Error marking store ${storeId} as complete:`, error);
+      throw error;
+    }
+  },
+  
+  // Document management methods
   getStoreDocuments: async (storeId: string, assetId: string, documentType: 'po' | 'invoice' | 'grn') => {
     // For demonstration purposes, we'll use mock data
     const { getMockDocuments } = await import('../data/mockData');
@@ -208,39 +209,59 @@ export const storeAPI = {
     // In a real app, this would make an API call
     // For now, just return a success message
     return { success: true, message: 'Document deleted successfully' };
+  }
+};
+
+// Separate assetAPI object
+export const assetAPI = {
+  getAllAssets: async (): Promise<Asset[]> => {
+    try {
+      // Use mock data in development
+      const { mockAssets } = await import('../data/mockData');
+      return mockAssets;
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+      throw error;
+    }
   },
-  
-  
-  
-  // Add mock implementations for other API methods used in the app
-  getAllStores: async () => {
-    // Import the mock stores from mockData
-    const { mockStoresOffline } = await import('../data/mockData');
-    return mockStoresOffline;
+
+  getAssetById: async (id: string): Promise<Asset> => {
+    try {
+      // Use mock data in development
+      const { getAssetById } = await import('../data/mockData');
+      return getAssetById(id);
+    } catch (error) {
+      console.error(`Error fetching asset with ID ${id}:`, error);
+      throw error;
+    }
   },
-  
-  getStoreById: async (id: string) => {
-    const { getStoreById } = await import('../data/mockData');
-    return getStoreById(id);
+
+  createAsset: async (assetData: Asset): Promise<Asset> => {
+    try {
+      console.log('Creating asset:', assetData);
+      return { success: true, ...assetData } as unknown as Asset;
+    } catch (error) {
+      console.error('Error creating asset:', error);
+      throw error;
+    }
   },
-  
-  getAssetById: async (id: string) => {
-    const { getAssetById } = await import('../data/mockData');
-    return getAssetById(id);
+
+  updateAsset: async (id: string, assetData: Asset): Promise<Asset> => {
+    try {
+      console.log('Updating asset:', { id, assetData });
+      return { success: true, ...assetData } as unknown as Asset;
+    } catch (error) {
+      console.error(`Error updating asset with ID ${id}:`, error);
+      throw error;
+    }
   },
-  
-  getStoreDetailsAssetsByStoreId: async (storeId: string) => {
-    const { getStoreAssetsByStoreId } = await import('../data/mockData');
-    return getStoreAssetsByStoreId(storeId);
-  },
-  
-  createAsset: async (assetData: any) => {
-    console.log('Creating asset:', assetData);
-    return { success: true, ...assetData };
-  },
-  
-  updateAsset: async (id: string, assetData: any) => {
-    console.log('Updating asset:', { id, assetData });
-    return { success: true, ...assetData };
+
+  deleteAsset: async (id: string): Promise<void> => {
+    try {
+      await axiosInstance.delete(`/assets/${id}`);
+    } catch (error) {
+      console.error(`Error deleting asset with ID ${id}:`, error);
+      throw error;
+    }
   }
 };

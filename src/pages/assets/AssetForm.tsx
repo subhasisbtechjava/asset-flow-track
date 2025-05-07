@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
@@ -64,6 +63,7 @@ const AssetForm = () => {
     pricePerUnit: 0,
     unitOfMeasurement: "",
     unit_of_measurement: "",
+    price_per_unit: 0,
   });
 
   const form = useForm<FormValues>({
@@ -102,6 +102,7 @@ const AssetForm = () => {
         category: res.category,
         code: res.code,
         pricePerUnit: res.pricePerUnit,
+        price_per_unit: res.pricePerUnit,
         unitOfMeasurement: res.unitOfMeasurement,
         unit_of_measurement: res.unitOfMeasurement,
         // Only include these properties if they exist in the response
@@ -123,6 +124,7 @@ const AssetForm = () => {
         unitOfMeasurement: data.unitOfMeasurement,
         unit_of_measurement: data.unitOfMeasurement, // Adding this for compatibility
         pricePerUnit: Number(data.pricePerUnit),
+        price_per_unit: Number(data.pricePerUnit), // Adding this for compatibility
       };
 
       if (isUpdate) {

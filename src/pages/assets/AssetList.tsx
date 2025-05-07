@@ -1,11 +1,11 @@
 
-import { useState,useEffect } from "react";
-import { Link ,useNavigate} from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Plus, Search, FileEdit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { assetAPI } from '../../api/storeAPI';  // ADDED ON 30-04-2025//////
+import { assetAPI } from '@/api/storeAPI';  // Fixed import path
 import {
   Card,
   CardContent,

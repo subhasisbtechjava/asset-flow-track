@@ -22,11 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { assetAPI, storeAPI } from "@/api/storeAPI";
+import { storeAPI, assetAPI } from "@/api/storeAPI";
 import { log } from "console";
 import { custom } from "zod";
-
-
 
 interface AssignedAsset {
   id: string;
@@ -48,13 +46,11 @@ const StoreAddAssets = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-
   // Fetch store details
-
   
   // const store = id ? getStoreById(id) : null;
   // -------------------------ismile--------------------
-  const [store,setStore] = useState(null);
+  const [store, setStore] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingLoading, setIsEditingLoading] = useState(false);
   const [isAssignAssetLoading, setIsAssignAssetLoading] = useState(false);
@@ -67,6 +63,7 @@ const StoreAddAssets = () => {
     useState(1);
   const [selectedAssignAssetPrice, setSelectedAssignAssetPrice] = useState(0);
   // -------------------------ismile--------------------
+
   // Prepare assets list
   const fetchMasterAssets = async () => {
     try {
@@ -77,28 +74,28 @@ const StoreAddAssets = () => {
       console.error("Failed to fetch stores", error);
     }
   };
+  
   const fetchStoreAssets = async () => {
     try {
-      const storeAssets = await storeAPI.fetchStoreWiseAssetsList(id);
+      const storeAssets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
       console.log("====================================");
-
       console.log(storeAssets);
       console.log("====================================");
       setAssetsToAdd(storeAssets);
-      // setAssets(allAssets);
     } catch (error) {
       console.error("Failed to fetch stores", error);
     }
   };
+  
   const fetchStoreDetails = async () => {
     try {
       const res = await storeAPI.getStoreById(id);
-   setStore(res);
-      // setAssets(allAssets);
+      setStore(res);
     } catch (error) {
       console.error("Failed to fetch stores", error);
     }
   };
+  
   useEffect(() => {
     // Load existing assigned assets if any
     // In a real app, this would come from an API fetch
@@ -228,9 +225,6 @@ const StoreAddAssets = () => {
       setIsAssignAssetLoading(false);
     }
   };
-
- 
-
 
   const handleUpdateAssignedAsset = async (asset) => {
     try {
