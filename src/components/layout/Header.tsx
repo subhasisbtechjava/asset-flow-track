@@ -82,6 +82,12 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/manage-brands" className="flex items-center cursor-pointer">
+                    <Package className="mr-2 h-4 w-4" />
+                    <span> Manage Master Brands</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/users" className="flex items-center cursor-pointer">
                     <Users className="mr-2 h-4 w-4" />
                     <span>Manage Users</span>

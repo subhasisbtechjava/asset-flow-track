@@ -140,6 +140,19 @@ export const storeAPI = {
       throw error;
     }
   },
+  storeAssetTrackingStatusUpdateWithFormData: async (id: string,updateParam:string,body:FormData) => {
+    try {
+      const response = await axios.post(`${API_URL}/assets/update/store_tracking_details/po_invoice/${updateParam}/${id}`,body, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching store ${id}:`, error);
+      throw error;
+    }
+  },
 
   // Create new store
   createStore: async (storeData: Store) => {

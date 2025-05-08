@@ -13,6 +13,8 @@ import UserList from "../users/UserList";
 import ProfileSettings from "../profile/ProfileSettings";
 import AuthGuard from "../../components/ui/privateRoute";
 import ChangePassword from "../profile/ChangePassword";
+
+import ManageBrands from "../../pages/manageBrands/manageBrands"
 const AllRoutes = () => {
   return (
     <Routes>
@@ -39,6 +41,7 @@ const AllRoutes = () => {
         <Route path="/stores/edit/:id" element={<StoreForm />} />
         <Route path="stores/:id/add-assets" element={<StoreAddAssets />} />
         <Route path="assets" element={<AssetList />} />
+        <Route path="/manage-brands" element={<ManageBrands />} />
         <Route path="assets/new" element={<AssetForm />} />
         <Route path="assets/edit/:id" element={<AssetForm />} />
         <Route path="users" element={<UserList />} />

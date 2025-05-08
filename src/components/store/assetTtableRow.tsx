@@ -43,11 +43,15 @@ import {
 } from "@/utility/get_file_type";
 import FileCard from "./fileCard";
 import { isSameDay } from "date-fns";
+import GrnListTable from "./grnListTable";
+import InvoiceListTable from "./invoiceListTable";
+import PoListTable from "./poListTable";
 interface AssetTableRow {
   storeId: string;
   storeAsset: StoreAsset;
   isLoading: boolean;
   onToggleStatus;
+  onToggleStatusWithFormData;
   invoiceDates;
   handleInvoiceDateChange;
   handleInvoiceAmountChange;
@@ -67,6 +71,7 @@ const AssetTableRow = ({
   storeAsset,
   isLoading,
   onToggleStatus,
+  onToggleStatusWithFormData,
   onDocumentDialogOpen,
   onInputChange,
   invoiceAmounts,
@@ -84,22 +89,25 @@ const AssetTableRow = ({
   const [invoiceValue, setInvoiceValue] = useState({
     invoiceNumber: null,
     invoiceDate: null,
-    invoiceDateRow:new Date(new Date().setHours(0, 0, 0, 0)),
+    invoiceDateRow: new Date(new Date().setHours(0, 0, 0, 0)),
     invoiceAmount: "",
     invoiceFileDetails: {
       name: "",
       base64: "",
     },
+    file: null,
   });
 
-
-  function isInvoiceUploadValidated(){
-
-
-    if(!invoiceValue.invoiceNumber || !invoiceValue.invoiceAmount ||!invoiceValue.invoiceFileDetails .name || !invoiceValue.invoiceDate ){
+  function isInvoiceUploadValidated() {
+    if (
+      !invoiceValue.invoiceNumber ||
+      !invoiceValue.invoiceAmount ||
+      !invoiceValue.invoiceFileDetails.name ||
+      !invoiceValue.invoiceDate || !invoiceValue.file
+    ) {
       return false;
     }
-return true;
+    return true;
   }
   const existingBody = {
     // approve_val: storeAsset.is_project_head_approved?true:false,
@@ -141,6 +149,23 @@ return true;
   useEffect(() => {
     setGrnValue(storeAsset.grn_number);
   }, []);
+
+
+  const resetInvoiceForm = ()=>{
+    setInvoiceValue({
+      invoiceNumber: null,
+      invoiceDate: null,
+      invoiceDateRow: new Date(
+        new Date().setHours(0, 0, 0, 0)
+      ),
+      invoiceAmount: "",
+      invoiceFileDetails: {
+        name: "",
+        base64: "",
+      },
+      file: null,
+    });
+  }
   return (
     <TableRow key={storeAsset.id}>
       <TableCell>
@@ -155,9 +180,7 @@ return true;
 
       {/* PO Number with file uploads */}
       <TableCell>
-
-
-          <Popover
+        <Popover
           open={isPoPopoverOpen}
           onOpenChange={(val) => {
             setPoValue(storeAsset.po_number);
@@ -304,8 +327,8 @@ return true;
                 </Button>
               </div>
             </div>
+            <PoListTable />
           </PopoverContent>
-      
         </Popover>
       </TableCell>
 
@@ -313,24 +336,28 @@ return true;
       <TableCell>
         <Popover
           onOpenChange={() => {
-            setInvoiceValue({
-              ...invoiceValue,
-              invoiceNumber: storeAsset?.invoice_number,
-              invoiceDate:storeAsset?.invoice_date? new Date(storeAsset?.invoice_date):null,
-              invoiceAmount: storeAsset?.invoice_amount ?? "",
-            });
+            // setInvoiceValue({
+            //   ...invoiceValue,
+            //   invoiceNumber: storeAsset?.invoice_number,
+            //   invoiceDate: storeAsset?.invoice_date
+            //     ? new Date(storeAsset?.invoice_date)
+            //     : null,
+            //   invoiceAmount: storeAsset?.invoice_amount ?? "",
+            // });
           }}
         >
           <PopoverTrigger asChild>
             <Button
               variant={storeAsset?.invoice_amount ? "default" : "outline"}
               size="sm"
-              className={storeAsset?.invoice_amount?"w-full bg-green-500":"w-full"}
+              className={
+                storeAsset?.invoice_amount ? "w-full bg-green-500" : "w-full"
+              }
             >
-              {storeAsset?.invoice_amount ?"Done": "Not Done"}
+              {storeAsset?.invoice_amount ? "Done" : "Not Done"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-96">
+          <PopoverContent className="w-[100%]">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">Invoice Details</h4>
@@ -338,40 +365,44 @@ return true;
                   Enter invoice information for {storeAsset?.assets_name}
                 </p>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor={`invoice-number-${storeAsset.id}`}>
-                  Invoice Number
-                </Label>
-                {/* {JSON.stringify(invoiceValue)} */}
-                <Input
-                  id={`invoice-number-${storeAsset.id}`}
-                  placeholder="Enter invoice number"
-                  defaultValue={storeAsset.invoice_number || ""}
-                  onChange={(e) => {
-                    setInvoiceValue({
-                      ...invoiceValue,
-                      invoiceNumber: e.target.value,
-                    });
-                  }}
-                />
+              <div className="flex gap-2">
+                <div className="space-y-1 pt-2">
+                  <Label htmlFor={`invoice-number-${storeAsset.id}`}>
+                    Invoice Number
+                  </Label>
+
+                  <Input
+                    id={`invoice-number-${storeAsset.id}`}
+                    placeholder="Enter invoice number"
+                    defaultValue={storeAsset.invoice_number || ""}
+                    onChange={(e) => {
+                      setInvoiceValue({
+                        ...invoiceValue,
+                        invoiceNumber: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
 
                 {/* Invoice Date */}
                 <div className="space-y-1 pt-2">
                   <Label htmlFor={`invoice-date-${storeAsset.id}`}>
                     Invoice Date
                   </Label>
-                  <Popover  open={isInvoicePopoverOpen} onOpenChange={(val)=>{
-                    setIsInvoicePopoverOpen(val)
-                  }}>
+                  <Popover
+                    open={isInvoicePopoverOpen}
+                    onOpenChange={(val) => {
+                      setIsInvoicePopoverOpen(val);
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         id={`invoice-date-${storeAsset.id}`}
                         variant="outline"
                         className="w-full justify-start text-left font-normal"
                       >
-
                         {/* {`${invoiceValue?.invoiceDate}`} */}
-{/* {format(invoiceValue?.invoiceDate.setHours(0, 0, 0, 0),"PPP")} */}
+                        {/* {format(invoiceValue?.invoiceDate.setHours(0, 0, 0, 0),"PPP")} */}
                         {/* {format(new Date(new Date().setHours(0, 0, 0, 0)), "PPP")} */}
                         {invoiceValue?.invoiceDate ? (
                           format(invoiceValue?.invoiceDate, "PPP")
@@ -382,13 +413,12 @@ return true;
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                   disabled={{ after: new Date() }} 
+                        disabled={{ after: new Date() }}
                         mode="single"
                         selected={invoiceValue?.invoiceDate ?? undefined}
                         // selected={invoiceDates[storeAsset.id]}
                         onSelect={(date) => {
                           if (!date) return;
-
 
                           console.log("date: ", date);
 
@@ -397,7 +427,7 @@ return true;
                             invoiceDate: new Date(date),
                           });
 
-                         setIsInvoicePopoverOpen(false);
+                          setIsInvoicePopoverOpen(false);
                         }}
                         initialFocus
                         className="p-3 pointer-events-auto"
@@ -416,21 +446,20 @@ return true;
                     type="number"
                     min="0"
                     step="1"
-                    defaultValue={storeAsset?.invoice_amount}
+                    // defaultValue={storeAsset?.invoice_amount}
                     placeholder="Enter invoice amount"
                     // value={invoiceAmounts[storeAsset.id] || ""}
-                    onChange={(e) =>
-                      // handleInvoiceAmountChange(storeAsset.id, e.target.value)
+                    onChange={(e) => {
                       setInvoiceValue({
                         ...invoiceValue,
                         invoiceAmount: e.target.value,
-                      })
-                    }
+                      });
+                    }}
                   />
                 </div>
 
                 {/* File uploads */}
-                <div>
+                <div className="space-y-1 pt-2">
                   <Label htmlFor={`invoice-amount-${storeAsset.id}`}>
                     Upload file
                   </Label>
@@ -451,39 +480,53 @@ return true;
                         setInvoiceValue({
                           ...invoiceValue,
                           invoiceFileDetails: fileDetails,
+                          file: e.target.files[0],
                         });
                       }
                     }
                   />
                 </div>
-                {storeAsset?.invoice_attachment_url &&<FileCard fileUrl={storeAsset?.invoice_attachment_url} />}
-                <div className="flex justify-end gap-2 pt-2">
+                {/* {storeAsset?.invoice_attachment_url && (
+                  <FileCard fileUrl={storeAsset?.invoice_attachment_url} />
+                )} */}
+                <div className="flex items-end mb-0">
                   <Button
-                  disabled ={!isInvoiceUploadValidated()}
+                    disabled={!isInvoiceUploadValidated()}
                     variant="outline"
                     onClick={() => {
-                      console.log("====================================");
-                      console.log(isInvoiceUploadValidated());
-                      console.log(invoiceValue);
-                      console.log("====================================");
+                      // console.log("====================================");
+                      // console.log(isInvoiceUploadValidated());
+                      // console.log(invoiceValue);
+                      // console.log("====================================");
                       const isoString = invoiceValue.invoiceDate;
                       const dateOnly = new Date(isoString)
                         .toISOString()
                         .split("T")[0];
-                      console.log(dateOnly);
-                      onToggleStatus(storeAsset.id, "invoice", {
-                        invoice_no: invoiceValue.invoiceNumber,
+                      // console.log(dateOnly);
+                      // onToggleStatus(storeAsset.id, "invoice", {
+                      //   invoice_no: invoiceValue.invoiceNumber,
+                      //   invoice_attachment:
+                      //     invoiceValue.invoiceFileDetails?.base64,
+                      //   invoice_attachment_name:
+                      //   invoiceValue.invoiceFileDetails?.name,
+                      //   invoice_date: dateOnly,
+                      //   invoice_amount: invoiceValue.invoiceAmount,
+                      // });
+                      const formData = new FormData();
+                      formData.append("invoice_no", invoiceValue.invoiceNumber);
+                      formData.append("invoice_date", dateOnly);
+                      formData.append(
+                        "invoice_amount",
+                        invoiceValue.invoiceAmount
+                      );
+                      formData.append("invoice_attachment", invoiceValue?.file);
+                      onToggleStatusWithFormData(
+                        storeAsset.id,
+                        "invoice",
+                        formData
+                      );
 
-                        invoice_attachment:
-                          invoiceValue.invoiceFileDetails?.base64,
-
-                        invoice_attachment_name:
-                          invoiceValue.invoiceFileDetails?.name,
-
-                        invoice_date: dateOnly,
-                        invoice_amount: invoiceValue.invoiceAmount,
-                      });
-                      // setIsPoPopoverOpen(!isPoPopoverOpen);
+                      resetInvoiceForm();
                     }}
                   >
                     Save Details
@@ -491,6 +534,7 @@ return true;
                 </div>
               </div>
             </div>
+            <InvoiceListTable invoiceDetails={storeAsset?.invoice_details} />
           </PopoverContent>
         </Popover>
       </TableCell>
@@ -524,7 +568,7 @@ return true;
                 : "Click to enter GRN number"}
             </TooltipContent>
           </Tooltip>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-[500px]">
             <div className="grid gap-4">
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">
@@ -534,7 +578,7 @@ return true;
                   Enter the GRN number for {storeAsset?.assets_name}
                 </p>
               </div>
-              <div className="grid gap-2">
+              <div className="flex gap-2">
                 <Input
                   value={grnValue}
                   placeholder="Enter GRN number"
@@ -551,10 +595,12 @@ return true;
                     setIsPopoverOpen(false);
                   }}
                 >
-                  Save
+                  <Plus className="mr-1 h-4 w-4" /> Add
                 </Button>
               </div>
             </div>
+            <br />
+            <GrnListTable />
           </PopoverContent>
         </Popover>
       </TableCell>

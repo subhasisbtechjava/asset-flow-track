@@ -229,18 +229,42 @@ const StoreDetail = () => {
     setIsLoading(false);
   };
 
-  const grnCompletionPercentage = filteredAssets.filter((asset)=>{
+  const toggleStatusWithFormData = async (
+    assetId: string,
+    updateParam: string,
+    body: FormData
+  ) => {
+    try {
+      setIsLoading(true);
 
-    return asset.grn_number!="" && asset.grn_number!=null;
+      const res = await storeAPI.storeAssetTrackingStatusUpdateWithFormData(
+        assetId,
+        updateParam,
+        body
+      );
+      console.log('====================================');
+  
+      console.log('res: ', res);
+      console.log('====================================');
+      fetchStoreAssets();
 
+      toast({
+        title: "Status updated",
+        description: "Asset status has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  })
-  const erpCompletionPercentage = filteredAssets.filter((asset)=>{
-
-    return asset.is_finance_booked!=null && asset.is_finance_booked!=false;
-
-
-  })
+  const grnCompletionPercentage = filteredAssets.filter((asset) => {
+    return asset.grn_number != "" && asset.grn_number != null;
+  });
+  const erpCompletionPercentage = filteredAssets.filter((asset) => {
+    return asset.is_finance_booked != null && asset.is_finance_booked != false;
+  });
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -263,6 +287,13 @@ const StoreDetail = () => {
           </div>
         </div>
         <div className="flex gap-2">
+        <Button
+            variant="default"
+            onClick={() => navigate(`/stores/${storeId}/add-assets`)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Manage Assets
+          </Button>
           <Button variant="outline" asChild>
             <Link to={`/stores/edit/${store.id}`}>
               <FileEdit className="mr-2 h-4 w-4" />
@@ -279,8 +310,16 @@ const StoreDetail = () => {
       /> */}
 
       <StoreProgressCards
-        grnCompletionPercentage={grnCompletionPercentage.length>0?((grnCompletionPercentage.length/filteredAssets.length)*100):0}
-        financeBookingPercentage={erpCompletionPercentage.length>0?((erpCompletionPercentage.length/filteredAssets.length)*100):0}
+        grnCompletionPercentage={
+          grnCompletionPercentage.length > 0
+            ? (grnCompletionPercentage.length / filteredAssets.length) * 100
+            : 0
+        }
+        financeBookingPercentage={
+          erpCompletionPercentage.length > 0
+            ? (erpCompletionPercentage.length / filteredAssets.length) * 100
+            : 0
+        }
       />
 
       <div className="mb-4">
@@ -300,6 +339,7 @@ const StoreDetail = () => {
         storeAssets={filteredAssets}
         isLoading={isLoading}
         onToggleStatus={toggleStatus}
+        onToggleStatusWithFormData={toggleStatusWithFormData}
         onDocumentDialogOpen={openDocumentDialog}
         onInputChange={setInputValue}
         onSaveDocument={saveDocumentNumber}

@@ -56,6 +56,7 @@ export interface StoreAsset {
   is_finance_booked: boolean;
   assets_name:string;
   asset?: Asset;
+  invoice_details?: [];
 }
 
 export type WorkflowStage = 

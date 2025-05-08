@@ -256,14 +256,14 @@ try{
                 }}>
                      
                   <SelectTrigger>
-                    <SelectValue placeholder="In Progress" />
+                    <SelectValue placeholder="Open" />
                   </SelectTrigger>
                   <SelectContent>
                     {/* <SelectItem value="all">Status</SelectItem> */}
                     {statuses.map((item,i) => (
                       <SelectItem key={item} value={item}>
                         {/* {item} */}
-                        {item==="in_progress"?"In Progress":item==="closed"?"Closed":item}
+                        {item==="in_progress"?"Open":item==="closed"?"Complete":item}
                         
                       </SelectItem>
                     ))}
@@ -336,9 +336,9 @@ try{
                                     <Link to={`/stores/edit/${store.id}`}>Edit</Link>
                                   </DropdownMenuItem>
                                 
-                                  <DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
+                                {store.status== "in_progress"&&<DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
                                     Mark as Complete
-                                  </DropdownMenuItem>
+                                  </DropdownMenuItem>}  
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -360,7 +360,7 @@ try{
         </CardContent>
         <CardFooter>
           <p className="text-sm text-muted-foreground">
-            Showing {stores.length} of {stores.length} stores
+            Showing {filteredStores.length} of {stores.length} stores
           </p>
         </CardFooter>
       </Card>
