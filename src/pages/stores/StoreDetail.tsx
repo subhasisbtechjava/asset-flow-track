@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Plus, Search } from "lucide-react";
@@ -17,7 +18,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { FileEdit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getStoreById, getStoreAssetsByStoreId } from "@/data/mockData";
 import { StoreSummaryCards } from "@/components/store/StoreSummaryCards";
 import { StoreProgressCards } from "@/components/store/StoreProgressCards";
 import { DocumentEntryDialog } from "@/components/store/DocumentEntryDialog";
@@ -37,7 +37,7 @@ const StoreDetail = () => {
     "po" | "invoice" | "grn" | null
   >(null);
   const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [useEnhancedTable, setUseEnhancedTable] = useState(true);
 
@@ -52,7 +52,7 @@ const StoreDetail = () => {
     if (id) {
       initialService();
     }
-  }, []);
+  }, [id]);
 
   function initialService() {
     fetchStoreDetails();
@@ -61,8 +61,11 @@ const StoreDetail = () => {
   
   async function fetchStoreDetails() {
     try {
+      console.log("Fetching store details for ID:", id);
       const storeDetails = await storeAPI.getStoreById(id);
+      console.log("Fetched store details:", storeDetails);
       setStore(storeDetails);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching store details:", error);
       toast({
@@ -70,12 +73,15 @@ const StoreDetail = () => {
         description: "Failed to load store details",
         variant: "destructive"
       });
+      setIsLoading(false);
     }
   }
   
   async function fetchStoreAssets() {
     try {
+      console.log("Fetching store assets for ID:", id);
       const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
+      console.log("Fetched store assets:", assets);
       setStoreAssetsList(assets);
     } catch (error) {
       console.error("Error fetching store assets:", error);
@@ -87,6 +93,19 @@ const StoreDetail = () => {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Loading Store Details...</h2>
+          <p className="text-muted-foreground mb-4">
+            Please wait while we load the store information.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!store) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -96,7 +115,7 @@ const StoreDetail = () => {
             The store you're looking for doesn't exist or has been removed.
           </p>
           <Button asChild>
-            <Link to="/">Back to Dashboard</Link>
+            <Link to="/stores">Back to Stores</Link>
           </Button>
         </div>
       </div>
