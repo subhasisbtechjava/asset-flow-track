@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StoreAsset } from "@/types";
 import MultipleDocumentsPopover from "./MultipleDocumentsPopover";
+import { storeAPI } from "@/api/storeAPI";
 
 interface AssetTableRowEnhancedProps {
   storeId: string;
@@ -20,10 +21,29 @@ const AssetTableRowEnhanced: React.FC<AssetTableRowEnhancedProps> = ({
   onToggleStatus,
   onRefresh
 }) => {
-  // Determine document counts (in a real app, these would come from your backend)
-  const poCount = storeAsset.po_number ? 1 : 0;
-  const invoiceCount = storeAsset.invoice_number ? 1 : 0;
-  const grnCount = storeAsset.grn_number ? 1 : 0;
+  // State for document counts
+  const [poCount, setPoCount] = useState(storeAsset.poCount || (storeAsset.po_number ? 1 : 0));
+  const [invoiceCount, setInvoiceCount] = useState(storeAsset.invoiceCount || (storeAsset.invoice_number ? 1 : 0));
+  const [grnCount, setGrnCount] = useState(storeAsset.grnCount || (storeAsset.grn_number ? 1 : 0));
+  
+  // Fetch document counts on mount
+  useEffect(() => {
+    const fetchDocumentCounts = async () => {
+      try {
+        const poDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'po');
+        const invoiceDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'invoice');
+        const grnDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'grn');
+        
+        setPoCount(poDocuments.length);
+        setInvoiceCount(invoiceDocuments.length);
+        setGrnCount(grnDocuments.length);
+      } catch (error) {
+        console.error("Error fetching document counts:", error);
+      }
+    };
+    
+    fetchDocumentCounts();
+  }, [storeId, storeAsset.id]);
   
   // For status toggles
   const toggleStatusHandler = (field: string, value: boolean) => {
@@ -46,6 +66,21 @@ const AssetTableRowEnhanced: React.FC<AssetTableRowEnhancedProps> = ({
     
     onToggleStatus(storeAsset.id, field, body);
   };
+
+  // Handle document updates
+  const handleDocumentUpdate = async () => {
+    // Refresh document counts
+    const poDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'po');
+    const invoiceDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'invoice');
+    const grnDocuments = await storeAPI.getStoreDocuments(storeId, storeAsset.id, 'grn');
+    
+    setPoCount(poDocuments.length);
+    setInvoiceCount(invoiceDocuments.length);
+    setGrnCount(grnDocuments.length);
+    
+    // Call parent refresh function
+    onRefresh();
+  };
   
   return (
     <tr className="border-b">
@@ -66,8 +101,8 @@ const AssetTableRowEnhanced: React.FC<AssetTableRowEnhancedProps> = ({
           assetId={storeAsset.id}
           documentType="po"
           documentCount={poCount}
-          hasDocuments={!!storeAsset.po_number}
-          onUpdate={onRefresh}
+          hasDocuments={poCount > 0}
+          onUpdate={handleDocumentUpdate}
         />
       </td>
       
@@ -78,8 +113,8 @@ const AssetTableRowEnhanced: React.FC<AssetTableRowEnhancedProps> = ({
           assetId={storeAsset.id}
           documentType="invoice"
           documentCount={invoiceCount}
-          hasDocuments={!!storeAsset.invoice_number}
-          onUpdate={onRefresh}
+          hasDocuments={invoiceCount > 0}
+          onUpdate={handleDocumentUpdate}
         />
       </td>
       
@@ -90,8 +125,8 @@ const AssetTableRowEnhanced: React.FC<AssetTableRowEnhancedProps> = ({
           assetId={storeAsset.id}
           documentType="grn"
           documentCount={grnCount}
-          hasDocuments={!!storeAsset.grn_number}
-          onUpdate={onRefresh}
+          hasDocuments={grnCount > 0}
+          onUpdate={handleDocumentUpdate}
         />
       </td>
       

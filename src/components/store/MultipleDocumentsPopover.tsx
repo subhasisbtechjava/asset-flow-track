@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import DocumentsManager from './DocumentsManager';
+import { storeAPI } from "@/api/storeAPI";
 
 interface MultipleDocumentsPopoverProps {
   storeId: string;
@@ -26,15 +27,48 @@ const MultipleDocumentsPopover: React.FC<MultipleDocumentsPopoverProps> = ({
   storeId,
   assetId,
   documentType,
-  documentCount,
-  hasDocuments,
+  documentCount: initialDocumentCount,
+  hasDocuments: initialHasDocuments,
   onUpdate
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [documentCount, setDocumentCount] = useState(initialDocumentCount);
+  const [hasDocuments, setHasDocuments] = useState(initialHasDocuments);
+  
+  useEffect(() => {
+    // Fetch the actual document count when the component mounts
+    const fetchDocuments = async () => {
+      try {
+        const documents = await storeAPI.getStoreDocuments(storeId, assetId, documentType);
+        setDocumentCount(documents.length);
+        setHasDocuments(documents.length > 0);
+      } catch (error) {
+        console.error(`Error fetching ${documentType} documents:`, error);
+      }
+    };
+    
+    fetchDocuments();
+  }, [storeId, assetId, documentType, initialDocumentCount]);
   
   const getButtonLabel = () => {
     if (!hasDocuments) return "Not Done";
     return documentCount > 1 ? `${documentCount} Added` : "Done";
+  };
+
+  const handleUpdate = () => {
+    // Refresh document count when documents are added or removed
+    const refreshDocuments = async () => {
+      try {
+        const documents = await storeAPI.getStoreDocuments(storeId, assetId, documentType);
+        setDocumentCount(documents.length);
+        setHasDocuments(documents.length > 0);
+        onUpdate(); // Call the parent's onUpdate function
+      } catch (error) {
+        console.error(`Error refreshing ${documentType} documents:`, error);
+      }
+    };
+    
+    refreshDocuments();
   };
 
   return (
@@ -65,9 +99,7 @@ const MultipleDocumentsPopover: React.FC<MultipleDocumentsPopoverProps> = ({
             storeId={storeId}
             assetId={assetId}
             documentType={documentType}
-            onUpdate={() => {
-              onUpdate();
-            }}
+            onUpdate={handleUpdate}
           />
         </div>
       </PopoverContent>
