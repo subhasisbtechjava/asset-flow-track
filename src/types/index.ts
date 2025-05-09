@@ -57,6 +57,7 @@ export interface StoreAsset {
   assets_name:string;
   asset?: Asset;
   invoice_details?: [];
+  po_details?: [];
 }
 
 export type WorkflowStage = 

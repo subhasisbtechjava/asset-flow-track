@@ -22,6 +22,7 @@ import { StoreSummaryCards } from "@/components/store/StoreSummaryCards";
 import { StoreProgressCards } from "@/components/store/StoreProgressCards";
 import { DocumentEntryDialog } from "@/components/store/DocumentEntryDialog";
 import { StoreAssetsTable } from "@/components/store/StoreAssetsTable";
+import EnhancedStoreAssetsTable from "@/components/store/EnhancedStoreAssetsTable";
 import { StoreAsset } from "@/types";
 import { storeAPI } from "@/api/storeAPI";
 
@@ -32,6 +33,7 @@ const StoreDetail = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
+    const [useEnhancedTable, setUseEnhancedTable] = useState(true);
   const [documentType, setDocumentType] = useState<
     "po" | "invoice" | "grn" | null
   >(null);
@@ -333,7 +335,13 @@ const StoreDetail = () => {
           />
         </div>
       </div>
-
+      {/* <EnhancedStoreAssetsTable
+          storeId={store.id}
+          storeAssets={filteredAssets}
+          isLoading={isLoading}
+          onToggleStatus={toggleStatus}
+          onRefresh={fetchStoreAssets}
+        /> */}
       <StoreAssetsTable
         storeId={store.id}
         storeAssets={filteredAssets}
