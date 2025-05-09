@@ -4,7 +4,7 @@ import { Plus, Search, FileEdit, Trash2, AlertTriangle, Package } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { assetAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
+import { brandAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
 import {
   Card,
   CardContent,
@@ -37,75 +37,66 @@ import {
 
 const ManageBrands = () => {
   let pagedata = [];
-  const [filteredAssets, setAssets] = useState([]);
-  const [filteredBrands, setBrands] = useState([1,2,3,4]);
+  
+  const [filteredBrands, setBrands] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const fetchAssets = async () => {
+  //     try {
+  //       //const allBrands = await brandAPI.getAllBrands();
+  //       const  allBrands = []
+  //       console.log(allBrands);
+  //       setBrands(allBrands);
+  //     } catch (error) {
+  //       console.error("Failed to fetch stores", error);
+  //     }
+  //   };
+
+  //   fetchAssets();
+  // }, [deletingId]);
+
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const allAssets = await assetAPI.getAllAssets();
-        //console.log(allAssets);
-        setAssets(allAssets);
+        const allBrands = await brandAPI.getAllBrands();
+        //console.log(allBrands);
+        //const  allBrands = []
+        setBrands(allBrands);
       } catch (error) {
         console.error("Failed to fetch stores", error);
       }
     };
 
     fetchAssets();
-  }, [deletingId]);
+  }, [filteredBrands,deletingId]);
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      try {
-        const allAssets = await assetAPI.getAllAssets();
-        //console.log(allAssets);
-        setAssets(allAssets);
-      } catch (error) {
-        console.error("Failed to fetch stores", error);
-      }
-    };
-
-    fetchAssets();
-  }, []);
-
-  const searcResult = filteredAssets.filter((filterdata) => {
+  const searcResult = filteredBrands.filter((filterdata) => {
     const matchesSearch =
-      searchTerm === "" ||
-      filterdata.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      filterdata.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      filterdata.category.toLowerCase().includes(searchTerm.toLowerCase());
+      searchTerm === "" ||filterdata.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
-  pagedata = searcResult.length > 0 ? searcResult : [];
+  pagedata = (searcResult.length) > 0 ? searcResult : [];
+  
+ // (searcResult.length > 0)? pagedata = searcResult : pagedata = filteredBrands;
 
   // Categories for grouping
-  const categories = Array.from(
-    new Set(pagedata.map((asset) => asset.category))
-  );
-
-  // Group assets by category
-  const assetsByCategory = categories.map((category) => {
-    return {
-      category,
-      assets: pagedata.filter((asset) => asset.category === category),
-    };
-  });
+  
 
   // Handle delete asset
   const handleDeleteAsset = async (id: string) => {
     console.log("Deleting asset:", id);
 
-    const deleteAssets = await assetAPI.deleteAsset(id);
+    const deleteAssets = await brandAPI.deleteBrand(id);
     toast({
-      title: "Asset deleted",
-      description: "Asset has been deleted successfully.",
+      title: "Brand deleted",
+      description: "Brand has been deleted successfully.",
     });
     setDeletingId(id);
-    navigate("/assets");
+    navigate("/manage-brands");
   };
 
   return (
@@ -116,7 +107,7 @@ const ManageBrands = () => {
           <p className="text-muted-foreground">Manage your brand master list</p>
         </div>
         <Button asChild>
-          <Link to="/assets/new">
+          <Link to="/brand/new">
             <Plus className="mr-2 h-4 w-4" />
             Add New Brand
           </Link>
@@ -158,14 +149,77 @@ const ManageBrands = () => {
               </TableHeader>
               <TableBody>
 
-{
-  filteredBrands.length>0?(
-    <TableRow></TableRow>
+{ pagedata.length>0?(  
+
+pagedata.map((barndval, index) => (
+  <TableRow key={barndval.id} className="h-[60px]"> {/* Decreased row height */}
+  <TableCell className="w-[80px] py-2">{index + 1}</TableCell>
+  
+  <TableCell className="w-[100px] py-2">
+    <div className="h-[70px] w-[70px] flex items-center justify-center overflow-hidden">
+      <img
+        src={barndval.image}
+        alt="Brand"
+        className="object-contain max-h-[70px]" // Ensures image is not too large
+      />
+    </div>
+  </TableCell>
+
+  <TableCell className="w-[120px] py-2">{barndval.name}</TableCell>
+  <TableCell
+  className={`w-[100px] py-2 capitalize font-bold ${
+    barndval.brand_status?.toLowerCase() === "active"
+      ? "text-green-600"
+      : "text-red-400"
+  }`}
+>
+  {barndval.brand_status}
+</TableCell>
+  <TableCell className="w-[120px] py-2">
+    <Button variant="ghost" size="icon" asChild>
+      <Link to={`/brand/edit/${barndval.id}`}>
+        <FileEdit className="h-4 w-4" />
+      </Link>
+    </Button>
+    {/* <Button variant="ghost" size="icon">
+      <Trash2 className="h-4 w-4" />
+    </Button> */}
+     <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant="ghost" size="icon">
+                                            <Trash2 className="h-4 w-4" />
+                                            <span className="sr-only">Delete</span>
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              This will delete the {barndval.name} brand from brand master list.
+                                              This action cannot be undone.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => handleDeleteAsset(barndval.id)}
+                                              disabled={deletingId === barndval.id}
+                                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                              {deletingId === barndval.id ? "Deleting..." : "Delete"}
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+  </TableCell>
+</TableRow>
+))
+
   ):(<TableRow>
     <TableCell colSpan={9} className="h-24 text-center">
       <div className="flex flex-col items-center justify-center text-muted-foreground">
         <AlertTriangle className="h-8 w-8 mb-2" />
-        <p>No assets found for this store</p>
+        <p>No brand found</p>
         <Button
           variant="outline"
           size="sm"
@@ -175,7 +229,7 @@ const ManageBrands = () => {
           }
         >
           <Package className="mr-2 h-4 w-4" />
-          Assign Assets
+          Assign Brand
         </Button>
       </div>
 
@@ -220,8 +274,8 @@ const ManageBrands = () => {
                 </div> */}
     </TableCell>
 
-  </TableRow>)
-}
+  </TableRow>
+)}
 
 
               
