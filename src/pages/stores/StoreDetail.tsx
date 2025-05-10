@@ -291,7 +291,7 @@ const StoreDetail = () => {
         <div className="flex gap-2">
         <Button
             variant="default"
-            onClick={() => navigate(`/stores/${storeId}/add-assets`)}
+            onClick={() => navigate(`/stores/${id}/add-assets`)}
           >
             <Plus className="mr-2 h-4 w-4" />
             Manage Assets
