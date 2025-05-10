@@ -509,4 +509,20 @@ export const brandAPI = {
       throw error;
     }
   },
+
+  getStoreBrands: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/storebarnd/list`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      throw error;
+    }
+  },
+
+
 };

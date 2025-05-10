@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { storeAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
+import { storeAPI,brandAPI } from "../../api/storeAPI"; // ADDED ON 30-04-2025//////
 import { Store } from "@/types";
 
 import {
@@ -45,8 +45,21 @@ const StoreForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [barnddata, setBrandData] = useState([]);
   const isEditing = !!id;
   const [storeData, setStoreData] = useState<Partial<StoreFormValues>>({});
+
+  const fetchBrand = async()=>{
+    const allBrands = await brandAPI.getStoreBrands();
+    setBrandData(allBrands);
+  }
+
+  useEffect(() => {
+    fetchBrand();
+  }, []);
+
+  console.log(barnddata);
+  
 
   const form = useForm<StoreFormValues>({
     resolver: zodResolver(storeFormSchema),
@@ -175,7 +188,7 @@ const StoreForm = () => {
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="brand"
                   render={({ field }) => (
@@ -190,6 +203,29 @@ const StoreForm = () => {
                       <FormMessage />
                     </FormItem>
                   )}
+                /> */}
+
+                <FormField
+                control={form.control}
+                name="brand"
+                render={({ field }) => (
+                <FormItem>
+                <h4>Brand<LabelMandatorySymbol /></h4>
+                <FormControl>
+                <select
+                {...field}
+                className="w-full border rounded px-3 py-2 text-sm"
+                >
+                <option value="">Select Brand</option>
+                {barnddata.length>0 &&( 
+                barnddata.map((barndval, index) => (
+                <option value={barndval.name}>{barndval.name}</option>                
+                )))}
+                </select>
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+                )}
                 />
 
                 <FormField
