@@ -14,7 +14,8 @@ interface User {
 }
 
 const id = localStorage.getItem('id') || '';
-const allUsers = id?await authAPI.getAllUsers():[];
+//const allUsers = id?await authAPI.getAllUsers():[];
+const allUsers = await authAPI.getAllUsers();
 
 // const mockUsers: User[] = [
 //   { id: '1', name: 'John Doe', email: 'john@example.com', role: 'Admin' },
