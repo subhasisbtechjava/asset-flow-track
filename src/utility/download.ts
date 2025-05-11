@@ -3,13 +3,16 @@ import { getFileNameFromUrl } from "./get_file_type";
 
   export const downloadFile = async (fileUrl: string, ) => {
     try {
+      // window.open(fileUrl);
+      // return;
       const fileName = getFileNameFromUrl(fileUrl)
+      const token = localStorage.getItem("token");
       const response = await fetch(fileUrl, {
         method: 'GET',
         // Uncomment and set token if needed
-        // headers: {
-        //   Authorization: `Bearer YOUR_TOKEN`,
-        // },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
   
       if (!response.ok) throw new Error("Network response was not ok");
