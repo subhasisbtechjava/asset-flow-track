@@ -105,7 +105,7 @@ const AssetForm = () => {
     setIsLoading(true);
 
     // Mock API call - would be replaced with real data persistence
-    setTimeout(() => {
+    
       if (isEditing) {
         const updateStoreValues= {                   
                   name: values.name || '', // Fallback to empty string
@@ -133,17 +133,27 @@ const AssetForm = () => {
           
         };
 
-        const newlycreatedAssets = assetAPI.createAsset(newAsset);
-        console.log("Creating asset:", newlycreatedAssets);
+      const newlycreatedAssets = await assetAPI.createAsset(newAsset);
+      console.log('================');
+      console.log(newlycreatedAssets);
+      if (newlycreatedAssets.message == "Assets code already exists") {
+        toast({
+          title: "Assets Error",
+          description: newlycreatedAssets.message,
+          variant: "destructive",
+        });
+      } else {
         toast({
           title: "Asset created",
           description: `${values.name} has been created successfully.`,
         });
       }
-      
+
+    }
+
       setIsLoading(false);
       navigate("/assets");
-    }, 1000);
+   
   };
 
   return (
