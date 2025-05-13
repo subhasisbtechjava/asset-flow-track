@@ -42,7 +42,7 @@ export function Header() {
   }
   return (
     <header className="border-b bg-card shadow-sm animate-fade-in flex items-center justify-center " >
-      {location.pathname!="/stores"&& <ChevronLeft style={{marginLeft:"20px"}} onClick={() => onBack()} />}
+      {location.pathname!="/stores"&& <ChevronLeft size={"35"} style={{marginLeft:"20px",cursor: "pointer"}} onClick={() => onBack()} />}
           <Link style={{marginLeft:"20px"}} to="/" >
             <div className="flex">
               {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary to-accent1 bg-clip-text text-transparent">
