@@ -29,6 +29,7 @@ export interface Asset {
   unitOfMeasurement: string;
   unit_of_measurement: string;
   pricePerUnit: number;
+  brands:string[]
 }
 
 export interface Changepass { 

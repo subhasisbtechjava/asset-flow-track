@@ -233,7 +233,7 @@ export const assetAPI = {
 
   // Create new asset
 
-  createAsset: async (assetData: Omit<Asset, "id">) => {
+  createAsset: async (assetData: unknown) => {
     try {
       const response = await axios.post(`${API_URL}/assets`, assetData, {
         headers: {
