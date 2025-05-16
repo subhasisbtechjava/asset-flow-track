@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { assetAPI, storeAPI } from "@/api/storeAPI";
+import { assetAPI, storeAPI,vendorAPI } from "@/api/storeAPI";
 import { log } from "console";
 import { custom } from "zod";
 
@@ -51,14 +51,20 @@ const StoreAddAssets = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchAvailableAsset, setAvailableAssetSearch] = useState("");
+  const [searchVendor, setSearchVendor] = useState("");
 
+
+  const [allVendorList, setVendor] = useState([]);
+  const [selectedVendor, setSelectedVendor] = useState("");
 
   // Fetch store details
 
   
   // const store = id ? getStoreById(id) : null;
   // -------------------------ismile--------------------
-  const [store,setStore] = useState(null);
+  //const [store,setStore] = useState(null);
+  const [storedata,setStore] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingLoading, setIsEditingLoading] = useState(false);
   const [isAssignAssetLoading, setIsAssignAssetLoading] = useState(false);
@@ -66,10 +72,12 @@ const StoreAddAssets = () => {
   const [editingItemId, setEditingItemId] = useState(false);
 
   const [assetsToAdd, setAssetsToAdd] = useState([]);
-  const [selectedAssignAsset, setSelectedAssignAsset] = useState(undefined);
+  const [selectedAssignAsset, setSelectedAssignAsset] = useState("");
   const [selectedAssignAssetQuantity, setSelectedAssignAssetQuantity] =
     useState(1);
   const [selectedAssignAssetPrice, setSelectedAssignAssetPrice] = useState(0);
+
+  const [selectedActualAssetPrice, setSelectedActualAssetPrice] = useState(0);
   // -------------------------ismile--------------------
   // Prepare assets list
   const fetchMasterAssets = async () => {
@@ -103,6 +111,19 @@ const StoreAddAssets = () => {
       console.error("Failed to fetch stores", error);
     }
   };
+
+  const fetchAllVendors = async () => {
+    try {
+      const allVendors = await vendorAPI.getAllVendors();
+      console.log(allVendors);
+      setVendor(allVendors);
+    } catch (error) {
+      console.error("Failed to fetch vendors", error);
+    }
+  };
+
+
+
   useEffect(() => {
      setLoading(true);
     // Load existing assigned assets if any
@@ -112,6 +133,7 @@ const StoreAddAssets = () => {
     fetchStoreAssets();
     // setAssignedAssets([]);
     fetchStoreDetails();
+    fetchAllVendors();
 
     // const preparedAssets = mockAssets.map(asset => ({
     //   ...asset,
@@ -125,28 +147,34 @@ const StoreAddAssets = () => {
       }, loadintime);
   }, []);
 
-  if (!store) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Store Not Found</h2>
-          <p className="text-muted-foreground mb-4">
-            The store you're looking for doesn't exist or has been removed.
-          </p>
-          <Button asChild>
-            <Link to="/">Back to Dashboard</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const store = (storedata) ? storedata :[];
+useEffect(()=>{
+    fetchAllVendors();
+  
+},[selectedVendor])
+
+  // if (!store) {
+  //   return (
+  //     <div className="flex items-center justify-center h-[60vh]">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold mb-2">Store Not Found</h2>
+  //         <p className="text-muted-foreground mb-4">
+  //           The store you're looking for doesn't exist or has been removed.
+  //         </p>
+  //         <Button asChild>
+  //           <Link to="/">Back to Dashboard</Link>
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Filter assets for search functionality
   const filteredAssets = assetsToAdd
   .filter(asset =>
-    asset.asset_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.asset_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.category.toLowerCase().includes(searchTerm.toLowerCase())
+    asset.asset_name.toLowerCase().includes(searchAvailableAsset.toLowerCase()) ||
+    asset.asset_code.toLowerCase().includes(searchAvailableAsset.toLowerCase()) ||
+    asset.category.toLowerCase().includes(searchAvailableAsset.toLowerCase())
   )
   const handleToggleSelect = (assetId: string) => {
     setAssetsToAdd((prev) =>
@@ -187,9 +215,11 @@ const StoreAddAssets = () => {
   };
 
   const resetQuickAddForm = () => {
-    setSelectedAssignAsset({});
+    setSelectedAssignAsset("");
     setSelectedAssignAssetPrice(0);
     setSelectedAssignAssetQuantity(1);
+    setSelectedActualAssetPrice(0)
+    setSelectedVendor("")
   };
   const handleQuickAdd = async () => {
     try {
@@ -208,7 +238,10 @@ const StoreAddAssets = () => {
         id,
         selectedAssignAsset?.id,
         selectedAssignAssetQuantity,
-        selectedAssignAssetPrice
+        selectedAssignAssetPrice,
+        selectedVendor?.id,
+        selectedVendor?.name,
+        selectedActualAssetPrice
       );
 
       if (!assignAssetRes["success"]) {
@@ -394,7 +427,8 @@ const StoreAddAssets = () => {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-12 gap-4">
-            <div className="md:col-span-5">
+
+            <div className="md:col-span-3">
               <label className="text-sm font-medium mb-1 block">
                 Select Asset
               </label>
@@ -402,7 +436,7 @@ const StoreAddAssets = () => {
                 value={
                   selectedAssignAsset
                     ? JSON.stringify(selectedAssignAsset)
-                    : undefined
+                    : ""
                 }
                 onValueChange={(value) => {
                   console.log("value: ", value);
@@ -415,24 +449,37 @@ const StoreAddAssets = () => {
                   <SelectValue placeholder="Select an asset..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {
-                    // assetsToAdd
+  <div className="p-2 sticky top-0 bg-white z-10">
+    <input
+      type="text"
+      placeholder="Search asset..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="w-full p-2 border rounded"
+    />
+  </div>
 
-                    allAssets.map((asset) => (
-                      <SelectItem key={asset.id} value={JSON.stringify(asset)}>
-                        {asset.name} ({asset.code})
-                      </SelectItem>
-                    ))
-                  }
-                </SelectContent>
+  <div className="max-h-60 overflow-y-auto">
+    {allAssets
+      .filter((asset) =>
+        asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        asset.code.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .map((asset) => (
+        <SelectItem key={asset.id} value={JSON.stringify(asset)}>
+          {asset.name} ({asset.code})
+        </SelectItem>
+      ))}
+  </div> 
+</SelectContent>
               </Select>
             </div>
 
            
 
-            <div className="md:col-span-3">
-              <label className="text-sm font-medium mb-1 block">
-                Price (₹) (Optional)
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">             
+                Ideal Price (₹)
               </label>
               <Input
                 type="number"
@@ -444,7 +491,71 @@ const StoreAddAssets = () => {
               />
             </div>
 
+
+
+
+
+             <div className="md:col-span-3">
+              <label className="text-sm font-medium mb-1 block">
+                Select Vendor
+              </label>
+              <Select
+                value={
+                  selectedVendor
+                    ? JSON.stringify(selectedVendor)
+                    : ""
+                }
+                onValueChange={(value) => {
+                  console.log("value: ", value);
+                  const vendorValue = JSON.parse(value) ;   
+                  setSelectedVendor(vendorValue);              
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an vendor..." />
+                </SelectTrigger>
+                <SelectContent>
+                
+                <div className="p-2 sticky top-0 bg-white z-10">
+                  <input
+                  type="text"
+                  placeholder="Search vendor..."
+                  value={searchVendor}
+                  onChange={(e) => setSearchVendor(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  />
+                  </div>
+
+                  <div className="max-h-60 overflow-y-auto">
+                  {allVendorList
+                    .filter((vendor_val) =>
+                    vendor_val.name.toLowerCase().includes(searchVendor.toLowerCase()) )
+                    .map((vendor_val) => (
+                    <SelectItem key={vendor_val.id} value={JSON.stringify(vendor_val)}>
+                    {vendor_val.name}
+                    </SelectItem>
+                    ))
+                  }
+                  </div>
+
+                </SelectContent>
+              </Select>
+            </div>     
+
             <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">             
+                Actaul Price (₹)
+              </label>
+              <Input
+                type="text"                   
+                value={selectedActualAssetPrice}           
+                placeholder="Actaul price"
+                onChange={(e) => setSelectedActualAssetPrice(+e.target.value)}
+              />
+            </div>
+
+
+            <div className="md:col-span-1">
               <label className="text-sm font-medium mb-1 block">Quantity</label>
               <Input
                 type="number"
@@ -459,7 +570,7 @@ const StoreAddAssets = () => {
               />
             </div>
 
-            <div className="md:col-span-2 flex items-end">
+            <div className="md:col-span-1 flex items-end">
               <Button
                 onClick={handleQuickAdd}
                 className="w-full"
@@ -481,8 +592,8 @@ const StoreAddAssets = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search assets..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchAvailableAsset}
+              onChange={(e) => setAvailableAssetSearch(e.target.value)}
               className="pl-10"
             />
           </div>

@@ -28,12 +28,17 @@ export const storeAPI = {
     storeId: string,
     assetId: string,
     quantity: number,
-    price?: number
+    price?: number,
+    vendor_id?:number,
+    vendor_name?:string,
+    actual_price?:number
   ) => {
     try {
       const body = {
-        assets: [{ assetId, quantity, price }],
+        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price }],
       };
+      console.log('UUUUUUUUUUUUUUUUUUU');
+      console.log(body.assets);
       const response = await axios.post(
         `${API_URL}/stores/${storeId}/assets`,
         body,
