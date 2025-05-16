@@ -123,7 +123,7 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
   };
 
   const handleAddDocument = async () => {
-    if (!newDocument.documentNumber || !newDocument.attachment) {
+    if (documentType == "grn"?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
       toast({
         title: "Validation Error",
         description: `Please provide document number and attachment for the ${documentType.toUpperCase()}`,
@@ -372,11 +372,11 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
 
             <Button
               onClick={handleAddDocument}
-              disabled={
-                !newDocument.documentNumber ||
+              disabled={documentType == "grn"?(!newDocument.documentNumber)
+:                (!newDocument.documentNumber ||
                 !newDocument.attachment ||
                 (documentType === "invoice" &&
-                  (!newDocument.documentDate || !newDocument.documentAmount))
+                  (!newDocument.documentDate || !newDocument.documentAmount)))
               }
               className="w-full"
             >
