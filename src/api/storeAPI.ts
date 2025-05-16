@@ -2,7 +2,7 @@
 // These would be implemented on a Node.js backend
 
 import axios from "axios";
-import { Store, Asset, StoreAsset,Brand } from "@/types";
+import { Store, Asset,Vendor, StoreAsset,Brand } from "@/types";
 
 //const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 
@@ -524,5 +524,95 @@ export const brandAPI = {
     }
   },
 
+
+};
+
+
+
+
+
+
+
+export const vendorAPI = {
+  // Get all assets
+
+  createVendor: async (vendorData: Vendor) => {
+    try {
+      console.log('+++++++++++++++++++++++');
+      console.log(vendorData);
+
+      
+
+
+      const response = await axios.post(`${API_URL}/vendor/insert`, vendorData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating asset:", error);
+      throw error;
+    }
+  },
+
+
+  getAllVendors: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/vendor/list`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      throw error;
+    }
+  },
+
+  getVendorById: async (id: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/editvendor/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching brand ${id}:`, error);
+      throw error;
+    }
+  },
+
+  updateVendor: async (id,vendorData: Vendor) => {
+    try {
+      console.log('+++++++++++++++++++++++');
+      console.log(vendorData);
+      const response = await axios.post(`${API_URL}/vendor/update/${id}`, vendorData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating brand:", error);
+      throw error;
+    }
+  },
+
+  deleteVendor: async (id: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/delete/vendor/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting vendor ${id}:`, error);
+      throw error;
+    }
+  },
 
 };

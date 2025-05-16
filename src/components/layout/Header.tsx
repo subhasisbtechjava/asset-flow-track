@@ -96,6 +96,15 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                <Link
+                to="/manage-vendors" // Update the route as needed
+                className="flex items-center cursor-pointer"
+                >
+                <Users className="mr-2 h-4 w-4" />
+                <span>Manage Vendor Master</span>
+                </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link
                     to="/manage-brands"
                     className="flex items-center cursor-pointer"

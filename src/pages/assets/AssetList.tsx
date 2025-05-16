@@ -25,12 +25,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import { toast } from "@/components/ui/use-toast";
+
+import Loader from '../../components/loader/Loader';
 
 const AssetList = () => {
   let pagedata = [];
   const [filteredAssets, setAssets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -50,6 +60,7 @@ const AssetList = () => {
 
 
     useEffect(() => {
+      setLoading(true);
       const fetchAssets = async () => {
         try {
           const allAssets = await assetAPI.getAllAssets();    
@@ -57,6 +68,8 @@ const AssetList = () => {
           setAssets(allAssets);
         } catch (error) {
           console.error("Failed to fetch stores", error);
+        }finally{
+          setLoading(false);
         }
       };
     
@@ -101,6 +114,8 @@ const AssetList = () => {
   };
 
   return (
+    <>
+    <Loader loading={loading} />
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -152,6 +167,7 @@ const AssetList = () => {
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Name</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Unit</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Price</th>
+                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Brand</th>
                             <th scope="col" className="px-4 py-3 text-right text-sm font-medium">Actions</th>
                           </tr>
                         </thead>
@@ -166,6 +182,40 @@ const AssetList = () => {
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 <span>&#8377;</span>{asset.price_per_unit}
                               </td>
+
+                              {/* <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                {asset.brand}
+                                </td> */}
+
+                                <td className="px-4 py-3 whitespace-nowrap text-sm">
+  {(() => {
+    // 1. Handle null/undefined/empty cases
+    if (!asset.brand) return '-';
+
+    // 2. If already an array, use it directly
+    const brands = Array.isArray(asset.brand) 
+      ? asset.brand 
+      : typeof asset.brand === 'string' 
+        ? asset.brand.split(',').map(brand => brand.trim()) 
+        : [String(asset.brand)]; // Fallback for numbers/objects
+
+    // 3. Display logic
+    if (brands.length === 0) return '_';
+    if (brands.length === 1) return brands[0];
+
+    return (
+      <Tooltip>
+        <TooltipTrigger>
+          <span>{`${brands[0]} + ${brands.length} More`}</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{brands.join(', ')}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  })()}
+</td>
+
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
                                 <div className="flex justify-end space-x-2">
                                   <Button 
@@ -226,6 +276,7 @@ const AssetList = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 

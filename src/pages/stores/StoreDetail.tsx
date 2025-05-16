@@ -26,6 +26,9 @@ import EnhancedStoreAssetsTable from "@/components/store/EnhancedStoreAssetsTabl
 import { StoreAsset } from "@/types";
 import { storeAPI } from "@/api/storeAPI";
 
+import Loader from '../../components/loader/Loader';
+import { useLoadertime } from "../../contexts/loadertimeContext";
+
 const StoreDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -39,10 +42,15 @@ const StoreDetail = () => {
   >(null);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const loadintime = useLoadertime();
   const [searchTerm, setSearchTerm] = useState("");
-
+ 
+  
   // Fetch store details
-  const [store, setStore] = useState(null);
+  const [storedata, setStore] = useState(null);
+
+  const store = (storedata) ? storedata :[];
 
   // Fetch store assets
   const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
@@ -50,13 +58,19 @@ const StoreDetail = () => {
   // -----------------------------
   const highProgressValue = 140;
 
+  //console.log("Loader time:", useLoadertime());
+
   // -------------------------
   useEffect(() => {
+    setLoading(true)
     if (id) {
       console.log("id: ", id);
       initialService();
     }
+    
   }, []);
+
+
 
   function initialService() {
     fetchStoreDetails();
@@ -80,10 +94,15 @@ const StoreDetail = () => {
     // });
   }
   async function fetchStoreAssets() {
+      
     const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
     setStoreAssetsList(assets);
 
     console.log("storeAssetsList: ", storeAssetsList);
+      setTimeout(() => {
+          setLoading(false)
+      }, loadintime);  
+    
   }
   //  async function fetchStoreAssets() {
   //   const assets = await getStoreAssetsByStoreId(id);
@@ -94,21 +113,22 @@ const StoreDetail = () => {
   //   console.log("assets: ", assets);
   //   // setStoreAssetsList(assets);
   // }
-  if (!store) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Store Not Found</h2>
-          <p className="text-muted-foreground mb-4">
-            The store you're looking for doesn't exist or has been removed.
-          </p>
-          <Button asChild>
-            <Link to="/">Back to Dashboard</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  
+  // if (!store) {
+  //   return (
+  //     <div className="flex items-center justify-center h-[60vh]">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold mb-2">Store Not Found</h2>
+  //         <p className="text-muted-foreground mb-4">
+  //           The store you're looking for doesn't exist or has been removed.
+  //         </p>
+  //         <Button asChild>
+  //           <Link to="/">Back to Dashboard</Link>
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Handle delete store
   const handleDeleteStore = () => {
@@ -268,6 +288,8 @@ const StoreDetail = () => {
     return asset.is_finance_booked != null && asset.is_finance_booked != false;
   });
   return (
+    <>
+     <Loader loading={loading} />
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -283,7 +305,8 @@ const StoreDetail = () => {
           </div>
           <h1 className="text-3xl font-bold mt-1">{store.name}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <Badge>{store.brand}</Badge>
+            {/* <Badge>{store.brand}</Badge> */}
+            <Badge>{store.brandname}</Badge>
             <Badge variant="outline">{store.code}</Badge>
             <span className="text-sm text-muted-foreground">{store.city}</span>
           </div>
@@ -363,6 +386,7 @@ const StoreDetail = () => {
         isLoading={isLoading}
       />
     </div>
+    </>
   );
 };
 

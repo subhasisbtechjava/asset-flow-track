@@ -7,6 +7,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import { ThemeProvider } from "./hooks/use-theme";
 import { AuthProvider } from "./contexts/AuthContext";
+import { Loadertime } from "./contexts/loadertimeContext";
 
 import AllRoutes  from "./pages/allRoutes/allRoutes.jsx"
 const App = () => {
@@ -20,7 +21,9 @@ const App = () => {
           <Toaster />
           <Sonner />
           <AuthProvider>
+             <Loadertime>
            <AllRoutes />
+           </Loadertime>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

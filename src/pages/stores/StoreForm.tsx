@@ -219,7 +219,7 @@ const StoreForm = () => {
                 <option value="">Select Brand</option>
                 {barnddata.length>0 &&( 
                 barnddata.map((barndval, index) => (
-                <option value={barndval.name}>{barndval.name}</option>                
+                <option value={barndval.id}>{barndval.name}</option>                
                 )))}
                 </select>
                 </FormControl>

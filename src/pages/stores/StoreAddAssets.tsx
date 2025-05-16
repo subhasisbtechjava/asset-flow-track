@@ -26,7 +26,8 @@ import { assetAPI, storeAPI } from "@/api/storeAPI";
 import { log } from "console";
 import { custom } from "zod";
 
-
+import Loader from '../../components/loader/Loader';
+import { useLoadertime } from "../../contexts/loadertimeContext";
 
 interface AssignedAsset {
   id: string;
@@ -44,6 +45,9 @@ const StoreAddAssets = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [allAssets, setAssets] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const loadintime = useLoadertime();
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,6 +104,7 @@ const StoreAddAssets = () => {
     }
   };
   useEffect(() => {
+     setLoading(true);
     // Load existing assigned assets if any
     // In a real app, this would come from an API fetch
 
@@ -114,6 +119,10 @@ const StoreAddAssets = () => {
     //   quantity: 1
     // }));
     // setAssetsToAdd(preparedAssets);
+
+    setTimeout(() => {
+          setLoading(false)
+      }, loadintime);
   }, []);
 
   if (!store) {
@@ -273,6 +282,8 @@ const StoreAddAssets = () => {
   };
 
   return (
+    <>
+     <Loader loading={loading} />
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2">
@@ -681,6 +692,7 @@ const StoreAddAssets = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 

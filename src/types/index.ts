@@ -37,6 +37,13 @@ export interface Changepass {
   confirmmpass: string;
 }
 
+export interface Vendor { 
+  vname: string;
+  vaddress: string;
+  vphone: string;
+  vstatus: string;
+}
+
 export interface Brand { 
   bname: string;
   bimage: FileList;

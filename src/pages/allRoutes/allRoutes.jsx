@@ -16,6 +16,10 @@ import ChangePassword from "../profile/ChangePassword";
 
 import ManageBrands from "../../pages/manageBrands/manageBrands"
 import BrandForm from "../../pages/manageBrands/BrandForm"
+
+import ManageVendors from "../../pages/manageVendors/manageVendors"
+import VendorForm from "../../pages/manageVendors/VendorForm"
+
 const AllRoutes = () => {
   return (
     <Routes>
@@ -45,6 +49,11 @@ const AllRoutes = () => {
         <Route path="/manage-brands" element={<ManageBrands />} />
         <Route path="brand/new" element={<BrandForm />} />
         <Route path="brand/edit/:id" element={<BrandForm />} />
+
+        <Route path="/manage-vendors" element={<ManageVendors />} />  
+        <Route path="vendor/new" element={<VendorForm />} />
+        <Route path="vendor/edit/:id" element={<VendorForm />} />
+
         <Route path="assets/new" element={<AssetForm />} />
         <Route path="assets/edit/:id" element={<AssetForm />} />
         <Route path="users" element={<UserList />} />
