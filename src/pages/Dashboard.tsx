@@ -322,25 +322,34 @@ try{
                               />
                             </td>
                             <td className="py-3 px-4">
+                              {store.status== "in_progress"&&(
+                                    <>
                               <DropdownMenu >
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm">
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
+                                 
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem asChild>
+
+                                  
+                                    <DropdownMenuItem asChild>
                                     <Link to={`/stores/${store.id}`}>View Details</Link>
                                   </DropdownMenuItem>
+
                                   <DropdownMenuItem asChild>
                                     <Link to={`/stores/edit/${store.id}`}>Edit</Link>
                                   </DropdownMenuItem>
+                                
                                 
                                 {store.status== "in_progress"&&<DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
                                     Mark as Complete
                                   </DropdownMenuItem>}  
                                 </DropdownMenuContent>
                               </DropdownMenu>
+                                </>
+                                  )}
                             </td>
                           </tr>
                         );

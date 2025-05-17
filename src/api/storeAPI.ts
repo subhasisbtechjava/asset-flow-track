@@ -69,11 +69,12 @@ export const storeAPI = {
       throw error;
     }
   },
-  updateAssignedAssets: async (id:string, quantity:number,price:number ) => {
+  updateAssignedAssets: async (id:string, quantity:number,price:number,tprice_with_gst:number ) => {
     try {
     const body=   {
       "quantity":quantity,
-      "price":price
+      "price":price,
+      "tprice":tprice_with_gst
     };
       const response = await axios.post(`${API_URL}/assets/update_qty_price/${id}`,  body,{
         headers: {

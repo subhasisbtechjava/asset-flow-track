@@ -80,6 +80,8 @@ const StoreAddAssets = () => {
   const [selectedActualAssetPrice, setSelectedActualAssetPrice] = useState(0);
 
   const [selectedGstRate, setSelectedAssignGstRate] = useState(0);
+
+  const [selectedUpdateTotPrice, setSelectedUpdateTotPrice] = useState(0);
   // -------------------------ismile--------------------
   // Prepare assets list
   const fetchMasterAssets = async () => {
@@ -211,7 +213,7 @@ useEffect(()=>{
 
     setAssetsToAdd((prev) =>
       prev.map((asset) =>
-        asset.id === assetId ? { ...asset, price_per_unit: price } : asset
+        asset.id === assetId ? { ...asset, actual_price: price } : asset
       )
     );
   };
@@ -282,7 +284,7 @@ useEffect(()=>{
  
 
 
-  const handleUpdateAssignedAsset = async (asset) => {
+  const handleUpdateAssignedAsset = async (asset,tprice_with_gst) => {
     try {
       setIsEditingLoading(true);
       if (!asset) {
@@ -296,11 +298,17 @@ useEffect(()=>{
       }
 
       console.log("asset+++: ", asset);
-      const { id, quantity, customPrice, price_per_unit } = asset;
+      //const { id, quantity, customPrice, price_per_unit } = asset;
+      const { id, quantity, customPrice, actual_price} = asset;
+      //const update_tot_price = selectedUpdateTotPrice;
+
+      //console.log("totprice===+++: ", tprice_with_gst);
+    
       const res = await storeAPI.updateAssignedAssets(
         id,
         quantity,
-        customPrice ?? price_per_unit
+        customPrice ?? actual_price,
+        tprice_with_gst
       );
       console.log("res: ", res);
       setIsEditing(!isEditing);
@@ -664,9 +672,12 @@ useEffect(()=>{
                         <td className="py-3 px-4 text-sm">
                         {asset.unit_of_measurement??"NA"}
                         </td>
-                        {/* <td className="py-3 px-4 text-sm">
-                          ₹{Number(asset.price_per_unit ?? "0").toFixed(2)}
-                        </td> */}
+
+                        <td className="py-3 px-4 text-sm">
+                         {asset.price_per_unit}
+                        </td>
+
+                        {/*
                          {isEditing && asset.id == editingItemId ? (
                           <td className="py-3 px-4">
                             <Input
@@ -695,6 +706,7 @@ useEffect(()=>{
                             {asset.price_per_unit}
                           </td>
                         )}
+                     */ }
 
                         <td className="py-3 px-4 text-sm">
                               {asset.vendor_name ? `${asset.vendor_name}` : ''}
@@ -709,9 +721,11 @@ useEffect(()=>{
                               step="1"
                               className="w-24"
                               placeholder="Optional"
-                              value={
-                               
-                                // asset.quantity *
+                              // value={ 
+                              //     Number(asset.actual_price ?? "0")
+                              // }
+                               value={
+                                asset.customPrice ??                                
                                   Number(asset.actual_price ?? "0")
                               }
                               onChange={(e) =>
@@ -790,20 +804,43 @@ useEffect(()=>{
                         {/* <td>{asset.quantity *
                                   Number(asset.price_per_unit ?? "0")}</td> */}
 
+
+                              <td>
+                              {(() => {
+                              if (asset.quantity && asset.actual_price) {
+                              const tprice = asset.quantity * Number(asset.actual_price);
+                              const tgst = (tprice * (asset.gst_rate || 0)) / 100;
+                              const tprice_with_gst = tprice + tgst;
+                              //setSelectedUpdateTotPrice(tprice_with_gst);  
+                              return tprice_with_gst.toLocaleString('en-IN', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                              });
+                              } else {
+                              return '0.00';
+                              }
+                              })()}
+                              </td>  
+
+                          {/*
                           <td>
-                          {asset.quantity && asset.price_per_unit 
+                          {asset.quantity && asset.actual_price 
                           ? (asset.quantity * Number(asset.price_per_unit)).toLocaleString('en-IN', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2
                           })
                           : '0.00'}
                           </td>
+                          */
+                          }
+
                         <td className="py-3 px-4 text-center">
                           <Button
                             size="sm"
                             variant="outline"
                             disabled={isEditingLoading && asset.id == editingItemId&&isEditingLoading}
                             onClick={() => {
+
                               console.log("isEditing: ", isEditing);
 
                               if (isEditing) {
@@ -812,7 +849,14 @@ useEffect(()=>{
                                   isEditing
                                 );
                                 // Save the changes to the assigned asset
-                                handleUpdateAssignedAsset(asset);
+                                 const tprice_with_gst = (() => {
+      if (!asset.quantity || !asset.actual_price) return 0;
+      const tprice = asset.quantity * Number(asset.actual_price);
+      const tgst = (tprice * (Number(asset.gst_rate) || 0)) / 100;
+      return tprice + tgst;
+       
+    })();
+                         handleUpdateAssignedAsset(asset,tprice_with_gst);      
                               } else {
                                 console.log(
                                   "=========initiating=======: ",
