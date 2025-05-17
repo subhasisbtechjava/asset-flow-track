@@ -78,6 +78,8 @@ const StoreAddAssets = () => {
   const [selectedAssignAssetPrice, setSelectedAssignAssetPrice] = useState(0);
 
   const [selectedActualAssetPrice, setSelectedActualAssetPrice] = useState(0);
+
+  const [selectedGstRate, setSelectedAssignGstRate] = useState(0);
   // -------------------------ismile--------------------
   // Prepare assets list
   const fetchMasterAssets = async () => {
@@ -234,14 +236,20 @@ useEffect(()=>{
       }
 
       console.log("id: ", id);
+      const total_price = selectedActualAssetPrice * selectedAssignAssetQuantity;
+      const gstcalculation = ((total_price * selectedGstRate) / 100);
+      const total_price_with_gst = (total_price + gstcalculation)
+
       const assignAssetRes = await storeAPI.assignAssetToStore(
         id,
         selectedAssignAsset?.id,
         selectedAssignAssetQuantity,
         selectedAssignAssetPrice,
-        selectedVendor?.id,
+        selectedVendor?.vendor_code,
         selectedVendor?.name,
-        selectedActualAssetPrice
+        selectedActualAssetPrice,
+        selectedGstRate,
+        total_price_with_gst
       );
 
       if (!assignAssetRes["success"]) {
@@ -443,6 +451,7 @@ useEffect(()=>{
                   const assetValue = JSON.parse(value) ;
                   setSelectedAssignAsset(assetValue);
                   setSelectedAssignAssetPrice(+assetValue.price_per_unit);
+                  setSelectedAssignGstRate(+assetValue.gst_rate);
                 }}
               >
                 <SelectTrigger>
@@ -492,7 +501,7 @@ useEffect(()=>{
             </div>
 
 
-
+            
 
 
              <div className="md:col-span-3">
@@ -574,7 +583,7 @@ useEffect(()=>{
               <Button
                 onClick={handleQuickAdd}
                 className="w-full"
-                disabled={isAssignAssetLoading ||!selectedAssignAsset?.id}
+                disabled={isAssignAssetLoading ||!selectedAssignAsset?.id || !selectedVendor?.id || !selectedActualAssetPrice}
               >
               {!isAssignAssetLoading&&  <Plus className="h-4 w-4 mr-1" />}
                 {isAssignAssetLoading ? "Assigning..." : "Add"}
@@ -616,7 +625,18 @@ useEffect(()=>{
                     UOM 
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
-                      Unit Cost (₹)
+                      Ideal Price
+                    </th>
+
+                     <th className="py-3 px-4 text-left text-sm font-medium">
+                      Vendor 
+                    </th>
+
+                     <th className="py-3 px-4 text-left text-sm font-medium">
+                      Actual Price
+                    </th>
+                    <th className="py-3 px-4 text-left text-sm font-medium">
+                      GST
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
                       Quantity
@@ -672,9 +692,50 @@ useEffect(()=>{
                           </td>
                         ) : (
                           <td className="py-3 px-4 text-sm">
-                            {Number(asset.price_per_unit ?? "0")}
+                            {asset.price_per_unit}
                           </td>
                         )}
+
+                        <td className="py-3 px-4 text-sm">
+                              {asset.vendor_name ? `${asset.vendor_name}` : ''}
+                          </td> 
+
+
+                          {isEditing && asset.id == editingItemId ? (
+                          <td className="py-3 px-4">
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              className="w-24"
+                              placeholder="Optional"
+                              value={
+                               
+                                // asset.quantity *
+                                  Number(asset.actual_price ?? "0")
+                              }
+                              onChange={(e) =>
+                                handlePriceChange(
+                                  asset.id,
+                                  e.target.value === ""
+                                    ? parseFloat(asset.actual_price)
+                                    : parseFloat(e.target.value)
+                                )
+                              }
+                            />
+                          </td>
+                        ) : (
+                          <td className="py-3 px-4 text-sm">
+                            {asset.actual_price}
+                          </td>
+                        )}
+
+
+                          <td className="py-3 px-4 text-sm">
+                              {asset.gst_rate ? `${asset.gst_rate} %` : ''}
+                          </td>     
+
+
                         {isEditing && asset.id == editingItemId ? (
                           <td className="py-3 px-4">
                             <Input
@@ -726,9 +787,17 @@ useEffect(()=>{
                                 Number(asset.price_per_unit ?? "0")}
                           </td>
                         )} */}
-                        <td>{asset.quantity *
-                                  Number(asset.price_per_unit ?? "0")}</td>
+                        {/* <td>{asset.quantity *
+                                  Number(asset.price_per_unit ?? "0")}</td> */}
 
+                          <td>
+                          {asset.quantity && asset.price_per_unit 
+                          ? (asset.quantity * Number(asset.price_per_unit)).toLocaleString('en-IN', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                          })
+                          : '0.00'}
+                          </td>
                         <td className="py-3 px-4 text-center">
                           <Button
                             size="sm"

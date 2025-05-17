@@ -167,7 +167,9 @@ const AssetList = () => {
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Name</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Unit</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Price</th>
-                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Brand</th>
+                            {/* <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Brand</th> */}
+                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">GST Rate</th>
+                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">HSN Code</th>
                             <th scope="col" className="px-4 py-3 text-right text-sm font-medium">Actions</th>
                           </tr>
                         </thead>
@@ -187,7 +189,7 @@ const AssetList = () => {
                                 {asset.brand}
                                 </td> */}
 
-                                <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                {/* <td className="px-4 py-3 whitespace-nowrap text-sm">
   {(() => {
     // 1. Handle null/undefined/empty cases
     if (!asset.brand) return '-';
@@ -214,7 +216,15 @@ const AssetList = () => {
       </Tooltip>
     );
   })()}
-</td>
+</td> */}
+
+                              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                             {asset.gst_rate ? `${asset.gst_rate} %` : ''}
+                              </td>
+
+                              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                {asset.hsn_code}
+                              </td>
 
                               <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
                                 <div className="flex justify-end space-x-2">

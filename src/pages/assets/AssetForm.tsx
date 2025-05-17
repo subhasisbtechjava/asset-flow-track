@@ -47,9 +47,17 @@ const assetFormSchema = z.object({
     .refine((val) => !isNaN(val), {
       message: "Price must be a valid number",
     }),
-  brands: z.array(z.unknown()).min(1, {
-    message: "Select at least one brand",
-  }),
+  // brands: z.array(z.unknown()).min(1, {
+  //   message: "Select at least one brand",
+  // }),
+
+  gst_rate: z.coerce.number()
+    .min(0.01, { message: "GST Rate is required" })
+    .refine((val) => !isNaN(val), {
+      message: "Price must be a valid number",
+    }),
+
+  hsn_code: z.string().min(1, { message: "HSN Code is required" }),
 });
 
 type AssetFormValues = z.infer<typeof assetFormSchema>;
@@ -77,7 +85,10 @@ const AssetForm = () => {
       category: "",
       unitOfMeasurement: "",
       pricePerUnit: 0,
-      brands: [],
+      //brands: [],
+      gst_rate:0,
+      hsn_code:""
+      
     },
   });
     const fetchBrand = async()=>{
@@ -94,7 +105,10 @@ const AssetForm = () => {
         category: assetData.category || "",
         unitOfMeasurement: assetData.unitOfMeasurement || "",
         pricePerUnit: assetData.pricePerUnit || 0,
-        brands: assetData.brands || [],
+        //brands: assetData.brands || [],
+        gst_rate:assetData.gst_rate,
+        hsn_code:assetData.hsn_code
+        
       });
     }
   }, [assetData, form]);
@@ -113,7 +127,9 @@ const AssetForm = () => {
             unitOfMeasurement: data.unit_of_measurement,
             created_at: data.created_at,
             updated_at: data.updated_at,
-            brands: data.brands || [], // assuming API sends array
+            //brands: data.brands || [], // assuming API sends array
+            gst_rate:data.gst_rate,
+            hsn_code:data.hsn_code
           };
           setAssetData(edited_data);
         } catch (err) {
@@ -134,7 +150,9 @@ const AssetForm = () => {
         category: values.category,
         price_per_unit: values.pricePerUnit,
         unit_of_measurement: values.unitOfMeasurement,
-        brand: values.brands.join(""),
+        //brand: values.brands.join(""),
+        gst_rate:values.gst_rate,
+        hsn_code:values.hsn_code
       };
 
       await assetAPI.updateAsset(id, updateStoreValues);
@@ -150,7 +168,9 @@ const AssetForm = () => {
         category: values.category,
         unitOfMeasurement: values.unitOfMeasurement,
         pricePerUnit: values.pricePerUnit,
-        brand: values.brands.join(""),
+        //brand: values.brands.join(""),
+        gst_rate:values.gst_rate,
+        hsn_code:values.hsn_code
       };
 
       const newlyCreated = await assetAPI.createAsset(newAsset);
@@ -265,7 +285,41 @@ const AssetForm = () => {
                 />
               </div>
 
-              <FormField
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="gst_rate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <h4>GST Rate<LabelMandatorySymbol /></h4>
+                      <FormControl>
+                        <Input placeholder="GST" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hsn_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <h4>HSN Code<LabelMandatorySymbol /></h4>
+                      <FormControl>
+                        <Input type="text" placeholder="HSN" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+
+
+
+              {/* <FormField
                 control={form.control}
                 name="brands"
                 render={({ field }) => (
@@ -283,7 +337,7 @@ const AssetForm = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </CardContent>
 
             <CardFooter className="flex justify-between">

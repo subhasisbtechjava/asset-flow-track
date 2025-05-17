@@ -29,7 +29,9 @@ export interface Asset {
   unitOfMeasurement: string;
   unit_of_measurement: string;
   pricePerUnit: number;
-  brands:string[]
+  //brands:string[];
+  gst_rate:number;
+  hsn_code:string;
 }
 
 export interface Changepass { 

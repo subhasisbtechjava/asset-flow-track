@@ -29,13 +29,15 @@ export const storeAPI = {
     assetId: string,
     quantity: number,
     price?: number,
-    vendor_id?:number,
+    vendor_id?:string,
     vendor_name?:string,
-    actual_price?:number
+    actual_price?:number,
+    gst_rate:number,
+    total_price_with_gst:number
   ) => {
     try {
       const body = {
-        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price }],
+        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price,gst_rate,total_price_with_gst }],
       };
       console.log('UUUUUUUUUUUUUUUUUUU');
       console.log(body.assets);
