@@ -11,6 +11,53 @@ const API_URL = import.meta.env.VITE_API_URL; // ADDED ON 30-04-2025//////
 // Store related endpoints
 export const storeAPI = {
 
+   getStoresMaster: async () => {
+    try {
+      //const response = await axios.get(`${API_URL}/stores`);
+      const response = await axios.get(`${API_URL}/store_master`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+      throw error;
+    }
+  },
+
+   getCityMaster: async () => {
+    try {
+      //const response = await axios.get(`${API_URL}/stores`);
+      const response = await axios.get(`${API_URL}/city_master`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching city:", error);
+      throw error;
+    }
+  },
+
+  getFormatMaster: async () => {
+    try {
+      //const response = await axios.get(`${API_URL}/stores`);
+      const response = await axios.get(`${API_URL}/format_master`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching format:", error);
+      throw error;
+    }
+  },
+
+
+
   getStoreDetailsAssetsByStoreId: async (storeId: string) => {
     try {
       const response = await axios.get(`${API_URL}/storeassets/${storeId}`,{

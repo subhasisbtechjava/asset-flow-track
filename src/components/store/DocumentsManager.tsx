@@ -123,7 +123,8 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
   };
 
   const handleAddDocument = async () => {
-    if (documentType == "grn"?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
+    //if( (documentType == "grn"?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
+    if ((documentType == "grn" || documentType == "po")?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
       toast({
         title: "Validation Error",
         description: `Please provide document number and attachment for the ${documentType.toUpperCase()}`,
@@ -349,7 +350,8 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
               </>
             )}
 
-           {documentType !== "grn" && <div>
+           {/* {documentType !== "grn" && <div> */}
+           {documentType !== "grn" && documentType !== "po" && <div>
               <Label htmlFor={`${documentType}-attachment`}>
                 Attachment <LabelMandatorySymbol />
               </Label>
@@ -370,7 +372,10 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
               </div>
             )}
 
-            <Button
+
+            {/* BELOW IS PREVIOUS DEVELOPEMENT */}
+
+            {/* <Button
               onClick={handleAddDocument}
               disabled={documentType == "grn"?(!newDocument.documentNumber)
 :                (!newDocument.documentNumber ||
@@ -381,7 +386,25 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
               className="w-full"
             >
               Add {documentType.toUpperCase()}
-            </Button>
+            </Button> */}
+
+
+            {/* BELOW IS NEW DEVELOPEMENT */}
+            <Button
+              onClick={handleAddDocument}
+              disabled={(documentType == "grn" || documentType == "po")?(!newDocument.documentNumber)
+:                (!newDocument.documentNumber ||
+                !newDocument.attachment ||
+                (documentType === "invoice" &&
+                  (!newDocument.documentDate || !newDocument.documentAmount)))
+              }
+              className="w-full"
+            >
+              Add {documentType.toUpperCase()}
+            </Button>  
+
+
+
           </div>
         </div>
       ) : (

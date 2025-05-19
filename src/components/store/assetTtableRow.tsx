@@ -196,14 +196,46 @@ const AssetTableRow = ({
 
             const formData = new FormData();
             formData.append("po_number", data.documentNumber);
-            formData.append("attachment", data?.attachment?.file);
+            //formData.append("attachment", data?.attachment?.file);
             onToggleStatusWithFormData(storeAsset.id, "po", formData);
           }}
         />
       </TableCell>
 
       {/* Invoice Number with file uploads and additional fields */}
-      <TableCell>
+
+     <TableCell>
+        <Button
+          size="sm"
+          className={
+            storeAsset.is_invoice_done ? "w-full bg-green-500" : "w-full"
+          }
+          variant={storeAsset.is_invoice_done ? "default" : "outline"}
+          onClick={() =>
+            onToggleStatus(
+              storeAsset.id,
+              "invoice_done",
+
+              {
+                ...existingBody,
+                invoice_val: storeAsset.is_invoice_done ? false : true,
+              }
+            )
+          }
+          disabled={isLoading}
+        >
+          {storeAsset.is_invoice_done ? (
+            <>
+              <Check className="mr-1 h-4 w-4" /> Done
+            </>
+          ) : (
+            "Not Done"
+          )}
+        </Button>
+      </TableCell>       
+
+        {/* BELOW IS PREVIOUS DEVELOPEMENT */}   
+      {/* <TableCell>
         <MultipleDocumentsPopover
        assetName={storeAsset?.assets_name}
           documentList={storeAsset?.invoice_details}
@@ -226,7 +258,7 @@ const AssetTableRow = ({
             onToggleStatusWithFormData(storeAsset.id, "invoice", formData);
           }}
         />
-      </TableCell>
+      </TableCell> */}
 
       {/* GRN Number */}
 

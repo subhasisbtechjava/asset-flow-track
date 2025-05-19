@@ -15,6 +15,7 @@ export interface Store {
   status: string;
   brand: string;
   city: string;
+  format: string;
   grn_progress: number;
   erp_progress: number;
   grnCompletionPercentage: number;
@@ -70,6 +71,7 @@ export interface StoreAsset {
   is_project_head_approved: boolean | null;
   is_audit_done: boolean;
   is_finance_booked: boolean;
+  is_invoice_done:boolean,
   assets_name:string;
   asset?: Asset;
   invoice_details?: [];

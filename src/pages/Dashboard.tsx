@@ -281,6 +281,7 @@ try{
                       <th className="py-3 px-4 text-left text-sm font-medium">Store Name</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">Brand</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">City</th>
+                      <th className="py-3 px-4 text-left text-sm font-medium">Format</th>
                       {/* <th className="py-3 px-4 text-left text-sm font-medium">Status</th> */}
                       <th className="py-3 px-4 text-left text-sm font-medium">GRN Progress</th>
                       <th className="py-3 px-4 text-left text-sm font-medium">ERP Progress</th>
@@ -306,6 +307,9 @@ try{
                               <Badge variant="outline">{store.brand}</Badge>
                             </td>
                             <td className="py-3 px-4 text-sm">{store.city}</td>
+                            
+                            <td className="py-3 px-4 text-sm">{store.format}</td>
+
                             {/* <td className="py-3 px-4 text-sm">{store.status}</td> */}
                             <td className="py-3 px-4 min-w-[160px]">
   

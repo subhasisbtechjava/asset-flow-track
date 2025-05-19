@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useRef} from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ChevronRight, Search, Plus, Trash2, Edit, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,20 @@ const StoreAddAssets = () => {
       console.error("Failed to fetch vendors", error);
     }
   };
+
+  const inputRef = useRef(null);
+  useEffect(() => {
+  if (inputRef.current) {
+    setTimeout(() => inputRef.current.focus(), 0);
+  }
+}, [searchTerm]);
+
+const inputRef2 = useRef(null);
+ useEffect(() => {
+  if (inputRef2.current) {
+    setTimeout(() => inputRef2.current.focus(), 0);
+  }
+}, [searchVendor]);
 
 
 
@@ -471,6 +485,7 @@ useEffect(()=>{
       type="text"
       placeholder="Search asset..."
       value={searchTerm}
+      ref={inputRef}
       onChange={(e) => setSearchTerm(e.target.value)}
       className="w-full p-2 border rounded"
     />
@@ -538,6 +553,7 @@ useEffect(()=>{
                   type="text"
                   placeholder="Search vendor..."
                   value={searchVendor}
+                  ref={inputRef2}
                   onChange={(e) => setSearchVendor(e.target.value)}
                   className="w-full p-2 border rounded"
                   />
@@ -561,12 +577,12 @@ useEffect(()=>{
 
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-1 block">             
-                Actaul Price (₹)
+                Actual Price (₹)
               </label>
               <Input
-                type="text"                   
+                type="number"                   
                 value={selectedActualAssetPrice}           
-                placeholder="Actaul price"
+                placeholder="Actual price"
                 onChange={(e) => setSelectedActualAssetPrice(+e.target.value)}
               />
             </div>
