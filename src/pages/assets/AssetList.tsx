@@ -168,7 +168,7 @@ const AssetList = () => {
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Unit</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Price</th>
                             {/* <th scope="col" className="px-4 py-3 text-left text-sm font-medium">Brand</th> */}
-                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">GST Rate</th>
+                            <th scope="col" className="px-4 py-3 text-left text-sm font-medium">GST (%)</th>
                             <th scope="col" className="px-4 py-3 text-left text-sm font-medium">HSN Code</th>
                             <th scope="col" className="px-4 py-3 text-right text-sm font-medium">Actions</th>
                           </tr>
@@ -219,7 +219,7 @@ const AssetList = () => {
 </td> */}
 
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
-                             {asset.gst_rate ? `${asset.gst_rate} %` : ''}
+                             {asset.gst_rate ? `${asset.gst_rate}` : ''}
                               </td>
 
                               <td className="px-4 py-3 whitespace-nowrap text-sm">

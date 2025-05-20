@@ -275,7 +275,7 @@ const AssetForm = () => {
                   name="pricePerUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <h4>Price per Unit (₹)<LabelMandatorySymbol /></h4>
+                      <h4>Price / Unit (in ₹)<LabelMandatorySymbol /></h4>
                       <FormControl>
                         <Input type="number" placeholder="0.00" step="0.01" min="0" {...field} />
                       </FormControl>
@@ -292,7 +292,7 @@ const AssetForm = () => {
                   name="gst_rate"
                   render={({ field }) => (
                     <FormItem>
-                      <h4>GST Rate<LabelMandatorySymbol /></h4>
+                      <h4>GST (%)<LabelMandatorySymbol /></h4>
                       <FormControl>
                         <Input placeholder="GST" {...field} />
                       </FormControl>
