@@ -660,7 +660,7 @@ useEffect(()=>{
                       Actual Price
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
-                      GST
+                      GST (%)
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
                       Quantity
@@ -762,7 +762,7 @@ useEffect(()=>{
 
 
                           <td className="py-3 px-4 text-sm">
-                              {asset.gst_rate ? `${asset.gst_rate} %` : ''}
+                              {asset.gst_rate ? `${asset.gst_rate}` : ''}
                           </td>     
 
 
