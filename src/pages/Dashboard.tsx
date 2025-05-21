@@ -326,8 +326,7 @@ try{
                               />
                             </td>
                             <td className="py-3 px-4">
-                              {store.status== "in_progress"&&(
-                                    <>
+                              
                               <DropdownMenu >
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm">
@@ -342,18 +341,21 @@ try{
                                     <Link to={`/stores/${store.id}`}>View Details</Link>
                                   </DropdownMenuItem>
 
-                                  <DropdownMenuItem asChild>
+                                  {store.status== "in_progress"&&
+                                    <>
+                                    <DropdownMenuItem asChild>
                                     <Link to={`/stores/edit/${store.id}`}>Edit</Link>
                                   </DropdownMenuItem>
                                 
                                 
-                                {store.status== "in_progress"&&<DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
+                                <DropdownMenuItem  onClick={() => handleStoreMarkAsComplete(store.id)}>
                                     Mark as Complete
-                                  </DropdownMenuItem>}  
+                                  </DropdownMenuItem>
+                                  </>
+                                  }  
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                                </>
-                                  )}
+                                
                             </td>
                           </tr>
                         );
