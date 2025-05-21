@@ -60,11 +60,9 @@ const StoreLayoutPopUp = () => {
     document.body.removeChild(link);
   };
 
-  const handleRemoveFile = () => {
-    if (!uploadedFile) return;
-    // Revoke the object URL to prevent memory leaks
-    URL.revokeObjectURL(uploadedFile.url);
-    setUploadedFile(null);
+  const handleDeleteLayout = async(storeid,fileid) => {  
+    const deletelayout = await storeAPI.deleteStorelayout(storeid,fileid); 
+    setIsUploadDone(true);
   };
 
   const uploadFileToAPI = async () => {
@@ -187,14 +185,14 @@ const StoreLayoutPopUp = () => {
               >
           <Download className="w-4 h-4" />
         </button>
-        <button
-          onClick={() => handleDeleteLayout(dtls.uploadId)} // You'll need to implement this
+        {/* <button
+          onClick={() => handleDeleteLayout(id,dtls.uploadId)} // You'll need to implement this
           className="p-2 text-red-600 hover:text-red-800"
           title="Remove"
           disabled={isUploading}
         >
           <X className="w-4 h-4" />
-        </button>
+        </button> */}
       </div>
     </div>
   ))

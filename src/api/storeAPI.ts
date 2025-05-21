@@ -272,7 +272,19 @@ export const storeAPI = {
   },
 
 
-
+  deleteStorelayout: async (storeid,id) => {
+    try {
+      const response = await axios.get(`${API_URL}/store/deletelayout/${storeid}/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting store ${id}:`, error);
+      throw error;
+    }
+  },
 
 
 
