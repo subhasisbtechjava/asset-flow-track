@@ -29,6 +29,8 @@ import { storeAPI } from "@/api/storeAPI";
 import Loader from '../../components/loader/Loader';
 import { useLoadertime } from "../../contexts/loadertimeContext";
 
+import StoreLayoutPopUp from '../../components/popup/StoreLayoutPopUp';
+
 const StoreDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -312,6 +314,7 @@ const StoreDetail = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <StoreLayoutPopUp></StoreLayoutPopUp>
         <Button
             variant="default"
             onClick={() => navigate(`/stores/${id}/add-assets`)}

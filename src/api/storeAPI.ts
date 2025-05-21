@@ -252,6 +252,44 @@ export const storeAPI = {
       throw error;
     }
   },
+
+
+
+  createStoreLayout: async (id: string,layOutData: FormData) => {
+    try {
+      console.log('+++++++++++++++++++++++');
+      console.log(layOutData);
+      const response = await axios.post(`${API_URL}/store/layoutupload/${id}`, layOutData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating asset:", error);
+      throw error;
+    }
+  },
+
+
+  deleteStorelayout: async (storeid,id) => {
+    try {
+      const response = await axios.get(`${API_URL}/store/deletelayout/${storeid}/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting store ${id}:`, error);
+      throw error;
+    }
+  },
+
+
+
+
+
 };
 
 // Asset related endpoints
