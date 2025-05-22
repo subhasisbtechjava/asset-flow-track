@@ -313,7 +313,8 @@ const StoreDetail = () => {
             <span className="text-sm text-muted-foreground">{store.city}</span>
           </div>
         </div>
-        <div className="flex gap-2">
+        {store.status == 'in_progress' &&
+        (<div className="flex gap-2">
           <StoreLayoutPopUp></StoreLayoutPopUp>
         <Button
             variant="default"
@@ -328,7 +329,7 @@ const StoreDetail = () => {
               Edit
             </Link>
           </Button>
-        </div>
+        </div>)}
       </div>
 
       {/* <StoreSummaryCards

@@ -3,6 +3,8 @@ import { Plus, X, Download, Upload } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { storeAPI } from "@/api/storeAPI";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { downloadFile } from "@/utility/download";
+
 const StoreLayoutPopUp = () => {
   const { id } = useParams();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -54,6 +56,7 @@ const StoreLayoutPopUp = () => {
   const handleDownload = (url:string,filename:string) => {    
     const link = document.createElement('a');
     link.href = url;
+    link.target = '_blank';
     link.download = filename || 'download';;
     document.body.appendChild(link);
     link.click();
@@ -179,6 +182,9 @@ const StoreLayoutPopUp = () => {
                     dtls.layout_attachment_url.split('/').pop()
                   )
                 }
+
+                //onClick={() => downloadFile (dtls.layout_attachment_url)}
+
                 className="p-2 text-blue-600 hover:text-blue-800"
                 title="Download"
                 disabled={isUploading}
@@ -215,7 +221,7 @@ const StoreLayoutPopUp = () => {
                 onClick={uploadFileToAPI}
                 disabled={!uploadedFile || isUploading}
               >
-                {isUploading ? 'Uploading...' : 'Upload to Server'}
+                {isUploading ? 'Uploading...' : 'Upload'}
               </Button>
             </div>
           </div>
