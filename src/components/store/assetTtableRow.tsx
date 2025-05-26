@@ -10,6 +10,7 @@ import {
   Plus,
   Upload,
   X,
+  MoreHorizontal
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
@@ -67,6 +68,18 @@ interface AssetTableRow {
   onInputChange: (value: string) => void;
   onSaveDocument: () => void;
 }
+
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+
+import HistoryLogPopUp from '../../components/historylog/HistoryLogPopUp';
+
 const AssetTableRow = ({
   storeId,
   storeAsset,
@@ -399,6 +412,11 @@ data?.documentNumber,
           )}
         </Button>
       </TableCell>
+
+        <TableCell>
+       <HistoryLogPopUp storeassetId={storeAsset.id}></HistoryLogPopUp>
+        </TableCell>    
+
     </TableRow>
   );
 };

@@ -286,10 +286,6 @@ export const storeAPI = {
     }
   },
 
-
-
-
-
 };
 
 // Asset related endpoints
@@ -370,6 +366,56 @@ export const assetAPI = {
       throw error;
     }
   },
+
+
+
+  getAssetHistoryById: async (id: number) => {
+    try {
+      const response = await axios.get(`${API_URL}/assetshistory/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching asset history ${id}:`, error);
+      throw error;
+    }
+  },
+
+
+  getVendorDeatisByAssignAssets: async (id: number) => {
+    try {
+      const response = await axios.get(`${API_URL}/vendorwise/poinvoice/${id}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add auth token
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching asset history ${id}:`, error);
+      throw error;
+    }
+  },
+
+
+    assetsPoInvoiceUpdateWithFormData: async (id: number,updateParam:string,body:FormData) => {
+    try {
+      const response = await axios.post(`${API_URL}/vendorwise/poinvoice/update/${updateParam}/${id}`,body, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching store ${id}:`, error);
+      throw error;
+    }
+  }
+
+
+
+
 };
 
 // Store assets related endpoints
