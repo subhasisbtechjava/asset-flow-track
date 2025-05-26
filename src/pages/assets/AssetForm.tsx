@@ -155,11 +155,21 @@ const AssetForm = () => {
         hsn_code:values.hsn_code
       };
 
-      await assetAPI.updateAsset(id, updateStoreValues);
-      toast({
-        title: "Asset updated",
-        description: `${values.name} has been updated successfully.`,
-      });
+      //await assetAPI.updateAsset(id, updateStoreValues);
+      const updateAssets =  await assetAPI.updateAsset(id, updateStoreValues);
+      if(updateAssets.message == 'Assets code already exists'){
+        toast({
+          title: "Assets Error",
+          description: updateAssets.message,
+          variant: "destructive",
+        })
+      }else{
+        toast({
+          title: "Asset updated",
+          description: `${values.name} has been updated successfully.`,
+        });
+      }
+     
     } else {
       const newAsset  = {
         id: generateId(),
@@ -263,7 +273,11 @@ const AssetForm = () => {
                     <FormItem>
                       <h4>Unit of Measurement<LabelMandatorySymbol /></h4>
                       <FormControl>
-                        <Input placeholder="pcs" {...field} />
+                        <Input placeholder="pcs" {...field} onChange={(e) => {
+              // Remove any numbers from the input
+              const value = e.target.value.replace(/[0-9]/g, '');
+              field.onChange(value);
+            }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -294,7 +308,15 @@ const AssetForm = () => {
                     <FormItem>
                       <h4>GST (%)<LabelMandatorySymbol /></h4>
                       <FormControl>
-                        <Input placeholder="GST" {...field} />
+                        <Input placeholder="GST" {...field} onChange={(e) => {
+            // Allow only numbers and a single decimal point
+            const value = e.target.value.replace(/[^0-9.]/g, '');
+            // Ensure only one decimal point
+            const decimalCount = (value.match(/\./g) || []).length;
+            if (decimalCount <= 1) {
+              field.onChange(value);
+            }
+          }}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
