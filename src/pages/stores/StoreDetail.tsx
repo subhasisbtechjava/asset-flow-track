@@ -25,11 +25,19 @@ import { StoreAssetsTable } from "@/components/store/StoreAssetsTable";
 import EnhancedStoreAssetsTable from "@/components/store/EnhancedStoreAssetsTable";
 import { StoreAsset } from "@/types";
 import { storeAPI } from "@/api/storeAPI";
+import { assetAPI } from "@/api/storeAPI";
 
 import Loader from '../../components/loader/Loader';
 import { useLoadertime } from "../../contexts/loadertimeContext";
 
 import StoreLayoutPopUp from '../../components/popup/StoreLayoutPopUp';
+
+import  SupplierMultipleDocumentsPopover  from "../../components/store/SupplierMultipleDocumentsPopover";
+
+
+// --- START OF NEW IMPORT FOR TABS ---
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// --- END OF NEW IMPORT ---
 
 const StoreDetail = () => {
   const { id } = useParams();
@@ -38,7 +46,7 @@ const StoreDetail = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [storeAssetsList, setStoreAssetsList] = useState<StoreAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
-    const [useEnhancedTable, setUseEnhancedTable] = useState(true);
+  const [useEnhancedTable, setUseEnhancedTable] = useState(true);
   const [documentType, setDocumentType] = useState<
     "po" | "invoice" | "grn" | null
   >(null);
@@ -47,7 +55,6 @@ const StoreDetail = () => {
   const [loading, setLoading] = useState(false);
   const loadintime = useLoadertime();
   const [searchTerm, setSearchTerm] = useState("");
- 
   
   // Fetch store details
   const [storedata, setStore] = useState(null);
@@ -57,12 +64,8 @@ const StoreDetail = () => {
   // Fetch store assets
   const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
 
-  // -----------------------------
   const highProgressValue = 140;
 
-  //console.log("Loader time:", useLoadertime());
-
-  // -------------------------
   useEffect(() => {
     setLoading(true)
     if (id) {
@@ -72,67 +75,42 @@ const StoreDetail = () => {
     
   }, []);
 
-
-
   function initialService() {
     fetchStoreDetails();
     fetchStoreAssets();
+    fetchVendorInvoiceDetails();
   }
+
+  const [vendorInvoiceDetails, setVendorInvoiceDetails] = useState([]);
+   async function fetchVendorInvoiceDetails() {
+    const vendorInvoice = await assetAPI.getVendorDeatisByAssignAssets(id);
+    //console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIII");
+    //console.log("vendorInvoiceDetails: ", vendorInvoice);
+    //console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIII");
+    setVendorInvoiceDetails(vendorInvoice);
+  }
+
+
+
+
+
+
   async function fetchStoreDetails() {
     const storeDetails = await storeAPI.getStoreById(id);
     console.log("====================================");
     console.log("storeDetails: ", storeDetails);
-
     console.log("====================================");
     setStore(storeDetails);
-    // setStore({
-    //   id: id,
-    //   name: "Acropolis",
-    //   code: "KOL246",
-    //   brand: "Wow! Kulfi",
-    //   city: "Kolkata",
-    //   grnCompletionPercentage: 100,
-    //   financeBookingPercentage: 80,
-    // });
   }
   async function fetchStoreAssets() {
-      
     const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
     setStoreAssetsList(assets);
-
     console.log("storeAssetsList: ", storeAssetsList);
-      setTimeout(() => {
-          setLoading(false)
-      }, loadintime);  
-    
+    setTimeout(() => {
+      setLoading(false)
+    }, loadintime);  
   }
-  //  async function fetchStoreAssets() {
-  //   const assets = await getStoreAssetsByStoreId(id);
-  //   setStoreAssetsList(assets);
-  //  }
-  // async function fetchStoreAssetss() {
-  //   const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-  //   console.log("assets: ", assets);
-  //   // setStoreAssetsList(assets);
-  // }
-  
-  // if (!store) {
-  //   return (
-  //     <div className="flex items-center justify-center h-[60vh]">
-  //       <div className="text-center">
-  //         <h2 className="text-2xl font-bold mb-2">Store Not Found</h2>
-  //         <p className="text-muted-foreground mb-4">
-  //           The store you're looking for doesn't exist or has been removed.
-  //         </p>
-  //         <Button asChild>
-  //           <Link to="/">Back to Dashboard</Link>
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
-  // Handle delete store
   const handleDeleteStore = () => {
     setIsDeleting(true);
     setTimeout(() => {
@@ -145,18 +123,12 @@ const StoreDetail = () => {
     }, 1000);
   };
 
-  // Filter assets based on search term
   const filteredAssets = storeAssetsList.filter(
     (asset) =>
       asset?.assets_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    // ||
-    // asset.asset?.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate summary statistics
   const totalAssets = storeAssetsList.length;
-
-  // ---------------------------
 
   const highProgressStores = filteredAssets.filter((store) => {
     const grnCompletionPercentage =
@@ -171,8 +143,6 @@ const StoreDetail = () => {
 
   const lowProgressStores = totalAssets - highProgressStores.length;
 
-  // ---------------------------
-
   const assetsInProgress = storeAssetsList.filter(
     (sa) => sa.poNumber && (!sa.isGrnDone || !sa.isFinanceBooked)
   ).length;
@@ -180,7 +150,6 @@ const StoreDetail = () => {
     (sa) => sa.isGrnDone && sa.isFinanceBooked
   ).length;
 
-  // Handle document dialog
   const openDocumentDialog = (
     assetId: string,
     type: "po" | "invoice" | "grn"
@@ -201,7 +170,6 @@ const StoreDetail = () => {
     setInputValue("");
   };
 
-  // Save document number
   const saveDocumentNumber = () => {
     if (!selectedAsset || !documentType || !inputValue) return;
 
@@ -234,7 +202,6 @@ const StoreDetail = () => {
     }, 800);
   };
 
-  // Toggle status
   const toggleStatus = async (assetId: string, updateParam: string, body) => {
     setIsLoading(true);
 
@@ -267,7 +234,6 @@ const StoreDetail = () => {
         body
       );
       console.log('====================================');
-  
       console.log('res: ', res);
       console.log('====================================');
       fetchStoreAssets();
@@ -289,6 +255,53 @@ const StoreDetail = () => {
   const erpCompletionPercentage = filteredAssets.filter((asset) => {
     return asset.is_finance_booked != null && asset.is_finance_booked != false;
   });
+
+  // --- START OF NEW MOCK DATA FOR INVOICE DETAILS ---
+  const invoiceDetails = [
+    {
+      vendor_name: "Supplier A",
+      actual_price: 5000,
+      total_po_amount: 4800,
+      uploadPO: "Not Uploaded",
+      total_invoice_amount: "Not Uploaded",
+    },    
+  ];
+  // --- END OF NEW MOCK DATA ---
+
+
+
+    const toggleSupplierPoInvoiceFormData = async (
+    dataId: number,
+    updateParam: string,
+    body: FormData
+  ) => {
+    try {
+      setIsLoading(true);
+
+      const res = await assetAPI.assetsPoInvoiceUpdateWithFormData(
+        dataId,
+        updateParam,
+        body
+      );
+      console.log('====================================');
+      console.log('after form submit podata: ', res);
+      console.log('====================================');
+      fetchVendorInvoiceDetails();
+
+      toast({
+        title: "Status updated",
+        description: "Vendor PO and Invoice has been updated successfully.",
+      });
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+
+
   return (
     <>
      <Loader loading={loading} />
@@ -307,7 +320,6 @@ const StoreDetail = () => {
           </div>
           <h1 className="text-3xl font-bold mt-1">{store.name}</h1>
           <div className="flex items-center gap-2 mt-1">
-            {/* <Badge>{store.brand}</Badge> */}
             <Badge>{store.brandname}</Badge>
             <Badge variant="outline">{store.code}</Badge>
             <span className="text-sm text-muted-foreground">{store.city}</span>
@@ -332,12 +344,6 @@ const StoreDetail = () => {
         </div>)}
       </div>
 
-      {/* <StoreSummaryCards
-        totalAssets={totalAssets}
-        assetsInProgress={assetsInProgress}
-        assetsCompleted={assetsCompleted}
-      /> */}
-
       <StoreProgressCards
         grnCompletionPercentage={
           grnCompletionPercentage.length > 0
@@ -351,34 +357,106 @@ const StoreDetail = () => {
         }
       />
 
-      <div className="mb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search assets by name or code..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+      {/* --- START OF NEW TABS IMPLEMENTATION --- */}
+      <Tabs defaultValue="store-details" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="store-details" >Store Details</TabsTrigger>
+          <TabsTrigger value="invoice-details" >Invoice Details</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="store-details">
+          <div className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search assets by name or code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          <StoreAssetsTable
+            storeId={store.id}
+            storeAssets={filteredAssets}
+            storeStatus={store.status}
+            isLoading={isLoading}
+            onToggleStatus={toggleStatus}
+            onToggleStatusWithFormData={toggleStatusWithFormData}
+            onDocumentDialogOpen={openDocumentDialog}
+            onInputChange={setInputValue}
+            onSaveDocument={saveDocumentNumber}
           />
-        </div>
-      </div>
-      {/* <EnhancedStoreAssetsTable
-          storeId={store.id}
-          storeAssets={filteredAssets}
-          isLoading={isLoading}
-          onToggleStatus={toggleStatus}
-          onRefresh={fetchStoreAssets}
-        /> */}
-      <StoreAssetsTable
-        storeId={store.id}
-        storeAssets={filteredAssets}
-        isLoading={isLoading}
-        onToggleStatus={toggleStatus}
-        onToggleStatusWithFormData={toggleStatusWithFormData}
-        onDocumentDialogOpen={openDocumentDialog}
-        onInputChange={setInputValue}
-        onSaveDocument={saveDocumentNumber}
-      />
+        </TabsContent>
+
+       <TabsContent value="invoice-details">
+  {/* <div className="border rounded-lg shadow-sm bg-white overflow-x-auto"> */}
+    <div className="border rounded-lg shadow-sm bg-white overflow-x-auto overflow-y-auto max-h-[400px]">
+    <table className="w-full text-sm min-w-max">
+      <thead className="sticky top-0 bg-white z-10">
+        <tr className="border-b border-gray-200">
+          <th className="p-2 text-left font-semibold text-gray-700">Supplier Name</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Total Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">PO Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Invoice Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Upload PO</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Upload Invoice</th>
+        </tr>
+      </thead>
+      <tbody>
+        {vendorInvoiceDetails.map((invoice, index) => (
+          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+            <td className="p-2 text-gray-600">{invoice.vendor_name}</td>
+            <td className="p-2 text-gray-600">{invoice.actual_price}</td>
+            <td className="p-2 text-gray-600">{invoice.total_po_amount}</td>
+            <td className="p-2 text-gray-600">{invoice.total_invoice_amount}</td>
+            <td className="p-2">
+              <SupplierMultipleDocumentsPopover              
+                documentList={invoice?.po_details}              
+                documentType="po"
+                documentCount={invoice?.po_details?.length}
+                hasDocuments={invoice?.po_details?.length > 0}
+                onUpdate={(data) => {
+                  console.log("workingpodata: ", data);
+                  const isoString = data.documentDate;
+                  const dateOnly = new Date(isoString).toISOString().split("T")[0];
+                  const formData = new FormData();
+                  formData.append("po_number", data.documentNumber);
+                  formData.append("po_date", dateOnly);
+                  formData.append("po_amount", data.documentAmount);
+                  formData.append("attachment", data?.attachment?.file);
+                  toggleSupplierPoInvoiceFormData(invoice.id, "po", formData);
+                }}
+              />
+            </td>
+            <td className="p-2">
+              <SupplierMultipleDocumentsPopover
+               
+               documentList={invoice?.invoice_details}              
+                documentType="invoice"
+                documentCount={invoice?.invoice_details?.length}
+                hasDocuments={invoice?.invoice_details?.length > 0}                
+                onUpdate={(data) => {
+                  console.log("data: ", data);
+                  const isoString = data.documentDate;
+                  const dateOnly = new Date(isoString).toISOString().split("T")[0];
+                  const formData = new FormData();
+                  formData.append("invoice_no", data.documentNumber);
+                  formData.append("invoice_date", dateOnly);
+                  formData.append("invoice_amount", data.documentAmount);
+                  formData.append("attachment", data?.attachment?.file);
+                  toggleSupplierPoInvoiceFormData(invoice.id, "invoice", formData);
+                }}
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</TabsContent>
+      </Tabs>
+      {/* --- END OF NEW TABS IMPLEMENTATION --- */}
 
       <DocumentEntryDialog
         isOpen={!!selectedAsset && !!documentType}

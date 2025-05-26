@@ -44,6 +44,7 @@ import AssetTableRow from "./assetTtableRow";
 interface StoreAssetsTableProps {
   storeId: string;
   storeAssets: StoreAsset[];
+  storeStatus:string;
   isLoading: boolean;
   onToggleStatus;
   onToggleStatusWithFormData,
@@ -64,6 +65,7 @@ interface FileUpload {
 export const StoreAssetsTable = ({
   storeId,
   storeAssets,
+  storeStatus,
   isLoading,
   onToggleStatus,
   onToggleStatusWithFormData,
@@ -187,6 +189,7 @@ export const StoreAssetsTable = ({
                   <TableHead className="w-[100px]">Approval</TableHead>
                   <TableHead className="w-[100px]">Audit</TableHead>
                   <TableHead className="w-[100px]">Booking</TableHead>
+                  <TableHead className="w-[100px]">History</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,7 +226,9 @@ export const StoreAssetsTable = ({
                   <TableRow>
                     <TableCell colSpan={9} className="h-24 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">
-                        <AlertTriangle className="h-8 w-8 mb-2" />
+                        {storeStatus == 'in_progress'&&(
+                          <>
+                        <AlertTriangle className="h-8 w-8 mb-2" />                        
                         <p>No assets found for this store</p>
                         <Button
                           variant="outline"
@@ -236,6 +241,8 @@ export const StoreAssetsTable = ({
                           <Package className="mr-2 h-4 w-4" />
                           Assign Assets
                         </Button>
+                        </>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
