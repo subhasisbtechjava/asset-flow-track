@@ -266,7 +266,7 @@ const VendorForm = () => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => navigate("/manage-brands")}
+                onClick={() => navigate("/manage-vendors")}
               >
                 Cancel
               </Button>

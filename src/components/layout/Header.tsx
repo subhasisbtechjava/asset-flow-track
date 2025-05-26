@@ -24,9 +24,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useLoadertime } from "@/contexts/loadertimeContext";
+import Loader from '../loader/Loader';
+
+
+
 export function Header() {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const [loading, setLoading] = useState(false);
+  const loadintime = useLoadertime();
   const navigate = useNavigate();
   const location = useLocation();
   const getInitials = (name: string) => {
@@ -38,10 +45,16 @@ export function Header() {
   };
 
   function onBack() {
+    setLoading(true);
     navigate(-1);
+   setTimeout(() => {
+      setLoading(false)
+    }, loadintime);
   }
   return (
+    
     <header className="border-b bg-card shadow-sm animate-fade-in flex items-center justify-center " >
+       <Loader loading={loading} />
       {location.pathname!="/stores"&& <ChevronLeft size={"35"} style={{marginLeft:"20px",cursor: "pointer"}} onClick={() => onBack()} />}
           <Link style={{marginLeft:"20px"}} to="/" >
             <div className="flex">
