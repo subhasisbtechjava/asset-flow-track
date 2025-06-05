@@ -1,7 +1,7 @@
 
 import { useState,useEffect } from "react";
 import { Link ,useNavigate} from "react-router-dom";
-import { Plus, Search, FileEdit, Trash2 } from "lucide-react";
+import { Plus, Search, FileEdit, Trash2,Download,Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -36,12 +36,18 @@ import { toast } from "@/components/ui/use-toast";
 
 import Loader from '../../components/loader/Loader';
 
+import ExportCSV from '../../components/exportfile/ExportCSV';
+import ImportFile from '../../components/importfile/ImportFile';
+
 const AssetList = () => {
   let pagedata = [];
   const [filteredAssets, setAssets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  const [uploadFinish,setUploadFinish] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,13 +56,19 @@ const AssetList = () => {
           const allAssets = await assetAPI.getAllAssets();    
           //console.log(allAssets);         
           setAssets(allAssets);
+          setUploadFinish("");
         } catch (error) {
           console.error("Failed to fetch stores", error);
         }
       };
     
       fetchAssets();
-    }, [deletingId]);
+    }, [deletingId,uploadFinish]);
+
+
+    const completeUpload=()=>{     
+          setUploadFinish("done");
+    }
 
 
     useEffect(() => {
@@ -118,19 +130,39 @@ const AssetList = () => {
     <Loader loading={loading} />
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Assets</h1>
-          <p className="text-muted-foreground">
-            Manage your asset master list
-          </p>
-        </div>
-        <Button asChild>
-          <Link to="/assets/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add New Asset
-          </Link>
-        </Button>
-      </div>
+  <div>
+    <h1 className="text-3xl font-bold">Assets</h1>
+    <p className="text-muted-foreground">
+      Manage your asset master list
+    </p>
+  </div>
+  
+  <div className="flex gap-2">
+    {/* Export Button */}
+    {/* <Button variant="outline">
+      <Download className="mr-2 h-4 w-4" />
+      Export
+    </Button> */}
+
+     <ExportCSV data={filteredAssets} fileName="assets_master.csv" />  
+
+    {/* Import Button */}
+    {/* <Button variant="outline">
+      <Upload className="mr-2 h-4 w-4" />
+      Import
+    </Button> */}
+
+    <ImportFile onupload={completeUpload}/>
+
+    {/* Existing "Add New Asset" Button (Primary) */}
+    <Button asChild>
+      <Link to="/assets/new">
+        <Plus className="mr-2 h-4 w-4" />
+        Add New Asset
+      </Link>
+    </Button>
+  </div>
+</div>
 
       <Card>
         <CardHeader className="pb-3">
@@ -179,7 +211,7 @@ const AssetList = () => {
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 <Badge variant="outline">{asset.code}</Badge>
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{asset.name}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{asset.name.toUpperCase()}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">{asset.unit_of_measurement}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-sm">
                                 <span>&#8377;</span>{asset.price_per_unit}

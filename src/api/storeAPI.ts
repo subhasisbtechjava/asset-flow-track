@@ -411,7 +411,26 @@ export const assetAPI = {
       console.error(`Error fetching store ${id}:`, error);
       throw error;
     }
-  }
+  },
+
+
+  uploadAssets: async (uploadData: FormData) => {
+    try {
+      console.log('+++++++++++++++++++++++');
+      //console.log(uploadData);
+      const response = await axios.post(`${API_URL}/assets/upload`, uploadData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating asset:", error);
+      throw error;
+    }
+  },
+
+
 
 
 
