@@ -14,11 +14,7 @@ import SupplierDocumentsManager from "./SupplierDocumentsManager";
 import { storeAPI } from "@/api/storeAPI";
 
 interface SupplierMultipleDocumentsPopoverProps {
-   documentType: "po" | "invoice" | "grn";
-  updatedPo :string; 
-  updatePoDate:string;
-  updatePoAttchment:string;
-  updatedGrn:string;
+   documentType: "po" | "invoice";
   documentCount: number;
   hasDocuments: boolean;
   documentList;
@@ -27,10 +23,6 @@ interface SupplierMultipleDocumentsPopoverProps {
 }
 
 const SupplierMultipleDocumentsPopover: React.FC<SupplierMultipleDocumentsPopoverProps> = ({
-  updatedPo,
-  updatePoDate,
-  updatePoAttchment,
-  updatedGrn,
   documentType,
   documentList,
   documentCount: initialDocumentCount,
@@ -63,8 +55,6 @@ const SupplierMultipleDocumentsPopover: React.FC<SupplierMultipleDocumentsPopove
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-
-      {documentType=="invoice" && (
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
@@ -76,7 +66,7 @@ const SupplierMultipleDocumentsPopover: React.FC<SupplierMultipleDocumentsPopove
               {documentList?.length > 1 ? `${documentList?.length } Added` : "Done"}{" "}
             </Button>
           </PopoverTrigger>
-        </TooltipTrigger>    
+        </TooltipTrigger>
         <TooltipContent>
           {documentList?.length>0 
             ? `${documentList?.length} ${documentType.toUpperCase()}${
@@ -85,49 +75,6 @@ const SupplierMultipleDocumentsPopover: React.FC<SupplierMultipleDocumentsPopove
             : `Click to add ${documentType.toUpperCase()}`}
         </TooltipContent>
       </Tooltip>
-      )}
-
-      {documentType=="po" && (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger asChild>
-            <Button
-              variant={updatePoAttchment  ? "default" : "outline"}
-              size="sm"
-              className={updatePoAttchment  ? "w-full bg-green-500" : "w-full "}
-            >
-              {(updatePoAttchment != '' && updatePoAttchment != undefined) ? `PO Details Updated` : "Done"}{" "}
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>    
-        <TooltipContent>
-          {(updatePoAttchment != '' && updatePoAttchment != undefined) ? `PO Updated` 
-            : `Click to add ${documentType.toUpperCase()}`}
-        </TooltipContent>
-      </Tooltip>
-      )}
-
-      {documentType=="grn" && (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger asChild>
-            <Button
-              variant={updatedGrn  ? "default" : "outline"}
-              size="sm"
-              className={updatedGrn  ? "w-full bg-green-500" : "w-full "}
-            >
-              {(updatedGrn != '' && updatedGrn != undefined) ? `GRN Updated` : "Done"}{" "}
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>    
-        <TooltipContent>
-          {(updatedGrn != '' && updatedGrn != undefined) ? `GRN Updated` 
-            : `Click to add ${documentType.toUpperCase()}`}
-        </TooltipContent>
-      </Tooltip>
-      )}
-
-
       <PopoverContent className="w-96 p-4">
         <div className="space-y-4">
           <h4 className="font-medium text-lg capitalize">
@@ -137,10 +84,6 @@ const SupplierMultipleDocumentsPopover: React.FC<SupplierMultipleDocumentsPopove
           <SupplierDocumentsManager
             documentCount={documentList?.length}
             documentList={documentList}
-            updatedPo ={updatedPo}
-            updatePoDate = {updatePoDate}
-            updatePoAttchment = {updatePoAttchment}
-            updatedGrn = {updatedGrn}
             hasDocuments={documentList?.length>0 }           
             documentType={documentType}
             onUpdate={handleUpdate}

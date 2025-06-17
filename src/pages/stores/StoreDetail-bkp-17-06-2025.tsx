@@ -39,10 +39,6 @@ import  SupplierMultipleDocumentsPopover  from "../../components/store/SupplierM
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // --- END OF NEW IMPORT ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { stringify } from "querystring";
-
-
 const StoreDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -59,17 +55,11 @@ const StoreDetail = () => {
   const [loading, setLoading] = useState(false);
   const loadintime = useLoadertime();
   const [searchTerm, setSearchTerm] = useState("");
-
-  const [activity, setActivity] = useState("");
   
   // Fetch store details
   const [storedata, setStore] = useState(null);
 
   const store = (storedata) ? storedata :[];
-
-
-  const [activeTab, setActiveTab] = useState("store-details");
-
 
   // Fetch store assets
   const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
@@ -94,11 +84,6 @@ const StoreDetail = () => {
   const [vendorInvoiceDetails, setVendorInvoiceDetails] = useState([]);
    async function fetchVendorInvoiceDetails() {
     const vendorInvoice = await assetAPI.getVendorDeatisByAssignAssets(id);
-
-    const allactivity = await assetAPI.getVendorStoreActivity(id);
-    setActivity(JSON.stringify(allactivity));
-    console.log("Getactivity================"+JSON.stringify(allactivity));
-
     //console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIII");
     //console.log("vendorInvoiceDetails: ", vendorInvoice);
     //console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIII");
@@ -253,9 +238,6 @@ const StoreDetail = () => {
       console.log('====================================');
       fetchStoreAssets();
 
-      fetchVendorInvoiceDetails(); //ADDED FOR NOT REFRESHING DATA
-
-
       toast({
         title: "Status updated",
         description: "Asset status has been updated successfully.",
@@ -362,7 +344,6 @@ const StoreDetail = () => {
         </div>)}
       </div>
 
-     {activeTab === "store-details" ? (     
       <StoreProgressCards
         grnCompletionPercentage={
           grnCompletionPercentage.length > 0
@@ -374,54 +355,10 @@ const StoreDetail = () => {
             ? (erpCompletionPercentage.length / filteredAssets.length) * 100
             : 0
         }
-      />):(
-       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).totalAsset}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total PO</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).totalPo}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Released</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).sum_invoice}</div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Pending</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{Number(JSON.parse(activity).totalPo-JSON.parse(activity).sum_invoice).toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}</div>
-        </CardContent>
-      </Card>
-    </div>)} 
-
-
-
-
-
-
-
+      />
 
       {/* --- START OF NEW TABS IMPLEMENTATION --- */}
-      <Tabs defaultValue="store-details" className="space-y-4"  onValueChange={(value) => setActiveTab(value)}>
+      <Tabs defaultValue="store-details" className="space-y-4">
         <TabsList>
           <TabsTrigger value="store-details" >Store Details</TabsTrigger>
           <TabsTrigger value="invoice-details" >Invoice Details</TabsTrigger>
@@ -458,60 +395,33 @@ const StoreDetail = () => {
     <table className="w-full text-sm min-w-max">
       <thead className="sticky top-0 bg-white z-10">
         <tr className="border-b border-gray-200">
-          <th className="p-2 text-left font-semibold text-gray-700">PO No</th>
           <th className="p-2 text-left font-semibold text-gray-700">Supplier Name</th>
-          {/* <th className="p-2 text-left font-semibold text-gray-700">Total Amount</th> TOTAL ASSET AMOUNT */} 
+          <th className="p-2 text-left font-semibold text-gray-700">Total Amount</th>
           <th className="p-2 text-left font-semibold text-gray-700">PO Amount</th>
-          <th className="p-2 text-left font-semibold text-gray-700">Release Amount</th>
-          <th className="p-2 text-left font-semibold text-gray-700">Pending Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Invoice Amount</th>
           <th className="p-2 text-left font-semibold text-gray-700">Upload PO</th>
-          <th className="p-2 text-left font-semibold text-gray-700">Update GRN No</th>
           <th className="p-2 text-left font-semibold text-gray-700">Upload Invoice</th>
         </tr>
       </thead>
       <tbody>
         {vendorInvoiceDetails.map((invoice, index) => (
           <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-            <td className="p-2 text-gray-600">{invoice.vendorpono}</td>
             <td className="p-2 text-gray-600">{invoice.vendor_name}</td>
-            {/* <td className="p-2 text-gray-600">{invoice.actual_price}</td> */}
-            <td className="p-2 text-gray-600">{Number(invoice.total_po_amount).toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}</td>
-            <td className="p-2 text-gray-600">{Number(invoice.total_invoice_amount).toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}</td>
-            <td className="p-2 text-gray-600">{Number(invoice.total_po_amount - invoice.total_invoice_amount).toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}</td>
+            <td className="p-2 text-gray-600">{invoice.actual_price}</td>
+            <td className="p-2 text-gray-600">{invoice.total_po_amount}</td>
+            <td className="p-2 text-gray-600">{invoice.total_invoice_amount}</td>
             <td className="p-2">
               <SupplierMultipleDocumentsPopover              
                 documentList={invoice?.po_details}              
-                updatedPo={invoice?.vendorpono}    
-                updatePoDate = {invoice?.podate}          
-                updatePoAttchment = {invoice?.poattachment}          
                 documentType="po"
                 documentCount={invoice?.po_details?.length}
                 hasDocuments={invoice?.po_details?.length > 0}
                 onUpdate={(data) => {
                   console.log("workingpodata: ", data);
-                  //const isoString = data.documentDate;
-                  //const dateOnly = new Date(isoString).toISOString().split("T")[0];
-
-                  // const dateOnly = data.documentDate
-                  // ? new Date(data.documentDate).toISOString().split("T")[0]
-                  // : null;
-
-                  const dateOnly = data.documentDate
-                  ? new Date(data.documentDate.getTime() - (data.documentDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0]
-                  : null;
-
+                  const isoString = data.documentDate;
+                  const dateOnly = new Date(isoString).toISOString().split("T")[0];
                   const formData = new FormData();
-                 // formData.append("po_number", data.documentNumber);
-                  formData.append("po_number", invoice.vendorpono);
+                  formData.append("po_number", data.documentNumber);
                   formData.append("po_date", dateOnly);
                   formData.append("po_amount", data.documentAmount);
                   formData.append("attachment", data?.attachment?.file);
@@ -519,28 +429,9 @@ const StoreDetail = () => {
                 }}
               />
             </td>
-
-           <td className="p-2">
-              <SupplierMultipleDocumentsPopover                     
-               documentList={invoice?.invoice_details} 
-               updatedGrn = {invoice?.grnno}                 
-                documentType="grn"
-                documentCount={invoice?.invoice_details?.length}
-                hasDocuments={invoice?.invoice_details?.length > 0}                
-                onUpdate={(data) => {
-                  console.log("data: ", data);
-                  const isoString = data.documentDate;
-                  const dateOnly = new Date(isoString).toISOString().split("T")[0];
-                  const formData = new FormData();
-                  formData.append("grn_no", data.documentNumber);                 
-                  toggleSupplierPoInvoiceFormData(invoice.id, "grn", formData);
-                }}
-              />
-            </td>     
-
             <td className="p-2">
               <SupplierMultipleDocumentsPopover
-               updatedPo={invoice?.vendorpono}              
+               
                documentList={invoice?.invoice_details}              
                 documentType="invoice"
                 documentCount={invoice?.invoice_details?.length}

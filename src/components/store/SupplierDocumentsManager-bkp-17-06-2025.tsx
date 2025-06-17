@@ -15,7 +15,6 @@ import {
 import { storeAPI } from "@/api/storeAPI";
 import LabelMandatorySymbol from "../ui/labeMandatorySymbol";
 import { downloadFile } from "@/utility/download";
-import { stringify } from "querystring";
 
 interface Document {
   id: string;
@@ -24,14 +23,10 @@ interface Document {
   documentAmount?: string;
   attachmentUrl?: string;
   attachmentName?: string;
-  updatedGrn?:string;
 }
 
 interface SupplierDocumentsManagerProps { 
-  documentType: "po" | "invoice"| "grn";
-  updatedPo:string;
-  updatePoDate :string;
-  updatePoAttchment:string;
+  documentType: "po" | "invoice";
   existingDocuments?: Document[];
   onUpdate: (data) => void;
   documentCount: number;
@@ -45,10 +40,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
   documentCount,
   documentList,
   hasDocuments,
-  updatedPo,
-  updatePoDate,
-  updatePoAttchment,
-  updatedGrn,
+
   onUpdate,
 }) => {
   const { toast } = useToast();
@@ -67,9 +59,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
     attachment: null,
   });
 
-  
-  console.log("documentList"+JSON.stringify(documentList));
-
+ 
 
   
 
@@ -115,14 +105,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
 
   const handleAddDocument = async () => {
     //if( (documentType == "grn"?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
-    if (
-  (documentType === "invoice" &&
-    (!newDocument.documentNumber || !newDocument.attachment || !newDocument.documentDate || !newDocument.documentAmount)) ||
-  (documentType === "po" &&
-    (!newDocument.attachment || !newDocument.documentDate || !newDocument.documentAmount)) ||
-  (documentType === "grn" &&
-    !newDocument.documentNumber)
-) {
+    if ((documentType == "invoice" || documentType == "po")?(!newDocument.documentNumber ):( !newDocument.documentNumber || !newDocument.attachment)) {
       toast({
         title: "Validation Error",
         description: `Please provide document number and attachment for the ${documentType.toUpperCase()}`,
@@ -194,8 +177,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
       {/* List existing documents */}
       <div className="grid grid-cols-1 gap-3">
         {/* reger{`${documentList}`}{documentType} */}
-        
-        {documentType=="invoice" && documentList?.map((doc) => (
+        {documentList?.map((doc) => (
           <div
             key={doc.id}
             className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
@@ -204,7 +186,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
               <div className="font-medium">
                 {documentType.toUpperCase()}  : {documentType=="invoice"? doc.invoice_no:documentType=="po"?doc?.po_number:documentType=="grn"?doc?.grn_val:""}
               </div>
-              {documentType=="invoice" && doc.podate && (
+              {documentType=="invoice" && doc.invoice_date && (
                 <div className="text-sm text-muted-foreground">
                   Date: {format(new Date(doc.invoice_date), "PP")}
                 </div>
@@ -229,41 +211,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
             </div>
           </div>
         ))}
-
-        
       </div>
-
-
-      {(documentType === "po" && updatePoDate !='' && updatePoDate != undefined) && (
-        <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-          <div className="text-sm text-muted-foreground">
-            PO Date: {format(new Date(updatePoDate), "PP")}
-          </div>
-
-          <div className="flex items-center gap-2">
-        
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => downloadFile(documentType == "po" ? updatePoAttchment : "")}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-          
-
-          </div>
-        </div>
-      )}
-
-       {documentType === "grn" && (
-        <div className="flex flex-col">
-              <div className="font-medium">
-                {documentType.toUpperCase()}  : {documentType=="grn"? updatedGrn:""}
-              </div>
-              </div>
-       )}
-
-      
 
       {/* Add new document form */}
       {isAddingNew ? (
@@ -281,9 +229,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
             </Button>
           </div>
 
-        
           <div className="space-y-3">
-            {documentType === "po" ? ( 
             <div>
               <Label htmlFor={`${documentType}-number`}>
                 {documentType.toUpperCase()} Number <LabelMandatorySymbol />
@@ -291,36 +237,16 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
               <Input
                 id={`${documentType}-number`}
                 placeholder={`Enter ${documentType.toUpperCase()} number`}
-                //value={newDocument.documentNumber}
-                value={updatedPo}
+                value={newDocument.documentNumber}
                 onChange={(e) =>
                   setNewDocument({
                     ...newDocument,
                     documentNumber: e.target.value,
                   })
                 }
-                readOnly
                 className="mt-1"
               />
             </div>
-            ):(<div>
-              <Label htmlFor={`${documentType}-number`}>
-                {documentType.toUpperCase()} Number <LabelMandatorySymbol />
-              </Label>
-              <Input
-                id={`${documentType}-number`}
-                placeholder={`Enter ${documentType.toUpperCase()} number`}
-                value={newDocument.documentNumber}
-                //value={updatedPo}
-                onChange={(e) =>
-                  setNewDocument({
-                    ...newDocument,
-                    documentNumber: e.target.value,
-                  })
-                }               
-                className="mt-1"
-              />
-            </div>)}
 
               {documentType === "po" && (              
                 <>  
@@ -449,8 +375,7 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
               </>
             )}
 
-               {(documentType === "invoice" || documentType === "po")  && (
-                <>
+           
               <Label htmlFor={`${documentType}-attachment`}>
                 Attachment <LabelMandatorySymbol />
               </Label>
@@ -470,18 +395,13 @@ const SupplierDocumentsManager: React.FC<SupplierDocumentsManagerProps> = ({
                 </span>
               </div>
             )}
-              </>
-          )}
-
-
 
 
             {/* BELOW IS PREVIOUS DEVELOPEMENT */}
 
             <Button
               onClick={handleAddDocument}
-              //disabled={(!newDocument.documentNumber || !newDocument.documentDate || !newDocument.documentAmount ||  !newDocument.attachment )}
-              disabled={(documentType == "invoice" || (documentType == "po"))? ( !newDocument.documentDate || !newDocument.documentAmount ||  !newDocument.attachment ): !newDocument.documentNumber}
+              disabled={(!newDocument.documentNumber || !newDocument.documentDate || !newDocument.documentAmount ||  !newDocument.attachment )}
               className="w-full"
             >
               Add {documentType.toUpperCase()}
