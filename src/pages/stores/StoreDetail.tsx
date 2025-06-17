@@ -381,7 +381,7 @@ const StoreDetail = () => {
           <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).totalAsset}</div>
+          <div className="text-2xl font-bold">{(activity)? JSON.parse(activity).totalAsset :0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -389,7 +389,7 @@ const StoreDetail = () => {
           <CardTitle className="text-sm font-medium">Total PO</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).totalPo}</div>
+          <div className="text-2xl font-bold">{(activity)?JSON.parse(activity).totalPo:0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -397,7 +397,7 @@ const StoreDetail = () => {
           <CardTitle className="text-sm font-medium">Total Released</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{JSON.parse(activity).sum_invoice}</div>
+          <div className="text-2xl font-bold">{(activity)?JSON.parse(activity).sum_invoice:0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -405,10 +405,10 @@ const StoreDetail = () => {
           <CardTitle className="text-sm font-medium">Total Pending</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{Number(JSON.parse(activity).totalPo-JSON.parse(activity).sum_invoice).toLocaleString('en-IN', {
+          <div className="text-2xl font-bold">{(activity)?Number(JSON.parse(activity).totalPo-JSON.parse(activity).sum_invoice).toLocaleString('en-IN', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
-            })}</div>
+            }):0}</div>
         </CardContent>
       </Card>
     </div>)} 
@@ -464,6 +464,7 @@ const StoreDetail = () => {
           <th className="p-2 text-left font-semibold text-gray-700">PO Amount</th>
           <th className="p-2 text-left font-semibold text-gray-700">Release Amount</th>
           <th className="p-2 text-left font-semibold text-gray-700">Pending Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">GRN No</th>
           <th className="p-2 text-left font-semibold text-gray-700">Upload PO</th>
           <th className="p-2 text-left font-semibold text-gray-700">Update GRN No</th>
           <th className="p-2 text-left font-semibold text-gray-700">Upload Invoice</th>
@@ -487,6 +488,7 @@ const StoreDetail = () => {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}</td>
+            <td className="p-2 text-gray-600">{invoice.grnno}</td>
             <td className="p-2">
               <SupplierMultipleDocumentsPopover              
                 documentList={invoice?.po_details}              
