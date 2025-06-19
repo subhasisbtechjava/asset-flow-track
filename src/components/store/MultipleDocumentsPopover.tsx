@@ -22,7 +22,8 @@ interface MultipleDocumentsPopoverProps {
   hasDocuments: boolean;
   documentList;
   onUpdate: (data) => void;
-
+  vendorPoInvoiceDetails:string;
+  onPoDelete: () => void;
 }
 
 const MultipleDocumentsPopover: React.FC<MultipleDocumentsPopoverProps> = ({
@@ -34,6 +35,8 @@ const MultipleDocumentsPopover: React.FC<MultipleDocumentsPopoverProps> = ({
   documentCount: initialDocumentCount,
   hasDocuments: initialHasDocuments,
   onUpdate,
+  vendorPoInvoiceDetails,
+  onPoDelete
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [documentCount, setDocumentCount] = useState(initialDocumentCount);
@@ -100,6 +103,8 @@ const MultipleDocumentsPopover: React.FC<MultipleDocumentsPopoverProps> = ({
             assetId={assetId}
             documentType={documentType}
             onUpdate={handleUpdate}
+            vendorPoInvoiceDetails={vendorPoInvoiceDetails}
+            onPoDelete={onPoDelete}
           />
         </div>
       </PopoverContent>

@@ -67,6 +67,8 @@ interface AssetTableRow {
   ) => void;
   onInputChange: (value: string) => void;
   onSaveDocument: () => void;
+  vendorPoInvoiceDetails:string;
+  onPoDelete: () => void;
 }
 
 
@@ -96,6 +98,8 @@ const AssetTableRow = ({
   handleRemoveFile,
   onSaveDocument,
   fileUploads,
+  onPoDelete,
+  vendorPoInvoiceDetails
 }: AssetTableRow) => {
   const [grnValue, setGrnValue] = useState(storeAsset.grn_number);
   const [poValue, setPoValue] = useState(null);
@@ -194,6 +198,7 @@ const AssetTableRow = ({
 
       <TableCell>
         <MultipleDocumentsPopover
+          vendorPoInvoiceDetails={vendorPoInvoiceDetails}
          assetName={storeAsset?.assets_name}
           documentList={storeAsset?.po_details}
           storeId={storeId}
@@ -201,6 +206,7 @@ const AssetTableRow = ({
           documentType="po"
           documentCount={storeAsset?.po_details?.length}
           hasDocuments={storeAsset?.po_details?.length > 0}
+          onPoDelete={onPoDelete}
           onUpdate={(data) => {
             console.log("data: ", data);
 

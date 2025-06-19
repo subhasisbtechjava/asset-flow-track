@@ -54,6 +54,8 @@ interface StoreAssetsTableProps {
   ) => void;
   onInputChange: (value: string) => void;
   onSaveDocument: () => void;
+  vendorPoInvoiceDetails:string;
+  onPoDelete: () => void;
 }
 
 interface FileUpload {
@@ -72,6 +74,8 @@ export const StoreAssetsTable = ({
   onDocumentDialogOpen,
   onInputChange,
   onSaveDocument,
+  vendorPoInvoiceDetails,
+  onPoDelete,
 }: StoreAssetsTableProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -219,6 +223,8 @@ export const StoreAssetsTable = ({
                         onToggleStatusWithFormData={onToggleStatusWithFormData}
                         storeAsset={storeAsset}
                         storeId={storeId}
+                        vendorPoInvoiceDetails={vendorPoInvoiceDetails}
+                        onPoDelete={onPoDelete}
                       />
                     );
                   })

@@ -202,6 +202,7 @@ export const storeAPI = {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
         },
       });
+      console.log("Duplicate"+response.data);
       return response.data;
     } catch (error) {
       console.error(`Error fetching store ${id}:`, error);
@@ -285,6 +286,24 @@ export const storeAPI = {
       throw error;
     }
   },
+
+
+  deletePO: async (id,pono) => {
+    try {
+      const response = await axios.get(`${API_URL}/store/deletePo/${id}/${pono}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting store ${id}:`, error);
+      throw error;
+    }
+  },
+
+
+
 
 };
 

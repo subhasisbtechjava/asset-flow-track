@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, X, FileCheck, Download,Trash2 } from "lucide-react";
+import { Plus, X, FileCheck, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,18 +15,6 @@ import {
 import { storeAPI } from "@/api/storeAPI";
 import LabelMandatorySymbol from "../ui/labeMandatorySymbol";
 import { downloadFile } from "@/utility/download";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
 
 interface Document {
   id: string;
@@ -39,15 +27,13 @@ interface Document {
 
 interface DocumentsManagerProps {
   storeId: string;
-  assetId: number;
+  assetId: string;
   documentType: "po" | "invoice" | "grn";
   existingDocuments?: Document[];
   onUpdate: (data) => void;
   documentCount: number;
   hasDocuments: boolean;
   documentList;
-  vendorPoInvoiceDetails:string;
-  onPoDelete: () => void;
 }
 
 const DocumentsManager: React.FC<DocumentsManagerProps> = ({
@@ -58,9 +44,8 @@ const DocumentsManager: React.FC<DocumentsManagerProps> = ({
   documentCount,
   documentList,
   hasDocuments,
-vendorPoInvoiceDetails,
+
   onUpdate,
-  onPoDelete,
 }) => {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>(existingDocuments);
@@ -226,40 +211,11 @@ vendorPoInvoiceDetails,
     }
   };
 
-
-     const handleDeletePO = async (id: number,pono:string) => {
-    try {
-         await storeAPI.deletePO(
-        id,
-        pono,
-      );
-      toast({
-        title: "Success",
-        description: `${documentType.toUpperCase()} deleted successfully`,
-      });
-      //fetchDocuments();
-      //onUpdate(newDocument);
-      onPoDelete();
-    } catch (error) {
-      console.error(`Error deleting ${documentType}:`, error);
-      toast({
-        title: "Error",
-        description: `Failed to delete ${documentType.toUpperCase()}`,
-        variant: "destructive",
-      });
-    }
-  };
-
-
-
-
-
   return (
     <div className="space-y-4">
-     
-      {/*
+      {/* List existing documents */}
       <div className="grid grid-cols-1 gap-3">
-    
+        {/* reger{`${documentList}`}{documentType} */}
         {documentList?.map((doc) => (
           <div
             key={doc.id}
@@ -295,102 +251,6 @@ vendorPoInvoiceDetails,
           </div>
         ))}
       </div>
-        */}
-
-<div className="grid grid-cols-1 gap-3">
-  {documentList?.map((doc) => (
-    <div
-      key={doc.id}
-      className="flex items-center justify-between bg-gray-50 p-3 rounded-md"
-    >
-      <div className="flex flex-col">
-        <div className="font-medium">
-          {documentType.toUpperCase()} : {documentType === "invoice" ? doc.invoice_no : documentType === "po" ? doc?.po_number : documentType === "grn" ? doc?.grn_val : ""}
-        </div>
-        {documentType === "invoice" && doc.invoice_date && (
-          <div className="text-sm text-muted-foreground">
-            Date: {format(new Date(doc.invoice_date), "PP")}
-          </div>
-        )}
-        {doc.documentAmount && (
-          <div className="text-sm text-muted-foreground">
-            Amount: ₹{doc.documentAmount}
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-2">
-        {(documentType === "invoice" ? doc?.invoice_attachment_url : documentType === "po" ? doc?.po_attachment_url : false) && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="text-muted-foreground hover:bg-transparent"
-            onClick={() =>
-              downloadFile(
-                documentType === "invoice"
-                  ? doc.invoice_attachment_url
-                  : documentType === "po"
-                  ? doc.po_attachment_url
-                  : ""
-              )
-            }
-          >
-            <Download className="h-4 w-4" />
-          </Button>
-        )}
-
-        {/* 🗑️ Trash button */}
-        {documentType === "po" &&
-  (! vendorPoInvoiceDetails || vendorPoInvoiceDetails.trim() === "" || !vendorPoInvoiceDetails.includes(doc?.po_number) ) && (
-    // <Button
-    //   size="icon"
-    //   variant="ghost"
-    //   className="text-red-500"
-    //   onClick={() => handleDeletePO(assetId,doc?.po_number)}
-    // >
-    //   <Trash2 className="h-4 w-4" />
-    // </Button>
-
-    <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                              <Button variant="ghost" size="icon">
-                                                <Trash2 className="h-4 w-4" />
-                                                <span className="sr-only">Delete</span>
-                                              </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                              <AlertDialogHeader>
-                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                  This will delete the po no {doc?.po_number} from list.
-                                                  This action cannot be undone.
-                                                </AlertDialogDescription>
-                                              </AlertDialogHeader>
-                                              <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction
-                                                onClick={() => handleDeletePO(assetId,doc?.po_number)}
-                                                 
-                                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                >
-                                                  Delete                                                
-                                                </AlertDialogAction>
-                                              </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                          </AlertDialog>
-
-
-
-)}
-
-
-      </div>
-    </div>
-  ))}
-</div>
-
-
-
 
       {/* Add new document form */}
       {isAddingNew ? (

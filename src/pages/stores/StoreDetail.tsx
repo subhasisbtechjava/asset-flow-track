@@ -70,6 +70,8 @@ const StoreDetail = () => {
 
   const [activeTab, setActiveTab] = useState("store-details");
 
+  const [vendorPoInvoiceDetails, setVendorPoInvoiceDetails] = useState("");
+
 
   // Fetch store assets
   const storeAssets = id ? getStoreAssetsByStoreId(id) : [];
@@ -119,12 +121,20 @@ const StoreDetail = () => {
   }
   async function fetchStoreAssets() {
     const assets = await storeAPI.getStoreDetailsAssetsByStoreId(id);
-    setStoreAssetsList(assets);
+
+    //console.log(">>>>>>>>>>>>>>>>>>>>>>>>");
+    //console.log("storeAssetssssssssssss: ", assets.vendor_invoice_result);
+
+    setStoreAssetsList(assets.store_assets_data);
+    setVendorPoInvoiceDetails(assets.vendor_invoice_result);
+
     console.log("storeAssetsList: ", storeAssetsList);
     setTimeout(() => {
       setLoading(false)
     }, loadintime);  
   }
+
+  console.log("setVendorPoInvoiceDetails>>>>>>>>>>"+vendorPoInvoiceDetails);
 
   const handleDeleteStore = () => {
     setIsDeleting(true);
@@ -249,17 +259,25 @@ const StoreDetail = () => {
         body
       );
       console.log('====================================');
-      console.log('res: ', res);
+      console.log('update+++++++++res: ', res);
       console.log('====================================');
       fetchStoreAssets();
 
       fetchVendorInvoiceDetails(); //ADDED FOR NOT REFRESHING DATA
-
-
-      toast({
+      if(res.data == 'PO No already exist'){
+        toast({
+        title: "Status updated",
+        description: res.data,
+        variant: "destructive",
+      });
+      }else{
+        toast({
         title: "Status updated",
         description: "Asset status has been updated successfully.",
-      });
+        });
+      }
+
+      
     } catch (error) {
       console.error("Upload failed:", error);
     } finally {
@@ -305,7 +323,7 @@ const StoreDetail = () => {
       console.log('after form submit podata: ', res);
       console.log('====================================');
       fetchVendorInvoiceDetails();
-
+      fetchStoreAssets();
       toast({
         title: "Status updated",
         description: "Vendor PO and Invoice has been updated successfully.",
@@ -449,6 +467,8 @@ const StoreDetail = () => {
             onDocumentDialogOpen={openDocumentDialog}
             onInputChange={setInputValue}
             onSaveDocument={saveDocumentNumber}
+            vendorPoInvoiceDetails={vendorPoInvoiceDetails}
+            onPoDelete={fetchStoreAssets}
           />
         </TabsContent>
 
