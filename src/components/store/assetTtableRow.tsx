@@ -191,6 +191,9 @@ const AssetTableRow = ({
         </div>
       </TableCell>
       <TableCell>
+        {storeAsset?.vendor_name}
+      </TableCell>
+      <TableCell>
         {storeAsset.quantity} {storeAsset.asset?.unitOfMeasurement}
       </TableCell>
 

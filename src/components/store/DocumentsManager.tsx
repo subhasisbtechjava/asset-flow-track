@@ -362,8 +362,7 @@ vendorPoInvoiceDetails,
                                               <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                  This will delete the po no {doc?.po_number} from list.
-                                                  This action cannot be undone.
+                                                  This will delete the po no {doc?.po_number} from list.                                                 
                                                 </AlertDialogDescription>
                                               </AlertDialogHeader>
                                               <AlertDialogFooter>

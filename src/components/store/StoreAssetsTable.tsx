@@ -185,6 +185,7 @@ export const StoreAssetsTable = ({
               <TableHeader>
                 <TableRow>
                   <TableHead>Asset</TableHead>
+                  <TableHead className="w-[100px]">Supplier</TableHead>
                   <TableHead className="w-[100px]">Quantity</TableHead>
                   <TableHead className="w-[120px]">PO</TableHead>
                   <TableHead className="w-[120px]">Invoice</TableHead>
