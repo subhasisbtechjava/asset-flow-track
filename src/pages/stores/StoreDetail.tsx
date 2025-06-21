@@ -248,7 +248,7 @@ const StoreDetail = () => {
   const toggleStatusWithFormData = async (
     assetId: string,
     updateParam: string,
-    body: FormData
+    body: FormData,
   ) => {
     try {
       setIsLoading(true);
@@ -264,7 +264,7 @@ const StoreDetail = () => {
       fetchStoreAssets();
 
       fetchVendorInvoiceDetails(); //ADDED FOR NOT REFRESHING DATA
-      if(res.data == 'PO No already exist'){
+      if(res.data == 'PO No already exist' || res.data == 'You have already added POs for the available assets. No more POs can be uploaded.' ){
         toast({
         title: "Status updated",
         description: res.data,
@@ -468,7 +468,7 @@ const StoreDetail = () => {
             onInputChange={setInputValue}
             onSaveDocument={saveDocumentNumber}
             vendorPoInvoiceDetails={vendorPoInvoiceDetails}
-            onPoDelete={fetchStoreAssets}
+            onPoDelete={initialService}
           />
         </TabsContent>
 
