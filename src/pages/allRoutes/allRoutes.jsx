@@ -8,6 +8,8 @@ import AssetList from "../assets/AssetList";
 import AssetForm from "../assets/AssetForm";
 import StoreForm from "../stores/StoreForm";
 import Login from "../auth/Login";
+import SSOBypass from "../auth/SSOBypass";
+import SSO from "../auth/sso";
 import NotFound from "../NotFound";
 import UserList from "../users/UserList";
 import ProfileSettings from "../profile/ProfileSettings";
@@ -22,7 +24,10 @@ import VendorForm from "../../pages/manageVendors/VendorForm"
 
 const AllRoutes = () => {
   return (
-    <Routes>
+
+    <Routes> 
+      <Route path="/sso" element={<SSO/>} />   
+      <Route path="/ssologin" element={<SSOBypass />} />
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Navigate to="/stores" replace />} />

@@ -9,6 +9,8 @@ import { ThemeProvider } from "./hooks/use-theme";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Loadertime } from "./contexts/loadertimeContext";
 
+
+
 import AllRoutes  from "./pages/allRoutes/allRoutes.jsx"
 const App = () => {
   // Move QueryClient initialization inside the component
@@ -20,6 +22,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+        
           <AuthProvider>
              <Loadertime>
            <AllRoutes />

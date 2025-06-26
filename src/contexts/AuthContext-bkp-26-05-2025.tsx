@@ -65,8 +65,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   //   }
   //   setIsLoading(false);
   // }, []);
-
-  /*
   useEffect(() => {
     // Check if user is stored in localStorage on component mount
     const storedUser = localStorage.getItem("user");
@@ -75,48 +73,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     setIsLoading(false);
   }, []);
-  */
-
-  useEffect(() => {
-  // Check if user is stored in localStorage on component mount
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    try {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      
-      // If we're on the SSO or login page, redirect to stores
-      if (location.pathname === "/sso" || location.pathname === "/login" ||  location.pathname === "/ssologin") {
-        navigate("/stores");
-      }
-    } catch (e) {
-      localStorage.removeItem("user");
-    }
-  }
-  setIsLoading(false);
-}, [location.pathname, navigate]);
 
 
-  /*
   useEffect(() => {
     // Redirect to login if user is not authenticated and not already on login page
-    if (!isLoading && !user && location.pathname !== "/login" &&location.pathname !== "/sso" ) {
+    if (!isLoading && !user && location.pathname !== "/login") {
       navigate("/login");
     }
   }, [user, isLoading, location.pathname, navigate]);
-  */
-
-  useEffect(() => {
-  // Skip redirection if we're still loading or on SSO page
-  if (isLoading || location.pathname === "/sso") return;
-
-  // Redirect to login if user is not authenticated and not already on login page
-  if (!user && location.pathname !== "/login" && location.pathname !== "/ssologin") {
-    navigate("/login");
-  }
-}, [user, isLoading, location.pathname, navigate]);
-
-
   // useEffect(() => {
   //   // Redirect to login if user is not authenticated and not already on login page
   //   if (!isLoading && !user && location.pathname !== "/login") {

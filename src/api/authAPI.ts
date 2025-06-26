@@ -99,4 +99,38 @@ export const authAPI = {
       }
     },
 
+
+
+  ssologin: async (userresponse: any) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/ssologin`, {userresponse});
+      if (response.data.token) {
+        //console.log("Return token",response.data.user);
+        localStorage.setItem('token', response.data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      }      
+      return response.data.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  },
+
+  ssoBypasslogin: async (empcode: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/ssoBypasslogin`, { empcode });
+      //console.log(response.data.token);
+      // Store token in localStorage
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      }
+      return response.data.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  },
+
+
 };
