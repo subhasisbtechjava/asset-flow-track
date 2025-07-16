@@ -106,6 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user, isLoading, location.pathname, navigate]);
   */
 
+  /*
   useEffect(() => {
   // Skip redirection if we're still loading or on SSO page
   if (isLoading || location.pathname === "/sso") return;
@@ -115,6 +116,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate("/login");
   }
 }, [user, isLoading, location.pathname, navigate]);
+*/
+
+
+useEffect(() => {
+  // Skip redirection if we're still loading or on SSO page
+  if (isLoading || location.pathname === "/sso") return;
+
+  // Redirect to login if user is not authenticated and not already on login page
+  if (!user && location.pathname !== "/ssologin") {
+    //navigate("/login");
+    navigate("/ssologin");
+  }
+}, [user, isLoading, location.pathname, navigate]);
+
+
 
 
   // useEffect(() => {
@@ -187,7 +203,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    navigate("/login");
+    //navigate("/login");
+    navigate("/ssologin");
   };
   const value = {
     user,
