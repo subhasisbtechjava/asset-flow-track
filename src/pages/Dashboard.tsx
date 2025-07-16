@@ -1,6 +1,6 @@
 
 import { useState, useMemo,useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,useLocation } from "react-router-dom";
 import { Plus, MoreHorizontal } from "lucide-react";
 import { authAPI } from '../api/authAPI';  // ADDED ON 30-04-2025//////
 import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
@@ -44,6 +44,9 @@ const Dashboard = () => {
   const [brandFilter, setBrandFilter] = useState<string | null>(null);
   const [cityFilter, setCityFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>("in_progress");
+
+  const location = useLocation();
+  //alert(location.pathname);
   const randomPercentage = (min: number, max: number) => 
     Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -64,7 +67,7 @@ const Dashboard = () => {
   useEffect(() => {
   
     fetchStores();
-  }, []);
+  }, [location]);
 
 
   const brands = useMemo(() => 
