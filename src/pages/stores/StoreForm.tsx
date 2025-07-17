@@ -356,7 +356,7 @@ const inputRef3 = useRef(null);
           form.setValue("format", storeMasterValue.format); // For the brand field
 
         }}
-        value={field.value ? JSON.stringify(filteredStoreCodes.find((c) => c.outletcode === field.value)) : ""}
+        value={field.value ? JSON.stringify(filteredStoreCodes.find((c) => c.outletcode === field.value)||{}) : ""}
       >
 
 
@@ -442,7 +442,7 @@ const inputRef3 = useRef(null);
           form.setValue("format", storeMasterValue.format); // For the brand field
 
         }}
-        value={field.value ? JSON.stringify(filteredStoreName.find((s) => s.outletname === field.value)) : ""}
+        value={field.value ? JSON.stringify(filteredStoreName.find((s) => s.outletname === field.value)||{}) : ""}
       >
 
 
