@@ -482,7 +482,7 @@ const StoreDetail = () => {
           <th className="p-2 text-left font-semibold text-gray-700">Supplier Name</th>
           {/* <th className="p-2 text-left font-semibold text-gray-700">Total Amount</th> TOTAL ASSET AMOUNT */} 
           <th className="p-2 text-left font-semibold text-gray-700">PO Amount</th>
-          <th className="p-2 text-left font-semibold text-gray-700">Release Amount</th>
+          <th className="p-2 text-left font-semibold text-gray-700">Amount Booked</th>
           <th className="p-2 text-left font-semibold text-gray-700">Pending Amount</th>
           <th className="p-2 text-left font-semibold text-gray-700">GRN No</th>
           <th className="p-2 text-left font-semibold text-gray-700">Upload PO</th>
