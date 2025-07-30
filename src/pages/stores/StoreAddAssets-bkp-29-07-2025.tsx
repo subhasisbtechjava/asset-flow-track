@@ -40,43 +40,6 @@ interface AssignedAsset {
   isEditing?: boolean;
 }
 
-const VendorSearchResults = ({ searchTerm }: { searchTerm: string }) => {
-  const [vendors, setVendors] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true);
-      try {
-        const results = await vendorAPI.getAllVendorsForAssetAdd({
-          search: searchTerm,
-          page: 1,
-          limit: 50
-        });
-        setVendors(results.data);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (searchTerm.length >= 3) {
-      fetchVendors();
-    }
-  }, [searchTerm]);
-
-  return loading ? (
-    <div className="p-4 text-center">Loading...</div>
-  ) : vendors.length > 0 ? (
-    vendors.map((vendor) => (
-      <SelectItem key={vendor.id} value={JSON.stringify(vendor)}>
-        {vendor.name}
-      </SelectItem>
-    ))
-  ) : (
-    <div className="p-4 text-center">No vendors found</div>
-  );
-};
-
 const StoreAddAssets = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -90,7 +53,7 @@ const StoreAddAssets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchAvailableAsset, setAvailableAssetSearch] = useState("");
   const [searchVendor, setSearchVendor] = useState("");
-   const MIN_SEARCH_CHARS = 3;
+
 
   const [allVendorList, setVendor] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("");
@@ -153,15 +116,15 @@ const StoreAddAssets = () => {
     }
   };
 
-  // const fetchAllVendors = async () => {
-  //   try {
-  //     const allVendors = await vendorAPI.getAllVendors();
-  //     console.log(allVendors);
-  //     setVendor(allVendors);
-  //   } catch (error) {
-  //     console.error("Failed to fetch vendors", error);
-  //   }
-  // };
+  const fetchAllVendors = async () => {
+    try {
+      const allVendors = await vendorAPI.getAllVendors();
+      console.log(allVendors);
+      setVendor(allVendors);
+    } catch (error) {
+      console.error("Failed to fetch vendors", error);
+    }
+  };
 
   const inputRef = useRef(null);
   useEffect(() => {
@@ -177,30 +140,7 @@ const inputRef2 = useRef(null);
   }
 }, [searchVendor]);
 
-  const fetchAllVendors = async () => {
-    try {
-      const allVendors = await vendorAPI.getAllVendorsForAssetAdd({
-        search: "",
-        page: 1,
-        limit: 50
-      });
-      setVendor(allVendors.data);
-    } catch (error) {
-      console.error("Failed to fetch vendors", error);
-    }
-  };
 
-  useEffect(() => {
-    if (inputRef.current) {
-      setTimeout(() => inputRef.current.focus(), 0);
-    }
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (inputRef2.current) {
-      setTimeout(() => inputRef2.current.focus(), 0);
-    }
-  }, [searchVendor]);
 
   useEffect(() => {
      setLoading(true);
@@ -587,7 +527,7 @@ useEffect(()=>{
             
 
 
-             {/* <div className="md:col-span-3">
+             <div className="md:col-span-3">
               <label className="text-sm font-medium mb-1 block">
                 Select Vendor
               </label>
@@ -633,47 +573,7 @@ useEffect(()=>{
 
                 </SelectContent>
               </Select>
-            </div>      */}
-
-            <div className="md:col-span-3">
-          <label className="text-sm font-medium mb-1 block">
-            Select Vendor
-          </label>
-          <Select
-            value={selectedVendor ? JSON.stringify(selectedVendor) : ""}
-            onValueChange={(value) => {
-              const vendorValue = JSON.parse(value);   
-              setSelectedVendor(vendorValue);              
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a vendor..." />
-            </SelectTrigger>
-            <SelectContent>
-              <div className="p-2 sticky top-0 bg-white z-10">
-                <Input
-                  type="text"
-                  placeholder={`Type at least ${MIN_SEARCH_CHARS} characters...`}
-                  value={searchVendor}
-                  ref={inputRef2}
-                  onChange={(e) => setSearchVendor(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="max-h-60 overflow-y-auto">
-                {searchVendor.length >= MIN_SEARCH_CHARS ? (
-                  <VendorSearchResults searchTerm={searchVendor} />
-                ) : (
-                  <p className="p-4 text-center text-sm text-muted-foreground">
-                    {searchVendor.length > 0 
-                      ? `Keep typing... (${MIN_SEARCH_CHARS - searchVendor.length} more)`
-                      : "Start typing to search vendors"}
-                  </p>
-                )}
-              </div>
-            </SelectContent>
-          </Select>
-        </div>
+            </div>     
 
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-1 block">             

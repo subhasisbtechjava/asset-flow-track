@@ -1,7 +1,7 @@
 
 import { useState,useEffect } from "react";
 import { Link ,useNavigate} from "react-router-dom";
-import { Plus, Search, FileEdit, Trash2,Download,Upload, Package, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Plus, Search, FileEdit, Trash2,Download,Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -49,9 +49,6 @@ const AssetList = () => {
   const [uploadFinish,setUploadFinish] = useState("");
 
   const navigate = useNavigate();
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20); // You can make this configurable
 
   useEffect(() => {
       const fetchAssets = async () => {
@@ -101,35 +98,16 @@ const AssetList = () => {
       return matchesSearch;
     });
 
-
-      // Calculate pagination
-      const totalItems = searcResult.length;
-      const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-      // Get current items
-      const indexOfLastItem = currentPage * itemsPerPage;
-      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-      const currentItems = searcResult.slice(indexOfFirstItem, indexOfLastItem);
-
-      // Change page
-      const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-      const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
-      const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-      const firstPage = () => setCurrentPage(1);
-      const lastPage = () => setCurrentPage(totalPages);
-
-
-
      pagedata =(searcResult.length > 0)?  searcResult : [];
 
   // Categories for grouping
-  const categories = Array.from(new Set(currentItems.map((asset) => asset.category)));
+  const categories = Array.from(new Set(pagedata.map((asset) => asset.category)));
 
   // Group assets by category
   const assetsByCategory = categories.map((category) => {
     return {
       category,
-      assets: currentItems.filter((asset) => asset.category === category),
+      assets: pagedata.filter((asset) => asset.category === category),
     };
   });
 
@@ -337,55 +315,6 @@ const AssetList = () => {
               </p>
             </div>
           )}
-
-          { totalItems > itemsPerPage && (
-              <div className="flex items-center justify-center gap-4 px-2 mt-4">
-  <Button
-    variant="outline"
-    className="hidden h-8 w-8 p-0 lg:flex"
-    onClick={firstPage}
-    disabled={currentPage === 1}
-  >
-    <span className="sr-only">Go to first page</span>
-    <ChevronsLeft className="h-4 w-4" />
-  </Button>
-  <Button
-    variant="outline"
-    className="h-8 w-8 p-0"
-    onClick={prevPage}
-    disabled={currentPage === 1}
-  >
-    <span className="sr-only">Go to previous page</span>
-    <ChevronLeft className="h-4 w-4" />
-  </Button>
-  
-  <span className="flex items-center justify-center text-sm font-medium mx-4">
-    Page {currentPage} of {totalPages}
-  </span>
-  
-  <Button
-    variant="outline"
-    className="h-8 w-8 p-0"
-    onClick={nextPage}
-    disabled={currentPage === totalPages}
-  >
-    <span className="sr-only">Go to next page</span>
-    <ChevronRight className="h-4 w-4" />
-  </Button>
-  <Button
-    variant="outline"
-    className="hidden h-8 w-8 p-0 lg:flex"
-    onClick={lastPage}
-    disabled={currentPage === totalPages}
-  >
-    <span className="sr-only">Go to last page</span>
-    <ChevronsRight className="h-4 w-4" />
-  </Button>
-</div>
-            ) }  
-
-
-
         </CardContent>
       </Card>
     </div>

@@ -40,8 +40,6 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import AssetTableRow from "./assetTtableRow";
-import { assetAPI } from "@/api/storeAPI";
-import { copyFileSync } from "fs";
 
 interface StoreAssetsTableProps {
   storeId: string;
@@ -160,75 +158,26 @@ export const StoreAssetsTable = ({
     // In a real app, you would send this data to your backend
   };
 
-  const handleDownloadDetails = async () => {
-    console.log("Download details clicked");
-    const csvResponse = await assetAPI.downloadDetails(storeId);
-    
-    const csvString = [
-        [
-            "Zone", "City", "State", "Brand", "Store Code", 
-            "Store Name", "Format", "Description", "Category",
-            "Vendor Name", "Amount Without GST", "Amount With GST",
-            "Invoice No/Date", "Purchase No", "GRN No"
-        ],
-        ...csvResponse.map(item => [
-            item.zone,
-            item.city,
-            item.state,
-            item.brand,
-            item.storecode,
-            `"${item.name.replace(/"/g, '""')}"`,  // Wrap in quotes in case of commas
-            item.format,
-            `"${item.assets_name.replace(/"/g, '""')}"`,
-            item.assets_category,
-            `"${item.vendor_name.replace(/"/g, '""')}"`,
-            item.actual_without_gst,
-            item.actual_with_gst,
-            `"${item.invoice_dtls.replace(/"/g, '""')}"`,  // This keeps invoice data in one column
-            item.purchase_no,
-            item.grnno
-        ].map(field => typeof field === 'string' ? field : String(field))) // Ensure all fields are strings
-    ]
-    .map(row => row.join(','))
-    .join('\n');
-
-    // Create and trigger download
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = "Store_Assets_Report.csv";
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-};
-
-
   return (
     <Card>
       <CardHeader>
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <CardTitle>Store Assets</CardTitle>
-      <CardDescription>
-        Manage store assets and track purchasing progress
-      </CardDescription>
-    </div>
-
-    <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        onClick={handleDownloadDetails} // You must define this handler
-        className="flex items-center gap-2"
-      >
-        <Download className="mr-2 h-4 w-4" />
-        Download Details
-      </Button>
-    </div>
-  </div>
-</CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle>Store Assets</CardTitle>
+            <CardDescription>
+              Manage store assets and track purchasing progress
+            </CardDescription>
+          </div>
+          {/* <Button 
+            variant="outline" 
+            onClick={() => navigate(`/stores/${storeId}/add-assets`)}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            Assign Assets
+          </Button> */}
+      
+        </div>
+      </CardHeader>
       <CardContent>
         <div className="rounded-md border">
           <div className="overflow-x-auto">

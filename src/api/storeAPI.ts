@@ -465,8 +465,19 @@ export const assetAPI = {
     }
   },
 
-
-
+  downloadDetails: async (storeId: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/stores/downloadDetails/${storeId}`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching assets for store ${storeId}:`, error);
+      throw error;
+    }
+  },
 
 
 
@@ -760,6 +771,27 @@ export const vendorAPI = {
       return response.data;
     } catch (error) {
       console.error("Error fetching assets:", error);
+      throw error;
+    }
+  },
+
+  getAllVendorsForAssetAdd: async (params: { search?: string; page?: number; limit?: number }) => {
+     try {
+      console.log("params");
+console.log(params);
+      const response = await axios.get(`${API_URL}/getvendor/list`, {
+        params: { // Send as query parameters
+          search: params.search,
+          page: params.page,
+          limit: params.limit
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
       throw error;
     }
   },
