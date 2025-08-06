@@ -1,7 +1,7 @@
 
 import { useState, useMemo,useEffect } from "react";
 import { Link,useLocation } from "react-router-dom";
-import { Plus, MoreHorizontal,Download } from "lucide-react";
+import { Plus, MoreHorizontal } from "lucide-react";
 import { authAPI } from '../api/authAPI';  // ADDED ON 30-04-2025//////
 import { storeAPI } from '../api/storeAPI';  // ADDED ON 30-04-2025//////
 import { User, Store } from "@/types";
@@ -164,56 +164,6 @@ try{
 
 
   }
-
-
-
-  const handleDownloadDetails = async () => {
-      console.log("Download details clicked");
-      const csvResponse = await storeAPI.downloadAllDetails();
-      
-      const csvString = [
-          [
-              "City","Brand", "Store Code", 
-              "Store Name", "Format", "Description", "Category",
-              "Vendor Name", "Amount Without GST", "Amount With GST",
-              "Invoice No/Date", "Purchase No", "GRN No"
-          ],
-          ...csvResponse.map(item => [          
-              item.city,            
-              item.brand,
-              item.storecode,
-              `"${item.name.replace(/"/g, '""')}"`,  // Wrap in quotes in case of commas
-              item.format,
-              `"${item.assets_name.replace(/"/g, '""')}"`,
-              item.assets_category,
-              `"${item.vendor_name.replace(/"/g, '""')}"`,
-              item.actual_without_gst,
-              item.actual_with_gst,
-              `"${item.invoice_dtls.replace(/"/g, '""')}"`,  // This keeps invoice data in one column
-              item.purchase_no,
-              item.grnno
-          ].map(field => typeof field === 'string' ? field : String(field))) // Ensure all fields are strings
-      ]
-      .map(row => row.join(','))
-      .join('\n');
-  
-      // Create and trigger download
-      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = "Store_Assets_Report.csv";
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-  };
-
-
-
-
-
     // Mock API call - would be replaced with real data deletion
   return (
     // <div className="space-y-6">
@@ -252,7 +202,7 @@ try{
 
       <Card>
         <CardHeader>
-          {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Store Progress</CardTitle>
               <CardDescription>Track progress of all your QSR store setups</CardDescription>
@@ -263,33 +213,7 @@ try{
                 Add Store
               </Link>
             </Button>
-          </div> */}
-
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-  <div>
-    <CardTitle>Store Progress</CardTitle>
-    <CardDescription>Track progress of all your QSR store setups</CardDescription>
-  </div>
-  <div className="flex gap-2">
-    <Button
-      variant="outline"
-      onClick={handleDownloadDetails} // You must define this handler
-      className="flex items-center gap-2"
-    >
-      <Download className="mr-2 h-4 w-4" />
-      Download Details
-    </Button>
-    <Button asChild>
-      <Link to="/stores/new">
-        <Plus className="h-4 w-4 mr-2" />
-        Add Store
-      </Link>
-    </Button>
-  </div>
-</div>
-
-
-
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

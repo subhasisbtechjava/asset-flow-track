@@ -302,8 +302,19 @@ export const storeAPI = {
     }
   },
 
-
-
+  downloadAllDetails: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/all_stores_assets_dtls/downloadAllDetails`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching assets:`, error);
+      throw error;
+    }
+  },
 
 };
 

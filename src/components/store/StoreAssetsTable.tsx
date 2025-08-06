@@ -166,15 +166,13 @@ export const StoreAssetsTable = ({
     
     const csvString = [
         [
-            "Zone", "City", "State", "Brand", "Store Code", 
+            "City","Brand", "Store Code", 
             "Store Name", "Format", "Description", "Category",
             "Vendor Name", "Amount Without GST", "Amount With GST",
             "Invoice No/Date", "Purchase No", "GRN No"
         ],
-        ...csvResponse.map(item => [
-            item.zone,
-            item.city,
-            item.state,
+        ...csvResponse.map(item => [          
+            item.city,            
             item.brand,
             item.storecode,
             `"${item.name.replace(/"/g, '""')}"`,  // Wrap in quotes in case of commas
