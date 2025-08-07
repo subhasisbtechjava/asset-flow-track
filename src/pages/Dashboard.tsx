@@ -176,7 +176,7 @@ try{
               "City","Brand", "Store Code", 
               "Store Name", "Format", "Description", "Category",
               "Vendor Name", "Amount Without GST", "Amount With GST",
-              "Invoice No/Date", "Purchase No", "GRN No"
+              "Invoice No","Invoice Date", "Purchase No", "GRN No"
           ],
           ...csvResponse.map(item => [          
               item.city,            
@@ -189,7 +189,9 @@ try{
               `"${item.vendor_name.replace(/"/g, '""')}"`,
               item.actual_without_gst,
               item.actual_with_gst,
-              `"${item.invoice_dtls.replace(/"/g, '""')}"`,  // This keeps invoice data in one column
+             // `"${item.invoice_dtls.replace(/"/g, '""')}"`,  // This keeps invoice data in one column
+              item.invoice_no,
+              item.invoice_date,
               item.purchase_no,
               item.grnno
           ].map(field => typeof field === 'string' ? field : String(field))) // Ensure all fields are strings
