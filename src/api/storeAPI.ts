@@ -80,11 +80,12 @@ export const storeAPI = {
     vendor_name?:string,
     actual_price?:number,
     gst_rate:number,
-    total_price_with_gst:number
+    total_price_with_gst:number,
+    assignmentDescription?:string
   ) => {
     try {
       const body = {
-        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price,gst_rate,total_price_with_gst }],
+        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price,gst_rate,total_price_with_gst,assignmentDescription }],
       };
       console.log('UUUUUUUUUUUUUUUUUUU');
       console.log(body.assets);

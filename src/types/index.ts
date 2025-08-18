@@ -77,6 +77,8 @@ export interface StoreAsset {
   invoice_details?: [];
   po_details?: [];
   vendor_name:string;
+  description:string
+
 }
 
 export type WorkflowStage = 

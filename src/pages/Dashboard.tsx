@@ -176,7 +176,7 @@ try{
               "City","Brand", "Store Code", 
               "Store Name", "Format", "Description", "Category",
               "Vendor Name", "Amount Without GST", "Amount With GST",
-              "Invoice No","Invoice Date", "Purchase No", "GRN No"
+              "Invoice No","Invoice Date", "Purchase No", "GRN No","Additional Details"
           ],
           ...csvResponse.map(item => [          
               item.city,            
@@ -193,7 +193,8 @@ try{
               item.invoice_no,
               item.invoice_date,
               item.purchase_no,
-              item.grnno
+              item.grnno,
+              item.addtional_description
           ].map(field => typeof field === 'string' ? field : String(field))) // Ensure all fields are strings
       ]
       .map(row => row.join(','))

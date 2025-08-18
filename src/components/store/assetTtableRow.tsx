@@ -81,6 +81,7 @@ import {
 
 
 import HistoryLogPopUp from '../../components/historylog/HistoryLogPopUp';
+import DescriptionPopup from '../../components/description/Decription';
 
 const AssetTableRow = ({
   storeId,
@@ -193,6 +194,24 @@ const AssetTableRow = ({
       <TableCell>
         {storeAsset?.vendor_name}
       </TableCell>
+
+
+      <TableCell>
+
+        {/* <Button
+        variant="outline"
+        onClick="" // You must define this handler
+        className="flex items-center gap-2"
+      >
+        
+        View
+      </Button> */}
+
+       {(storeAsset?.addition_details) && <DescriptionPopup description={storeAsset?.addition_details} />}
+          
+      </TableCell>
+
+
       <TableCell>
         {storeAsset.quantity} {storeAsset.asset?.unitOfMeasurement}
       </TableCell>

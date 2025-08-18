@@ -77,31 +77,6 @@ const VendorSearchResults = ({ searchTerm }: { searchTerm: string }) => {
   );
 };
 
-
-const ReadMoreLess = ({ text, maxLength = 100 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (!text) return null;
-  if (text.length <= maxLength) return <span>{text}</span>;
-
-  return (
-    <span>
-      {isExpanded ? text : `${text.substring(0, maxLength)}...`}
-      {' '}
-      <a 
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setIsExpanded(!isExpanded);
-        }}
-        className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
-      >
-        {isExpanded ? 'Show less' : 'Show more'}
-      </a>
-    </span>
-  );
-};
-
 const StoreAddAssets = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -142,8 +117,6 @@ const StoreAddAssets = () => {
   const [selectedActualAssetPrice, setSelectedActualAssetPrice] = useState(0);
 
   const [selectedGstRate, setSelectedAssignGstRate] = useState(0);
-
-  const [assignmentDescription,setAssignmentDescription] = useState("");
 
   const [selectedUpdateTotPrice, setSelectedUpdateTotPrice] = useState(0);
   // -------------------------ismile--------------------
@@ -325,7 +298,6 @@ useEffect(()=>{
     setSelectedAssignAssetQuantity(1);
     setSelectedActualAssetPrice(0)
     setSelectedVendor("")
-    setAssignmentDescription("")
   };
   const handleQuickAdd = async () => {
     try {
@@ -353,8 +325,7 @@ useEffect(()=>{
         selectedVendor?.name,
         selectedActualAssetPrice,
         selectedGstRate,
-        total_price_with_gst,
-        assignmentDescription
+        total_price_with_gst
       );
 
       if (!assignAssetRes["success"]) {
@@ -540,183 +511,211 @@ useEffect(()=>{
         </Card>
       )} */}
       {/* Quick Asset Assignment */}
-        
-    <Card>
-  <CardHeader>
-    <CardTitle>Quick Asset Assignment</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="grid md:grid-cols-12 gap-4">
-      {/* Select Asset */}
-      <div className="md:col-span-3">
-        <label className="text-sm font-medium mb-1 block">
-          Select Asset
-        </label>
-        <Select
-          value={selectedAssignAsset ? JSON.stringify(selectedAssignAsset) : ""}
-          onValueChange={(value) => {
-            const assetValue = JSON.parse(value);
-            setSelectedAssignAsset(assetValue);
-            setSelectedAssignAssetPrice(+assetValue.price_per_unit);
-            setSelectedAssignGstRate(+assetValue.gst_rate);
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select an asset..." />
-          </SelectTrigger>
-          <SelectContent>
-            <div className="p-2 sticky top-0 bg-white z-10">
-              <input
-                type="text"
-                placeholder="Search asset..."
-                value={searchTerm}
-                ref={inputRef}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div className="max-h-60 overflow-y-auto">
-              {allAssets
-                .filter(
-                  (asset) =>
-                    asset.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    asset.code
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                )
-                .map((asset) => (
-                  <SelectItem key={asset.id} value={JSON.stringify(asset)}>
-                    {asset.name} ({asset.code})
-                  </SelectItem>
-                ))}
-            </div>
-          </SelectContent>
-        </Select>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Asset Assignment</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-12 gap-4">
 
-      {/* Ideal Price */}
-      <div className="md:col-span-2">
-        <label className="text-sm font-medium mb-1 block">             
-          Ideal Price (₹)
-        </label>
-        <Input
-          type="number"
-          min="0"
-          step="1"
-          value={selectedAssignAssetPrice}
-          placeholder="Default price"
-          onChange={(e) => setSelectedAssignAssetPrice(+e.target.value)}
-        />
-      </div>
+            <div className="md:col-span-3">
+              <label className="text-sm font-medium mb-1 block">
+                Select Asset
+              </label>
+              <Select
+                value={
+                  selectedAssignAsset
+                    ? JSON.stringify(selectedAssignAsset)
+                    : ""
+                }
+                onValueChange={(value) => {
+                  console.log("value: ", value);
+                  const assetValue = JSON.parse(value) ;
+                  setSelectedAssignAsset(assetValue);
+                  setSelectedAssignAssetPrice(+assetValue.price_per_unit);
+                  setSelectedAssignGstRate(+assetValue.gst_rate);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an asset..." />
+                </SelectTrigger>
+                <SelectContent>
+  <div className="p-2 sticky top-0 bg-white z-10">
+    <input
+      type="text"
+      placeholder="Search asset..."
+      value={searchTerm}
+      ref={inputRef}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="w-full p-2 border rounded"
+    />
+  </div>
 
-      {/* Select Vendor */}
-      <div className="md:col-span-3">
-        <label className="text-sm font-medium mb-1 block">
-          Select Vendor
-        </label>
-        <Select
-          value={selectedVendor ? JSON.stringify(selectedVendor) : ""}
-          onValueChange={(value) => {
-            const vendorValue = JSON.parse(value);
-            setSelectedVendor(vendorValue);
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a vendor..." />
-          </SelectTrigger>
-          <SelectContent>
-            <div className="p-2 sticky top-0 bg-white z-10">
+  <div className="max-h-60 overflow-y-auto">
+    {allAssets
+      .filter((asset) =>
+        asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        asset.code.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .map((asset) => (
+        <SelectItem key={asset.id} value={JSON.stringify(asset)}>
+          {asset.name} ({asset.code})
+        </SelectItem>
+      ))}
+  </div> 
+</SelectContent>
+              </Select>
+            </div>
+
+           
+
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">             
+                Ideal Price (₹)
+              </label>
               <Input
-                type="text"
-                placeholder={`Type at least ${MIN_SEARCH_CHARS} characters...`}
-                value={searchVendor}
-                ref={inputRef2}
-                onChange={(e) => setSearchVendor(e.target.value)}
-                className="w-full"
+                type="number"
+                min="0"
+                step="1"
+                value={selectedAssignAssetPrice}
+                placeholder="Default price"
+                onChange={(e) => setSelectedAssignAssetPrice(+e.target.value)}
               />
             </div>
-            <div className="max-h-60 overflow-y-auto">
-              {searchVendor.length >= MIN_SEARCH_CHARS ? (
-                <VendorSearchResults searchTerm={searchVendor} />
-              ) : (
-                <p className="p-4 text-center text-sm text-muted-foreground">
-                  {searchVendor.length > 0
-                    ? `Keep typing... (${
-                        MIN_SEARCH_CHARS - searchVendor.length
-                      } more)`
-                    : "Start typing to search vendors"}
-                </p>
-              )}
-            </div>
-          </SelectContent>
-        </Select>
-      </div>
 
-      {/* Actual Price */}
-      <div className="md:col-span-2">
-        <label className="text-sm font-medium mb-1 block">             
-          Actual Price (₹)
-        </label>
-        <Input
-          type="number"
-          value={selectedActualAssetPrice}
-          placeholder="Actual price"
-          onChange={(e) => setSelectedActualAssetPrice(+e.target.value)}
-        />
-      </div>
 
-      {/* Quantity */}
-      <div className="md:col-span-2">
-        <label className="text-sm font-medium mb-1 block">Quantity</label>
-        <Input
-          type="number"
-          min="1"
-          value={selectedAssignAssetQuantity}
-          onChange={(e) => {
-            setSelectedAssignAssetQuantity(+e.target.value);
-          }}
-        />
-      </div>
+            
 
-      {/* Description + Add button in the same row */}
-      <div className="md:col-span-12 grid grid-cols-12 gap-4">
-        {/* Description */}
-        <div className="col-span-11">
+
+             {/* <div className="md:col-span-3">
+              <label className="text-sm font-medium mb-1 block">
+                Select Vendor
+              </label>
+              <Select
+                value={
+                  selectedVendor
+                    ? JSON.stringify(selectedVendor)
+                    : ""
+                }
+                onValueChange={(value) => {
+                  console.log("value: ", value);
+                  const vendorValue = JSON.parse(value) ;   
+                  setSelectedVendor(vendorValue);              
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an vendor..." />
+                </SelectTrigger>
+                <SelectContent>
+                
+                <div className="p-2 sticky top-0 bg-white z-10">
+                  <input
+                  type="text"
+                  placeholder="Search vendor..."
+                  value={searchVendor}
+                  ref={inputRef2}
+                  onChange={(e) => setSearchVendor(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  />
+                  </div>
+
+                  <div className="max-h-60 overflow-y-auto">
+                  {allVendorList
+                    .filter((vendor_val) =>
+                    vendor_val.name.toLowerCase().includes(searchVendor.toLowerCase()) )
+                    .map((vendor_val) => (
+                    <SelectItem key={vendor_val.id} value={JSON.stringify(vendor_val)}>
+                    {vendor_val.name}
+                    </SelectItem>
+                    ))
+                  }
+                  </div>
+
+                </SelectContent>
+              </Select>
+            </div>      */}
+
+            <div className="md:col-span-3">
           <label className="text-sm font-medium mb-1 block">
-            Description (Optional)
+            Select Vendor
           </label>
-          <textarea
-            className="w-full p-2 border rounded-md min-h-[80px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter additional details about this asset..."
-            value={assignmentDescription}
-            onChange={(e) => setAssignmentDescription(e.target.value)}
-          />
-        </div>
-
-        {/* Add button aligned with textarea */}
-        <div className="col-span-1 flex items-end" style={{ marginBottom: "7px" }}>
-          <Button
-            onClick={handleQuickAdd}
-            className="w-full"
-            disabled={
-              isAssignAssetLoading ||
-              !selectedAssignAsset?.id ||
-              !selectedVendor?.id ||
-              !selectedActualAssetPrice
-            }
+          <Select
+            value={selectedVendor ? JSON.stringify(selectedVendor) : ""}
+            onValueChange={(value) => {
+              const vendorValue = JSON.parse(value);   
+              setSelectedVendor(vendorValue);              
+            }}
           >
-            {!isAssignAssetLoading && <Plus className="h-4 w-4 mr-1" />}
-            {isAssignAssetLoading ? "Assigning..." : "Add"}
-          </Button>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a vendor..." />
+            </SelectTrigger>
+            <SelectContent>
+              <div className="p-2 sticky top-0 bg-white z-10">
+                <Input
+                  type="text"
+                  placeholder={`Type at least ${MIN_SEARCH_CHARS} characters...`}
+                  value={searchVendor}
+                  ref={inputRef2}
+                  onChange={(e) => setSearchVendor(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="max-h-60 overflow-y-auto">
+                {searchVendor.length >= MIN_SEARCH_CHARS ? (
+                  <VendorSearchResults searchTerm={searchVendor} />
+                ) : (
+                  <p className="p-4 text-center text-sm text-muted-foreground">
+                    {searchVendor.length > 0 
+                      ? `Keep typing... (${MIN_SEARCH_CHARS - searchVendor.length} more)`
+                      : "Start typing to search vendors"}
+                  </p>
+                )}
+              </div>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
-    </div>
-  </CardContent>
-</Card>
-   
 
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium mb-1 block">             
+                Actual Price (₹)
+              </label>
+              <Input
+                type="number"                   
+                value={selectedActualAssetPrice}           
+                placeholder="Actual price"
+                onChange={(e) => setSelectedActualAssetPrice(+e.target.value)}
+              />
+            </div>
+
+
+            <div className="md:col-span-1">
+              <label className="text-sm font-medium mb-1 block">Quantity</label>
+              <Input
+                type="number"
+                min="1"
+                value={selectedAssignAssetQuantity}
+                onChange={(e) => {
+                  setSelectedAssignAssetQuantity(+e.target.value);
+                  // setSelectedAssignAssetPrice(
+                  //   +e.target.value * selectedAssignAsset?.price_per_unit 
+                  // );
+                }}
+              />
+            </div>
+
+            <div className="md:col-span-1 flex items-end">
+              <Button
+                onClick={handleQuickAdd}
+                className="w-full"
+                disabled={isAssignAssetLoading ||!selectedAssignAsset?.id || !selectedVendor?.id || !selectedActualAssetPrice}
+              >
+              {!isAssignAssetLoading&&  <Plus className="h-4 w-4 mr-1" />}
+                {isAssignAssetLoading ? "Assigning..." : "Add"}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Available Assets</CardTitle>
@@ -743,11 +742,6 @@ useEffect(()=>{
                     <th className="py-3 px-4 text-left text-sm font-medium">
                       Asset Name
                     </th>
-
-                    <th className="py-3 px-4 text-left text-sm font-medium">
-                      Description
-                    </th>
-
                     <th className="py-3 px-4 text-left text-sm font-medium">
                       Category
                     </th>
@@ -789,11 +783,6 @@ useEffect(()=>{
                         <td className="py-3 px-4 text-sm font-medium">
                           {asset.asset_name}
                         </td>
-
-                        <td className="py-3 px-4 text-sm">
-                        <ReadMoreLess text={asset.description} />
-                        </td>
-
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
 
                         <td className="py-3 px-4 text-sm">
