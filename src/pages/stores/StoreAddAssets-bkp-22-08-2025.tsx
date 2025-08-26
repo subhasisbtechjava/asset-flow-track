@@ -147,8 +147,6 @@ const StoreAddAssets = () => {
 
   const [assignmentDescription,setAssignmentDescription] = useState("");
 
-  const [assignDisplayName,setAssignDisplayName] = useState("");
-
   const [selectedUpdateTotPrice, setSelectedUpdateTotPrice] = useState(0);
   // -------------------------ismile--------------------
   // Prepare assets list
@@ -323,14 +321,6 @@ useEffect(()=>{
     );
   };
 
-  const handleDisplayNameChange=(assetId: string, descriptionVal: string)=>{
-    setAssetsToAdd((prev) =>
-    prev.map((asset) =>
-    asset.id === assetId ? { ...asset, display_name: descriptionVal } : asset
-    )
-    );
-  }
-
   const resetQuickAddForm = () => {
     setSelectedAssignAsset("");
     setSelectedAssignAssetPrice(0);
@@ -338,13 +328,7 @@ useEffect(()=>{
     setSelectedActualAssetPrice(0)
     setSelectedVendor("")
     setAssignmentDescription("")
-    setAssignDisplayName("")
   };
-
-
-  console.log("JJJJJJJJJJJJJJJJJJj",assignDisplayName);
-
-
   const handleQuickAdd = async () => {
     try {
       setIsAssignAssetLoading(true);
@@ -372,8 +356,7 @@ useEffect(()=>{
         selectedActualAssetPrice,
         selectedGstRate,
         total_price_with_gst,
-        assignmentDescription,
-        assignDisplayName
+        assignmentDescription
       );
 
       if (!assignAssetRes["success"]) {
@@ -406,7 +389,6 @@ useEffect(()=>{
  
 
 
-
   const handleUpdateAssignedAsset = async (asset,tprice_with_gst) => {
     try {
       setIsEditingLoading(true);
@@ -422,7 +404,7 @@ useEffect(()=>{
 
       console.log("asset+++: ", asset);
       //const { id, quantity, customPrice, price_per_unit } = asset;
-      const { id, quantity, customPrice, actual_price,display_name} = asset;
+      const { id, quantity, customPrice, actual_price} = asset;
       //const update_tot_price = selectedUpdateTotPrice;
 
       //console.log("totprice===+++: ", tprice_with_gst);
@@ -431,8 +413,7 @@ useEffect(()=>{
         id,
         quantity,
         customPrice ?? actual_price,
-        tprice_with_gst,
-        display_name
+        tprice_with_gst
       );
       console.log("res: ", res);
       setIsEditing(!isEditing);
@@ -580,7 +561,6 @@ useEffect(()=>{
             setSelectedAssignAsset(assetValue);
             setSelectedAssignAssetPrice(+assetValue.price_per_unit);
             setSelectedAssignGstRate(+assetValue.gst_rate);
-            setAssignDisplayName(assetValue.name);
           }}
         >
           <SelectTrigger>
@@ -705,7 +685,7 @@ useEffect(()=>{
       {/* Description + Add button in the same row */}
       <div className="md:col-span-12 grid grid-cols-12 gap-4">
         {/* Description */}
-        <div className="col-span-7">
+        <div className="col-span-11">
           <label className="text-sm font-medium mb-1 block">
             Description (Optional)
           </label>
@@ -717,22 +697,8 @@ useEffect(()=>{
           />
         </div>
 
-          <div className="col-span-4">
-          <label className="text-sm font-medium mb-1 block">
-           Display Name
-          </label>
-          <Input 
-          id="meta-title" 
-          placeholder="Display Name" 
-          onChange={(e) => setAssignDisplayName(e.target.value)}
-          value={assignDisplayName}          
-          />
-          </div>
-
-
-
         {/* Add button aligned with textarea */}
-        <div className="col-span-1 flex items-end" style={{ marginBottom: "46px" }}>
+        <div className="col-span-1 flex items-end" style={{ marginBottom: "7px" }}>
           <Button
             onClick={handleQuickAdd}
             className="w-full"
@@ -785,11 +751,6 @@ useEffect(()=>{
                     </th>
 
                     <th className="py-3 px-4 text-left text-sm font-medium">
-                      Display Name
-                    </th>
-
-
-                    <th className="py-3 px-4 text-left text-sm font-medium">
                       Category
                     </th>
                     <th className="py-3 px-4 text-left text-sm font-medium">
@@ -835,34 +796,9 @@ useEffect(()=>{
                         <ReadMoreLess text={asset.description} />
                         </td> */}
 
-                        {/* <td>
+                        <td>
                           {asset?.description &&  <DescriptionPopup description={asset?.description} descripUpdateId = {asset?.id} />}
-                        </td> */}
-
-                          <td>
-                          <DescriptionPopup description={asset?.description} descripUpdateId = {asset?.id} />
                         </td>
-
-
-                       {isEditing && asset.id == editingItemId ? (
-                          <td className="py-3 px-4">
-                            <Input                              
-                              className="w-20"
-                              value={asset.display_name}
-                              onChange={(e) =>
-                                handleDisplayNameChange(asset.id,e.target.value)
-                              }
-                            />
-                          </td>
-                        ) : (
-                          <td className="py-3 px-4 text-sm">
-                            {asset.display_name}
-                          </td>
-                        )}   
-
-
-
-
 
                         <td className="py-3 px-4 text-sm">{asset.category}</td>
 

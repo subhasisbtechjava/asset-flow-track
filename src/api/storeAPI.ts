@@ -81,11 +81,12 @@ export const storeAPI = {
     actual_price?:number,
     gst_rate:number,
     total_price_with_gst:number,
-    assignmentDescription?:string
+    assignmentDescription?:string,
+    assignDisplayName?:string
   ) => {
     try {
       const body = {
-        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price,gst_rate,total_price_with_gst,assignmentDescription }],
+        assets: [{ assetId, quantity, price,vendor_id,vendor_name,actual_price,gst_rate,total_price_with_gst,assignmentDescription,assignDisplayName }],
       };
       console.log('UUUUUUUUUUUUUUUUUUU');
       console.log(body.assets);
@@ -117,12 +118,13 @@ export const storeAPI = {
       throw error;
     }
   },
-  updateAssignedAssets: async (id:string, quantity:number,price:number,tprice_with_gst:number ) => {
+  updateAssignedAssets: async (id:string, quantity:number,price:number,tprice_with_gst:number,display_name:string ) => {
     try {
     const body=   {
       "quantity":quantity,
       "price":price,
-      "tprice":tprice_with_gst
+      "tprice":tprice_with_gst,
+      "updated_display_name":display_name
     };
       const response = await axios.post(`${API_URL}/assets/update_qty_price/${id}`,  body,{
         headers: {
@@ -646,6 +648,26 @@ export const storeAssetAPI = {
       throw error;
     }
   },
+
+   updateDescriptionDetails: async (descriptionData) => {
+    try {
+      console.log('+++++++++++++++++++++++');
+      console.log(descriptionData);
+      const response = await axios.post(`${API_URL}/storeassets/description/update`, descriptionData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add auth token
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating description:", error);
+      throw error;
+    }
+  },
+
+
+
+
 };
 
 export const brandAPI = {

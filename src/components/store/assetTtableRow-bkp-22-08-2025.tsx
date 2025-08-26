@@ -207,15 +207,8 @@ const AssetTableRow = ({
         View
       </Button> */}
 
-       {/* {(storeAsset?.addition_details) && <DescriptionPopup description={storeAsset?.addition_details} descripUpdateId = {storeAsset?.id} />} */}
-
-
-      <DescriptionPopup description={storeAsset?.addition_details} descripUpdateId = {storeAsset?.id} />
+       {(storeAsset?.addition_details) && <DescriptionPopup description={storeAsset?.addition_details} descripUpdateId = {storeAsset?.id} />}
           
-      </TableCell>
-
-      <TableCell>
-        {storeAsset?.displayName}
       </TableCell>
 
 

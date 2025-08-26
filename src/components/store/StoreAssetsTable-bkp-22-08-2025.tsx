@@ -169,7 +169,7 @@ export const StoreAssetsTable = ({
             "City","Brand", "Store Code", 
             "Store Name", "Format", "Description", "Category",
             "Vendor Name", "Amount Without GST", "Amount With GST",
-            "Invoice No","Invoice Date","Purchase No", "GRN No","Additional Details","Display Name"
+            "Invoice No","Invoice Date","Purchase No", "GRN No","Additional Details"
         ],
         ...csvResponse.map(item => [          
             item.city,            
@@ -187,8 +187,7 @@ export const StoreAssetsTable = ({
             item.invoice_date,
             item.purchase_no,
             item.grnno,
-             `"${item.addtional_description.replace(/[\r\n,]/g, "")}"`,
-            item.display_name
+            item.addtional_description
         ].map(field => typeof field === 'string' ? field : String(field))) // Ensure all fields are strings
     ]
     .map(row => row.join(','))
@@ -240,7 +239,6 @@ export const StoreAssetsTable = ({
                   <TableHead>Asset</TableHead>
                   <TableHead className="w-[100px]">Supplier</TableHead>
                   <TableHead className="w-[100px]">Description</TableHead>
-                  <TableHead className="w-[100px]">Display Name</TableHead>
                   <TableHead className="w-[100px]">Quantity</TableHead>
                   <TableHead className="w-[120px]">PO</TableHead>
                   <TableHead className="w-[120px]">Invoice</TableHead>

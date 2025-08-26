@@ -1,14 +1,64 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Loader from '../../components/loader/Loader';
 import { useLoadertime } from "../../contexts/loadertimeContext";
+import { storeAssetAPI } from "@/api/storeAPI";
+import { useToast } from '@/hooks/use-toast';
 
-export default function DescriptionPopup({ description }) {
+
+export default function DescriptionPopup({ description,descripUpdateId }) {
+  
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
    const [isPopupOpen, setIsPopupOpen] = useState(false);
      const [loading, setLoading] = useState(false);
+     const [updateDescription,setUpdateDescription] = useState("");
      const loadintime = useLoadertime();
+
+     const [formData, setFormData] = useState({   
+    description: description || '',    
+  });
+
+
+    useEffect(() => {
+    setFormData({ description: description || '' });
+  }, [description, descripUpdateId]);
+
+
+  const handleUpdateDescription = async () => {
+   
+    setLoading(true);
+    try {
+      const formDataToSubmit = new FormData();      
+      formDataToSubmit.append('updateDescription', formData.description);
+      formDataToSubmit.append('description_id', descripUpdateId);
+      const payload:any = {
+        updateDescription: formData.description,
+        description_id: descripUpdateId
+      }
+      await storeAssetAPI.updateDescriptionDetails(payload);
+      toast({
+        title: "Description Update!",
+        description: `Description has been updated successfully.`,
+      });
+
+      setIsPopupOpen(false);
+    }catch (error) {
+      console.error('Error updating description:', error);
+      toast({
+        title: "Error",
+        //description: error instanceof Error ? error.message : "Something went wrong",
+        description:  error.response.data.error ? error.response.data.error : "Something went wrong",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
 
   return (
     <div>
@@ -61,20 +111,26 @@ export default function DescriptionPopup({ description }) {
                 
 
                 { description !== "" && (<Loader loading={loading} />)}
-                <p className="text-gray-700">{description}</p>
+                {/* <p className="text-gray-700">{description}</p> */}
+            <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full h-40 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-700"
+            placeholder="Enter description here..."
+            />
              
             </div>
 
             {/* Footer */}
-            {/* <div className="border-t p-4 flex justify-end bg-gray-50 rounded-b-lg">
+            <div className="border-t p-4 flex justify-end bg-gray-50 rounded-b-lg">
               <Button 
-                onClick={() => setIsPopupOpen(false)}
+                onClick={() => handleUpdateDescription()}
                 variant="outline"
-                className="hover:bg-gray-100 transition-colors"
+                 className="flex items-center gap-2"
               >
-                Close
+                Update
               </Button>
-            </div> */}
+            </div>
           </div>
         </div>
         </>
