@@ -8,6 +8,10 @@ import {
   Plus,
   Upload,
   X,
+  ChevronLeft, 
+  ChevronRight, 
+  ChevronsLeft, 
+  ChevronsRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -90,6 +94,9 @@ export const StoreAssetsTable = ({
   const [invoiceAmounts, setInvoiceAmounts] = useState<Record<string, number>>(
     {}
   );
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // You can make this configurable
 
   const handleFileUpload = (
     assetId: string,
@@ -208,6 +215,23 @@ export const StoreAssetsTable = ({
 };
 
 
+
+   // Calculate pagination
+      const totalItems = storeAssets.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+      // Get current items
+      const indexOfLastItem = currentPage * itemsPerPage;
+      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+      const currentItems = storeAssets.slice(indexOfFirstItem, indexOfLastItem);
+
+      // Change page
+      const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+      const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+      const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+      const firstPage = () => setCurrentPage(1);
+      const lastPage = () => setCurrentPage(totalPages);
+
   return (
     <Card>
       <CardHeader>
@@ -253,8 +277,8 @@ export const StoreAssetsTable = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {storeAssets.length > 0 ? (
-                  storeAssets.map((storeAsset) => {
+                {currentItems.length > 0 ? (
+                  currentItems.map((storeAsset) => {
                     const existingBody = {
                       // approve_val: storeAsset.is_project_head_approved?true:false,
                       // audit_val: storeAsset.is_audit_done?true:false,
@@ -313,6 +337,52 @@ export const StoreAssetsTable = ({
             </Table>
           </div>
         </div>
+
+        { totalItems > itemsPerPage && (
+                      <div className="flex items-center justify-center gap-4 px-2 mt-4">
+          <Button
+            variant="outline"
+            className="hidden h-8 w-8 p-0 lg:flex"
+            onClick={firstPage}
+            disabled={currentPage === 1}
+          >
+            <span className="sr-only">Go to first page</span>
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={prevPage}
+            disabled={currentPage === 1}
+          >
+            <span className="sr-only">Go to previous page</span>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <span className="flex items-center justify-center text-sm font-medium mx-4">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+          >
+            <span className="sr-only">Go to next page</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="hidden h-8 w-8 p-0 lg:flex"
+            onClick={lastPage}
+            disabled={currentPage === totalPages}
+          >
+            <span className="sr-only">Go to last page</span>
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
+                    ) }
       </CardContent>
     </Card>
   );
